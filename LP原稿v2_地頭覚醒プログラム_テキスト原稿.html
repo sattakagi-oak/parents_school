@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>LP原稿v2｜地頭覚醒プログラム テキスト原稿（コーディング用）</title>
+  <!--
+  ========================================================
+  LP テキスト原稿 v2（コーディング用・デザイナー渡し版）
+  --------------------------------------------------------
+  更新方針
+  1. 「我が子3人全員・東大現役合格」を全セクションの背骨として強調
+  2. CTA をすべて「公式LINE登録ボタン」へ変更
+  3. テキストとセクション構造の詳細を記述し、コーディングしやすい形式で出力
+
+  カラー設計（コーダー向けメモ）
+  ─ Primary   : #1A3F6F（ネイビー）
+  ─ Accent    : #3B82C4（インテリジェンスブルー）
+  ─ BG Light  : #EFF5FB（淡いブルー背景）
+  ─ Gold      : #B8922A（権威・実績アクセント）
+  ─ LINE CTA  : #06C755（LINE公式グリーン）
+  ─ Text      : #1C1C1C
+  ========================================================
+  -->
+  <style>
+    body { font-family: "Hiragino Mincho ProN","Yu Mincho",serif; line-height:2; color:#1C1C1C; max-width:860px; margin:0 auto; padding:24px; }
+    /* ── セクション区切りの視認性（原稿閲覧用） ── */
+    .sec { border:2px solid #3B82C4; border-radius:8px; padding:28px 32px; margin-bottom:48px; }
+    .sec-label { display:inline-block; background:#1A3F6F; color:#fff; font-size:11px; letter-spacing:.18em; padding:4px 14px; border-radius:2px; margin-bottom:16px; font-family:"Hiragino Kaku Gothic ProN",sans-serif; }
+    .img-box { border:2px dashed #3B82C4; background:#EFF5FB; border-radius:8px; padding:24px; margin:24px 0; color:#3B82C4; font-family:"Hiragino Kaku Gothic ProN",sans-serif; font-size:13px; line-height:1.7; }
+    .img-box b { display:block; font-size:11px; letter-spacing:.1em; color:#8FBCD4; margin-bottom:6px; }
+    .btn-box { border:3px solid #06C755; background:#f0fff4; border-radius:8px; padding:24px 28px; margin:28px 0; font-family:"Hiragino Kaku Gothic ProN",sans-serif; }
+    .btn-box b { display:block; color:#06C755; font-size:12px; letter-spacing:.12em; margin-bottom:8px; }
+    .btn-text { font-size:17px; font-weight:bold; color:#06C755; line-height:1.55; }
+    .btn-sub { font-size:12px; color:#555; margin-top:6px; }
+    .btn-spec { font-size:11px; color:#888; margin-top:8px; font-style:italic; }
+    h1 { font-size:28px; line-height:1.45; color:#1A3F6F; }
+    h2 { font-size:22px; line-height:1.5; color:#1A3F6F; border-bottom:2px solid #D0E4F5; padding-bottom:8px; margin-top:0; }
+    h3 { font-size:17px; color:#1A3F6F; margin:28px 0 10px; }
+    .gold { color:#B8922A; font-weight:bold; }
+    .em { background:linear-gradient(transparent 60%,rgba(59,130,196,.18) 60%); }
+    hr { border:none; border-top:1px solid #D0E4F5; margin:20px 0; }
+    p { margin:0 0 18px; font-size:15.5px; }
+    ul { padding-left:0; list-style:none; }
+    ul li { padding:14px 16px 14px 44px; position:relative; border-bottom:1px solid #D0E4F5; font-size:15px; line-height:1.8; }
+    ul li:before { content:"▶"; position:absolute; left:14px; color:#3B82C4; font-size:13px; top:16px; }
+    .month-header { background:#1A3F6F; color:#fff; padding:14px 20px; border-radius:6px 6px 0 0; }
+    .month-header .kana { font-size:11px; color:#9EC9EF; letter-spacing:.18em; font-family:"Hiragino Kaku Gothic ProN",sans-serif; }
+    .month-header h3 { color:#fff; margin:4px 0 0; font-size:17px; }
+    .session { border:1px solid #D0E4F5; border-top:none; padding:18px 20px; }
+    .session:last-child { border-radius:0 0 6px 6px; }
+    .session h4 { color:#1A3F6F; font-size:15px; margin:0 0 12px; }
+    .session h4 span { background:#3B82C4; color:#fff; font-size:10px; padding:2px 9px; border-radius:2px; margin-right:8px; font-family:"Hiragino Kaku Gothic ProN",sans-serif; vertical-align:middle; }
+    .meta { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+    .meta-item { background:#EFF5FB; border-radius:6px; padding:10px 12px; }
+    .meta-item .ml { font-size:10px; color:#3B82C4; letter-spacing:.1em; margin-bottom:4px; font-family:"Hiragino Kaku Gothic ProN",sans-serif; }
+    .meta-item p { font-size:12.5px; margin:0; color:#333; line-height:1.65; }
+    .asset { border:1px solid #C0DAF0; border-radius:8px; padding:22px 24px; margin-bottom:18px; }
+    .asset .num { display:inline-block; background:#B8922A; color:#fff; font-size:11px; padding:3px 12px; border-radius:2px; margin-bottom:10px; font-family:"Hiragino Kaku Gothic ProN",sans-serif; letter-spacing:.08em; }
+    .asset h3 { margin:0 0 10px; font-size:16px; }
+    .asset p { font-size:14px; margin:0; color:#333; }
+    .fact-box { background:#0D2A50; border-radius:8px; padding:28px 30px; margin:24px 0; }
+    .fact-box p { color:#BDD5EC; margin:0 0 10px; }
+    .fact-box p:last-child { margin:0; }
+    .fact-box strong { color:#fff; }
+    .fact-num { font-size:48px; font-weight:900; color:#7EC8F0; line-height:1; }
+    .pull { border-left:4px solid #3B82C4; background:#F0F7FF; padding:16px 20px; border-radius:0 8px 8px 0; font-style:italic; color:#1A3F6F; margin:20px 0; font-size:15.5px; }
+    .conclusion { border:1px solid #B8922A; background:rgba(184,146,42,.06); border-radius:8px; padding:24px 26px; margin-top:28px; }
+    .conclusion p { color:#7A5A00; margin:0; font-size:15px; }
+    .benefit-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
+    .b-card { border:1px solid #B8D5EE; border-radius:8px; padding:20px 16px; background:#F8FBFF; text-align:center; }
+    .b-card .ico { font-size:28px; margin-bottom:8px; }
+    .b-card h4 { color:#1A3F6F; font-size:14px; margin:0 0 8px; }
+    .b-card p { font-size:13px; margin:0; color:#444; line-height:1.7; }
+    .urgency-box { background:#1C1C1C; border-radius:8px; padding:26px 28px; margin:20px 0; }
+    .urgency-box p { color:#C0C0C0; margin:0 0 12px; font-size:15px; }
+    .urgency-box p:last-child { margin:0; }
+    .urgency-box strong { color:#fff; }
+    .urgency-box em { color:#E8D9A0; font-style:normal; }
+    .limit { display:inline-block; border:2px solid #B8922A; color:#B8922A; font-size:14px; font-weight:bold; padding:8px 22px; border-radius:4px; font-family:"Hiragino Kaku Gothic ProN",sans-serif; letter-spacing:.1em; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<!--
+===================================================================
+  SECTION INDEX（コーダー確認用）
+  S01 ファーストビュー（FV）
+  S02 ターゲットへの呼びかけ（該当性認知）
+  S03 共感・痛みの言語化（問題の顕在化）
+  S04 不都合な真実（常識の破壊・絶望）
+  S05 新事実の提示（光・希望 × 3人東大のロジック）
+  S06 圧倒的な実績（ファクトの暴力）
+  S07 3ヶ月カリキュラム（全12回詳細）
+  S08 独自サービス・投資価値の担保（3つの個別アセット）
+  S09 ベネフィットの確約（得られる未来）
+  S10 希少性と緊急性（今動くべき理由）
+  S11 行動喚起（CTA × 公式LINE登録）
+===================================================================
+-->
+
+
+<!-- ===================================================================
+     S01｜ファーストビュー（FV）
+     背景：ネイビーグラデーション（#0D2A50 → #1A3F6F → #2462A0）
+     テキスト色：白・淡いブルー系
+     目的：1秒でスクロールを止め、「これは私の話だ」と直感させる
+=================================================================== -->
+<div class="sec" id="s01">
+  <span class="sec-label">S01｜FIRST VIEW（ファーストビュー）</span>
+
+  <!-- ── プレヘッドライン ── -->
+  <p style="font-size:12px; letter-spacing:.2em; color:#3B82C4; font-family:'Hiragino Kaku Gothic ProN',sans-serif; margin-bottom:10px;">
+    ［コーダーへ：全画面ネイビーグラデ背景。以下のテキストはすべて白・淡ブルー系で表示。中央寄せ。］
+  </p>
+
+  <p style="font-size:13px; letter-spacing:.16em; color:#9EC9EF; font-family:'Hiragino Kaku Gothic ProN',sans-serif; margin-bottom:16px;">
+    【プレヘッドライン】<br>
+    我が子3人全員・東大現役合格。30年間で9割が第一志望へ合格した、唯一の現場カルテ。
+  </p>
+
+  <!-- ── メインキャッチコピー ── -->
+  <h1 style="font-size:clamp(24px,5vw,46px); font-weight:900; color:#fff; line-height:1.4;">
+    9割の親が知らない、<br>
+    <span style="color:#7EC8F0;">「東大ルート」</span>の分かれ道。
+  </h1>
+
+  <!-- ── サブタイトル ── -->
+  <p style="font-size:clamp(15px,2.5vw,19px); color:#C8E0F4; line-height:1.7; margin:16px 0 6px;">
+    ―― 偏差値70超・東大ルートへ舵を切る、3ヶ月の地頭覚醒プログラム。
+  </p>
+
+  <hr>
+
+  <!-- ── サブキャッチコピー（3人東大を最前面へ）── -->
+  <p style="font-size:clamp(14px,2.2vw,17px); color:#E8F3FC; line-height:1.9; margin:20px 0;">
+    【サブキャッチ（太字・白文字で強調）】<br>
+    <strong>我が子を【3人全員、東大現役合格】させた母が教える、他では絶対に得られない再現性の教育。</strong><br>
+    高級進学塾に課金する前に、わが子を「最上位クラス直行」の体質に変える3ヶ月システム。
+  </p>
+
+  <!-- ── バッジ行 ── -->
+  <p style="font-size:12px; letter-spacing:.12em; color:#9EC9EF; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    【バッジ3連（横並び・ボーダー）】<br>
+    ｜ 全12回・3ヶ月完全変革 ｜ 個別脳育成カルテ付き ｜ 完全審査制・定員限定 ｜
+  </p>
+
+  <hr>
+
+  <!-- ── イラスト枠 ── -->
+  <div class="img-box">
+    <b>【画像・イラスト枠 FV-01】</b>
+    3人の子どもが晴れやかな笑顔で東大・赤門をくぐる姿と、少し後方でそっと見守る穏やかな母親を表現したイラスト。淡いブルーとホワイトを基調に、格調と温かみを両立させてください。人物は漫画的でなく、上質なラインイラスト・水彩風を推奨。母親の表情は「誇りと静かな確信」を持った穏やかな笑顔に。
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S02｜ターゲットへの呼びかけ（該当性認知）
+     背景：#F8FBFF（淡いブルー）
+     目的：「私のことだ」とロックオンさせる。深夜の焦燥感を3本の矢で撃ち抜く
+=================================================================== -->
+<div class="sec" id="s02">
+  <span class="sec-label">S02｜ターゲットへの呼びかけ（該当性認知）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>このページは、そんな「焦燥感」を<br>深夜に抱えるあなたのために書きました。</h2>
+
+  <!-- ── リード文 ── -->
+  <p>
+    SAPIXや四谷大塚、幼児教室、公文——あらゆるチャンネルから正しい情報を収集し、我が子の教育に誰よりも本気で投資してきた。それでも、夜、子どもが眠ったあとにスマートフォンを手に取ると、どこかずっと消えないこの感覚があります。
+  </p>
+
+  <!-- ── 焦燥感3箇条 ── -->
+  <ul>
+    <li>
+      <strong>SAPIXや四谷大塚の最上位（α）クラスを目指して、公文・幼児教室・知育おもちゃに毎月高額を課金している。</strong><br>
+      しかし、「これは本当に偏差値70超の中高一貫・東大ルートに直結しているのか」という冷たい疑念が、眠れない夜に浮かびあがってくる。投資は間違っていないのか、という問いに、自分で答えを出せずにいる。
+    </li>
+    <li>
+      <strong>本当は「余裕のある、洗練された母親」でありたいのに、現実は毎日「早くしなさい！」「宿題やったの！？」と怒鳴り散らしている、醜い自分への深い自己嫌悪。</strong><br>
+      夫の前では冷静に振る舞えるのに、子どもの前でだけは感情が制御できなくなる。あれだけ嫌いだった「ガミガミ母親」に、いつの間にか自分がなっていた。その事実が、頭から離れない。
+    </li>
+    <li>
+      <strong>親が横に張り付き、ヒントを囁き、お膳立てしてなんとかプリントを消化させているこの現状——それが「限界」だとわかっていながら、やめることができない。</strong><br>
+      「私がここを離れたら、この子は一切机に向かわない」という現実が、受験本番の5年後・6年後と重なったとき、出口のない恐怖として迫ってくる。
+    </li>
+  </ul>
+
+  <p style="margin-top:20px;">
+    ひとつでも心当たりがあるなら、このページはあなたのために存在しています。
+  </p>
+</div>
+
+
+<!-- ===================================================================
+     S03｜共感・痛みの言語化（問題の顕在化）
+     背景：白（#ffffff）
+     目的：「過剰な管理が不合格のカウントダウン」という真実を示唆し、
+           次のセクションへの心理的な導火線を引く
+=================================================================== -->
+<div class="sec" id="s03">
+  <span class="sec-label">S03｜共感・痛みの言語化（問題の顕在化）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>いつまで、この「勉強の監視兵」を<br>続けなければいけないの？</h2>
+
+  <!-- ── 本文 ── -->
+  <p>
+    わが子の将来のために、今できる限りの教育投資をする。スケジュールを管理し、丸付けをし、ダラダラしていれば声を荒げる。それは保護者として、これ以上なく誠実な行動に見えるかもしれません。
+  </p>
+
+  <p>
+    しかし、少しだけ立ち止まって、聞いてください。
+  </p>
+
+  <p>
+    あなたがそこまで身を削って伴走しているのは、本当は「そうでもしなければ、この子は机に向かわないから」ではありませんか。「私が横にいなければ、この子は一切勉強しなくなる」——認めたくても、この思いが頭から離れない。
+  </p>
+
+  <div class="pull">
+    「私が目を離したら、この子は一切勉強しなくなる」——これが、多くのエリート家庭が静かに抱える、拭えない「焦りの正体」です。
+  </div>
+
+  <p>
+    自分が東大や早慶、医学部を出て、外資コンサルや経営者として一流の場所で戦ってきたからこそ、「指示を待つだけの人間」がこれからの時代にどう扱われるかを、骨身で知っている。その像が、目の前の子どもと重なった瞬間の、あの冷えたざわめき。
+  </p>
+
+  <p>
+    そして、ここが本当に重要な点です。今、あなたが良かれと思って続けているその「過剰な管理とお膳立て」は、<span class="em">入試本番でわが子を不合格へと引きずり下ろすカウントダウンになっている</span>可能性があります。
+  </p>
+
+  <p>
+    これは煽りではありません。30年間、数百家庭の子どもたちの現場カルテを診続け、自分自身の3人の子どもを全員東大に現役合格させた経験から言える、冷徹なファクトです。
+  </p>
+</div>
+
+
+<!-- ===================================================================
+     S04｜不都合な真実の提示（常識の破壊・絶望）
+     背景：ダークネイビー（#0D2A50）
+     テキスト：白・淡ブルー系
+     目的：小4〜小6の「致命的ドミノ倒し」を時間軸で暴き、
+           「塾前の地頭作り」こそが唯一の分岐点だと確信させる
+=================================================================== -->
+<div class="sec" id="s04">
+  <span class="sec-label">S04｜不都合な真実の提示（常識の破壊・絶望）</span>
+  <p style="font-size:12px; color:#888; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    ［コーダーへ：セクション全体をダークネイビー（#0D2A50）背景に。テキストは白・淡ブルー系。ドミノブロック3枚は枠線付きカードで表示。］
+  </p>
+
+  <!-- ── セクション見出し ── -->
+  <h2 style="color:#fff; border-color:rgba(126,200,240,.25);">
+    親のガミガミ管理で合格できるほど、<br>中学受験は甘くありません。
+  </h2>
+  <p style="color:#9EC9EF; font-size:12px; letter-spacing:.16em; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    ── 30年間の現場カルテが証明する、冷徹なファクト
+  </p>
+
+  <!-- ── リード文 ── -->
+  <p style="color:#BDD5EC;">
+    小3、小4と進むにつれ、大手塾のテキストの量と難易度は3倍、5倍へと跳ね上がります。そのとき、<strong style="color:#fff;">親に言われないと動けない「指示待ちの脳」のまま入塾した子</strong>は、ここから合否を分ける致命的なドミノ倒しに巻き込まれます。これは例外ではありません。私が30年間のカルテで見てきた、繰り返される「エリート家庭の転落パターン」です。
+  </p>
+
+  <hr style="border-color:rgba(126,200,240,.2);">
+
+  <!-- ── ドミノブロック1：小4 ── -->
+  <div style="border:1px solid rgba(126,200,240,.25); border-radius:8px; padding:22px 24px; margin:18px 0; background:rgba(255,255,255,.04);">
+    <span class="gold" style="font-size:12px; letter-spacing:.1em; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">【小4の壁】</span>
+    <h3 style="color:#fff; margin:8px 0 12px;">宿題パニックと「置物化」――投資効率がゼロになる日</h3>
+    <p style="color:#BDD5EC;">
+      膨大な宿題の波に溺れ、親が夜中まで張り付いて答えを教え込む「自転車操業」がスタートします。塾の授業はスピードが速すぎてついていけず、ただ座って板書を写すだけの「置物」と化します。<strong style="color:#fff;">毎月の高額な塾代の投資効率は、この時点でほぼゼロになります。</strong>席に座って課金し続けているだけ——それが、外から見えないエリート家庭の現実です。
+    </p>
+  </div>
+
+  <!-- ── ドミノブロック2：小5 ── -->
+  <div style="border:1px solid rgba(126,200,240,.25); border-radius:8px; padding:22px 24px; margin:18px 0; background:rgba(255,255,255,.04);">
+    <span class="gold" style="font-size:12px; letter-spacing:.1em; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">【小5の絶望】</span>
+    <h3 style="color:#fff; margin:8px 0 12px;">難問激増によるクラス落ちの常態化――継ぎ足しでは埋まらない格差</h3>
+    <p style="color:#BDD5EC;">
+      思考力・記述力を問う難問が激増する小5。親の丸暗記メソッドは完全に限界を迎え、最上位クラスから一気に転落します。焦った親がさらにガミガミ追い詰め、子どもの自己肯定感は崩壊。<strong style="color:#fff;">いくら個別指導や家庭教師を継ぎ足しても、自走しない脳には一切知識が吸着しません。</strong>コップに穴が開いたまま、上から水を注ぎ続ける——補習費用だけが増えていく残酷な現実がそこにあります。
+    </p>
+  </div>
+
+  <!-- ── ドミノブロック3：小6 ── -->
+  <div style="border:1px solid rgba(126,200,240,.25); border-radius:8px; padding:22px 24px; margin:18px 0; background:rgba(255,255,255,.04);">
+    <span class="gold" style="font-size:12px; letter-spacing:.1em; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">【小6の限界】</span>
+    <h3 style="color:#fff; margin:8px 0 12px;">志望校2ランクダウン、そして「全落ち」へ――隠されたエリート家庭の末路</h3>
+    <p style="color:#BDD5EC;">
+      入試直前期、過去問演習が始まると勝負は完全に決します。偏差値70超の最難関校が求めるのは「初めて見る難問に対して、自分の頭で段取りを組み、粘り強く仮説を立てる力」。<strong style="color:#fff;">親の指示通りにしか動いてこなかった子は、問題用紙を前にして手も足も出ず、パニックを起こします。</strong>模試の判定は下がり続け、直前で志望校を2ランク下げ、それでも本番では実力を出し切れずに滑り止めにも落ちる。年間数百万円をドブに捨て、親子で精神を病んだ末に「中学受験全落ち」を迎える——これが繰り返されてきた、エリート家庭の隠されたリアルな末路です。
+    </p>
+  </div>
+
+  <!-- ── 結論 ── -->
+  <div style="border:1px solid #B8922A; border-radius:8px; padding:24px 26px; margin-top:28px; background:rgba(184,146,42,.07);">
+    <p style="color:#E8D9A0;">
+      学歴投資の成否を分けるのは、塾選びでも、ワークの枚数でも、個別指導の時間数でもありません。<strong>入塾前に、親の管理を一切必要とせず、最高難度の入試問題にみずから目を輝かせて挑む「自走する地頭（前頭葉）」を仕込んでおくこと。</strong>この一線を超えられるかどうかが、偏差値70超の特等席へわが子を送り込めるかどうかの、唯一の分かれ道です。
+    </p>
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S05｜新事実の提示（光・希望への転換 × 3人東大のロジック）
+     背景：#F8FBFF（淡いブルー）
+     目的：「家事知育」という新パラダイムを提示＋
+           「3人全員東大合格はこのシステムの直接的な産物」という
+           因果関係を強く打ち出し、確信へ転換させる
+=================================================================== -->
+<div class="sec" id="s05">
+  <span class="sec-label">S05｜新事実の提示（光・希望への転換 × 3人東大のロジック）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>テキストを閉じなさい。<br>本物の地頭は、「日々の暮らし（家事）」でしか育たない。</h2>
+
+  <!-- ── リード：脳科学的根拠 ── -->
+  <p>
+    なぜ早期のガリガリ勉強が、結果として子どもの伸び代を奪うのか。脳科学的に言えば、勉強の強制は脳の<strong>前頭葉（自発性・思考力・問題解決力を司る領域）</strong>を萎縮させるからです。難問に出会ったときに目を輝かせて挑む「自走する地頭」は、外から詰め込まれた知識では育ちません。
+  </p>
+
+  <p>
+    自走する脳を作るために本当に必要なのは、机の上の勉強ではありません。家庭内での<strong>「お片付け」</strong>や<strong>「お皿洗い」</strong>という、手順を自分で組み立て、エラーをリアルタイムで修正し続ける、最高難度の日常タスクです。
+  </p>
+
+  <ul>
+    <li>
+      <strong>お片付け → 論理的思考力（プログラミング脳）の育成</strong><br>
+      物の「分類・最適化・優先順位」を自分で考える行為は、算数・国語の論理構造と完全に同型です。ルールを自ら設計し、実行する快感が、難問を解く快感に直結します。
+    </li>
+    <li>
+      <strong>お皿洗い → 段取り力・メタ認知能力の育成</strong><br>
+      「どの順番で洗えば効率がいいか」「どうすれば水が飛び散らないか」。手順を組み立て、エラーを修正し続けるこの作業は、幼児教室のペーパーワーク100枚分に匹敵する集中力と問題解決力を育てます。
+    </li>
+    <li>
+      <strong>自立ルーティン → 時間管理力と「自走の起動」</strong><br>
+      パジャマの準備・朝の支度など、身の回りのタスクを完全自動化させる。「早くしなさい！」が家庭から消えた瞬間、親の管理コストはゼロになり、子どもの脳は次のステージへ動き出します。
+    </li>
+  </ul>
+
+  <hr>
+
+  <!-- ── 3人東大との因果関係（最重要パラグラフ） ── -->
+  <div class="fact-box">
+    <p>
+      断言します。<strong>私の3人の子どもが全員、東大に現役合格したのは、この家庭内システムを幼少期から一切の妥協なく実践し続けたからです。</strong>
+    </p>
+    <p>
+      これは偶然ではありません。上の子が東大に合格したとき、「この子が優秀だっただけかもしれない」と私自身も思いました。しかし2人目が、3人目が、同じ家庭環境の下で同じように東大へ現役合格したとき、それは「才能」という不確かなものではなく、<strong>「環境設計というロジック」が100%再現されたという証明</strong>に他なりませんでした。
+    </p>
+    <p>
+      家事で前頭葉を耕し、2ヶ月目に徹底的に鍛え、3ヶ月目に「実際の塾の授業・予習復習システム」へカチッと接続（プラグイン）させる。<strong>日本で唯一のこの家庭環境完全変革システムが、あなたの家庭でも今日から再現できます。</strong>
+    </p>
+  </div>
+
+  <p>
+    本プログラムは、SAPIXや公文・幼児教室への既存投資を否定するものではありません。それらと並走する形で、家庭という「土台」を根本から作り変えることで、<span class="em">すでに課金している塾代の投資効率を120%に跳ね上げるブースター（プラグイン）</span>として機能させます。
+  </p>
+
+  <!-- ── イラスト枠 ── -->
+  <div class="img-box">
+    <b>【画像・イラスト枠 S05-01】</b>
+    子どもが楽しそうにお皿を丁寧に両手で運び、母親が隣でそっと微笑みながら問いかけている、家庭内での前頭葉育成シーンを表現した温かみのあるイラスト。淡いブルーとホワイトを基調に、日常の中に潜む知的な豊かさを感じさせる雰囲気で。キッチンや食卓が舞台。母親の表情は「管理する親」ではなく「伴走する知的パートナー」のイメージ。
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S06｜圧倒的な実績（ファクトの暴力）
+     背景：#1A3F6F（ミッドネイビー）
+     テキスト：白・淡ブルー
+     目的：「3人全員・東大現役合格は遺伝やセンスではなくロジックの産物」
+           という確信を、数字の力で疑いようなく打ち込む
+=================================================================== -->
+<div class="sec" id="s06">
+  <span class="sec-label">S06｜圧倒的な実績（ファクトの暴力）</span>
+  <p style="font-size:12px; color:#888; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    ［コーダーへ：セクション全体をネイビー（#1A3F6F）背景に。テキストは白・淡ブルー系。数字は特大フォントで表示。中央寄せ推奨。］
+  </p>
+
+  <!-- ── セクション見出し ── -->
+  <h2 style="color:#fff; border-color:rgba(126,200,240,.25);">
+    我が子3人全員、東大現役合格。<br>
+    遺伝でもセンスでもない、<span class="gold">「圧倒的再現性」</span>の証明。
+  </h2>
+
+  <!-- ── リード文 ── -->
+  <p style="color:#BDD5EC;">
+    世の中には「合格体験談」が溢れています。しかしそのほとんどは、他人の子どもの話です。その子がたまたま天才だったかもしれない。その家庭が特別だったかもしれない。<strong style="color:#fff;">他人の成功は、再現性の証明にはなりません。</strong>
+  </p>
+
+  <p style="color:#BDD5EC;">
+    私の証明は、違います。
+  </p>
+
+  <!-- ── 数字パネル3連 ── -->
+  <p style="font-size:12px; color:#9EC9EF; letter-spacing:.12em; font-family:'Hiragino Kaku Gothic ProN',sans-serif; margin:8px 0 4px;">
+    ［コーダーへ：以下3つの数字を横3列のカードUIで表示。背景は半透明の白（rgba 5%）、枠線は淡ブルー30%。数字は特大・#7EC8F0。］
+  </p>
+
+  <p style="color:#fff; font-size:15px; text-align:center; margin:4px 0 16px;"><strong>【数字パネル A】</strong></p>
+  <p style="text-align:center; color:#7EC8F0; font-size:52px; font-weight:900; line-height:1;">3 / 3</p>
+  <p style="text-align:center; color:#BDD5EC; font-size:13px; line-height:1.6; margin-bottom:20px;">塾長自身の3人の子ども<br><strong style="color:#fff;">全員・東大に現役合格</strong></p>
+
+  <p style="color:#fff; font-size:15px; text-align:center; margin:4px 0 16px;"><strong>【数字パネル B】</strong></p>
+  <p style="text-align:center; color:#7EC8F0; font-size:52px; font-weight:900; line-height:1;">9割以上</p>
+  <p style="text-align:center; color:#BDD5EC; font-size:13px; line-height:1.6; margin-bottom:20px;">30年間の指導実績<br><strong style="color:#fff;">第一志望の難関校へ合格</strong></p>
+
+  <p style="color:#fff; font-size:15px; text-align:center; margin:4px 0 16px;"><strong>【数字パネル C】</strong></p>
+  <p style="text-align:center; color:#7EC8F0; font-size:52px; font-weight:900; line-height:1;">30年</p>
+  <p style="text-align:center; color:#BDD5EC; font-size:13px; line-height:1.6; margin-bottom:20px;">現場カルテの蓄積<br><strong style="color:#fff;">エリート育成の実証データ</strong></p>
+
+  <hr style="border-color:rgba(126,200,240,.2);">
+
+  <!-- ── 本文（再現性の論理展開） ── -->
+  <p style="color:#BDD5EC;">
+    同じ屋根の下、同じ家庭環境で育った3人の子どもが、例外なく全員東大へ現役合格した。これが何を意味するか。<strong style="color:#fff;">「この家庭で行われていた教育システムには、再現性がある」</strong>という揺るぎない証明です。
+  </p>
+
+  <p style="color:#BDD5EC;">
+    さらに、30年間の塾経営において9割以上の生徒を第一志望へ合格させてきた現場カルテがある。自分の子どもだけでなく、他人の子どもにも同じロジックで同じ結果を出し続けてきた。<strong style="color:#fff;">これこそが、「環境設計のロジック」に100%の再現性がある、唯一の証拠です。</strong>
+  </p>
+
+  <p style="color:#BDD5EC;">
+    生まれ持った才能やセンスのせいにするのは、今日で終わりにしましょう。このロジックは、今日から、あなたの家でも再現できます。
+  </p>
+</div>
+
+
+<!-- ===================================================================
+     S07｜3ヶ月カリキュラム（全12回詳細）
+     背景：#F8FBFF（淡いブルー）
+     目的：全12回のロードマップで「これなら私にもできる」と
+           明確な成果をイメージさせ、投資意欲を高める
+=================================================================== -->
+<div class="sec" id="s07">
+  <span class="sec-label">S07｜3ヶ月カリキュラム（全12回詳細）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>偏差値70突破への軌道に乗せる、<br>3ヶ月のロードマップ。全12回・完全実践型。</h2>
+
+  <!-- ── リード文 ── -->
+  <p>
+    講義を聞くだけの時間はほぼゼロ。毎週「即実践するタスク」を渡し、家庭で検証し、<strong>個別脳育成カルテで見える化</strong>する完全実践型ワークショップです。3人の子どもを東大へ現役合格させたシステムを、あなたの家庭専用にカスタマイズして届けます。
+  </p>
+
+  <hr>
+
+  <!-- ── 1ヶ月目 ── -->
+  <div style="margin-bottom:36px;">
+    <div class="month-header">
+      <div class="kana">MONTH 01 ／ 第1回〜第4回</div>
+      <h3>脳の土壌改革とコントロール欲の破壊</h3>
+    </div>
+
+    <div class="session">
+      <h4><span>第1回</span>東大ルートへ繋がる「地頭育成」の仕組みと、親のOS書き換え</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>なぜ早期の強制勉強が前頭葉を萎縮させ、指示待ち人間を作るのか。3人全員を東大へ現役合格させた家庭環境のメカニズムを脳科学的に解説し、親の教育観を180度転換します。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>12週間、子どもの勉強・行動への不必要な介入を完全停止する「サイレント・ウオッチング（静かな観察）」の開始。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>「勉強しなさい！」が激減し、家庭内の不毛なイライラが消えて、子どもの脳が伸びのびと動き出す「安全基地」が完成します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第2回</span>今日から口出しを完全禁止する「親の声かけシステム」の導入</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>子どものやる気とIQを奪う「地雷の声かけ」を排除し、自発性を引き出す「問いかけ」に変える技術。感情的に怒るのを防ぐ環境デザイン。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>感情が爆発しそうになった瞬間に親の脳をリセットする「感情リカバリーワーク」の実践。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>子どもが「親の顔色を伺って動く」のをやめ、自分の意志で行動を選択し始める最初の変化が、早ければこの1週間で現れます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第3回</span>わが子の「主体性・IQ段階」を測定する、家庭内行動観察カルテの作成</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>30年間の現場カルテをベースに、わが子が今どの段階（指示待ち／過保護による麻痺／自走の芽生え）にいるかを、日常行動から冷徹に可視化します。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>朝起きてから寝るまでの子どもの行動パターンを記録し、チェックシートを提出。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>塾長からの直接フィードバックにより、わが家の「教育のバグ（過保護な関わり）」がどこにあるのかが1軒ずつ完全に特定されます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第4回</span>【1ヶ月目グルコン】日常バトルの原因を徹底解剖・バグ取り</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>1ヶ月実践して浮き彫りになった「どうしても口出ししてしまうシーン」や「子どもの反発パターン」を塾長が直接カウンセリング。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>各家庭のカルテの修正と、2ヶ月目「家事知育」へ向けた家庭内ルールの整備。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>親のブレが完全になくなり、家庭環境の「舵」が東大ルートへ向けて完全に固定されます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2ヶ月目 ── -->
+  <div style="margin-bottom:36px;">
+    <div class="month-header">
+      <div class="kana">MONTH 02 ／ 第5回〜第8回</div>
+      <h3>日常のタスク（家事）を最高難度の知育へ昇華</h3>
+    </div>
+
+    <div class="session">
+      <h4><span>第5回</span>おもちゃの片付けを「論理的思考力（プログラミング脳）」に変える技術</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>ただ片付けさせるのは労働。物の「分類・最適化・優先順位」を子ども自身に考えさせることで、算数の論理的思考力の基礎を鍛え上げます。3人の東大生も幼少期に徹底した知育の核心。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>子どもが自らルールを作り、片付けをゲーム化する「収納システム設計ワーク」の実施。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>子どもが「自分でルールを決め、それを実行する快感」を覚え、脳の処理能力が目に見えて向上します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第6回</span>1回のお皿洗いが、塾の難問を解く「段取り力・集中力」に変わる理由</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>「どの順番で洗えば効率がいいか」「どうすれば水が飛び散らないか」。手順を組み立て、エラーをリアルタイムで修正する「メタ認知能力」を日常の家事で徹底的に鍛えます。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>家庭内での「お皿洗い・配膳」の役割分担と、子どもの「工夫」を引き出す声かけの実践。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>幼児教室のペーパーワーク100枚分に匹敵する、問題解決のための「粘り強い集中力」の土台が完成します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第7回</span>パジャマの準備から始める「自立駆動ルーティン」の設計</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>朝の支度や夜の就寝準備など、自分の身の回りのタスクを「完全自動化」させるスケジュール設計の理論と実装法。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>子ども自身が時間をコントロールするための、文字を使わない「幼児・低学年向け視覚的ルーティンボード」の作成。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>「早くしなさい！」と言われなくても、子どもが時間を見て自らパジャマを畳み、明日の準備を済ませる「指示待ちの完全卒業」を達成します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第8回</span>【2ヶ月目グルコン】お手伝いタスクの進捗確認と、子どもの脳の変化チェック</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>家事知育を通じて、子どもの「表情・集中力・発言の質」がどう変わったかをカルテで検証。家庭ごとの差異を塾長が直接分析します。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>3ヶ月目「実際の塾の勉強へのスライド」に向けた、脳の成熟度の最終確認。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>「家事で脳を耕す」フェーズを完了し、どんな難問にも折れない最強の「前頭葉（地頭）」が仕上がります。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3ヶ月目 ── -->
+  <div style="margin-bottom:16px;">
+    <div class="month-header">
+      <div class="kana">MONTH 03 ／ 第9回〜第12回</div>
+      <h3>塾での自走システム定着と、東大ルートへの完全接続</h3>
+    </div>
+
+    <div class="session">
+      <h4><span>第9回</span>塾の授業を「一言も聞き漏らさない脳」を作る、入塾前の心構えと姿勢づくり（アクティブ・リスニング）</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>大手塾が始まってから差がつくのは「授業の受け方」。先生の話をただ座って板書するだけの受動的な子ではなく、能動的に知識をハントする姿勢を仕込みます。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>家庭内の会話（今日あったニュースや出来事）を使って、相手の話の要点を瞬時に掴む「アクティブ・リスニング3分間トレーニング」の実践。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>塾が始まった初日から授業内容を100%吸収して帰ってくる「授業態度」が完成し、トップ集団に直行する切符を手に入れます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第10回</span>親の管理を完全卒業！塾のテキストを自発的に回す「予習復習システム」（宿題マネジメントシート）</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>2ヶ月目に家事で鍛えた「段取り力」を、そのまま勉強の「スケジュール設計」にスライド。親が横に張り付いて管理する過酷な塾生活を未然に防ぎます。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>子どもがゲーム感覚でみずから復習ノートを開き、間違えた問題を自分で分析してやり直す「1週間の宿題マネジメントシート」の導入。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>「宿題やったの！？」と怒鳴らなくても、子どもが自立して学習をコントロールする「家庭内自走型ルーティン」が確立します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第11回</span>失敗を恐れず難問に飢える「折れない心（レジリエンス）」と魔法のフィードバック</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>塾のクラス分けテストで悪い結果が出たとき、親子で潰れないためのメンタルタフネス。初めて見る難問に対して「自分で解きたい！」と挑むマインドの育成法。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>テスト結果が出た当日、親が絶対にやるべき「成長をブーストさせるフィードバック（魔法の声かけ）」と、絶対にやってはいけない「地雷の声かけ」のロープレ。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>テストの点数に一喜一憂せず、エラー（間違い）を成長のチャンスと捉える最強の合格体質が育ち、最上位クラスをキープし続ける基盤が固まります。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="session">
+      <h4><span>第12回</span>【最終成果発表会】わが家だけの「生涯東大ルート・ロードマップ」確定・納品</h4>
+      <div class="meta">
+        <div class="meta-item">
+          <div class="ml">LECTURE｜講義内容</div>
+          <p>3ヶ月間のカルテの推移をベースに、将来の大手塾・名門中受験を見据えたオーダーメイドの家庭内教育戦略を最終確定。3人全員を東大へ送り出したロードマップをわが家専用に設計します。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">TASK｜即実践タスク</div>
+          <p>3ヶ月間の変化を成果発表形式で振り返り、「生涯東大ルート・ロードマップ」として文書化・納品。</p>
+        </div>
+        <div class="meta-item">
+          <div class="ml">RESULT｜得られる成果</div>
+          <p>ここから始まるリアルな塾生活を「我が家の主治医」として生涯サポートするバックエンドプログラムへの移行案内も実施。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ===================================================================
+     S08｜他では得られない独自サービス（投資価値の担保）
+     背景：白（#ffffff）
+     目的：3つの個別アセットで「30〜50万円を即決する」に値する
+           対価以上のリターンを確信させる
+=================================================================== -->
+<div class="sec" id="s08">
+  <span class="sec-label">S08｜独自サービス・投資価値の担保（3つの個別アセット）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>あなたの家庭を<span class="gold">絶対に脱落させない</span>、<br>「3つの個別アセット」</h2>
+
+  <!-- ── リード文 ── -->
+  <p>
+    セミナーを「聞くだけ」で終わらせず、確実に成果を出すための仕組みです。これら3つのアセットこそが、本講座を単なる勉強会ではなく、30〜50万円の即決に値する「オーダーメイドの教育コンサルティング」たらしめる核心です。3人の子どもを東大へ現役合格させた塾長が、1軒1軒の家庭を直接診断するからこそ実現できるサービスです。
+  </p>
+
+  <!-- ── アセット1 ── -->
+  <div class="asset">
+    <div class="num">アセット 01</div>
+    <h3>【塾長直伝：個別脳育成カルテ】の共有</h3>
+    <p>
+      30年間トップ層を育て続けた現場カルテをベースに、毎週、わが子の行動変化（お片付けができた、自分でパジャマを畳んだ等）を記録し、<strong>塾長から直接、あなたの家庭専用の「教育バグ」を特定するフィードバック</strong>を受け取れる環境です。一般的なセミナーが「全員への一律な情報提供」で終わるのに対し、本講座では塾長が1軒ずつのカルテを手書きで診断します。これはいわば、わが家の教育の「かかりつけ医・主治医」を手に入れる価値です。3人全員を東大へ送り出してきた30年分の目が、わが子だけを見続けます。
+    </p>
+  </div>
+
+  <!-- ── アセット2 ── -->
+  <div class="asset">
+    <div class="num">アセット 02</div>
+    <h3>【親の行動チェックシート＆毎朝のマインドセット音声】</h3>
+    <p>
+      「ついガミガミ言ってしまった」「今日も怒鳴ってしまった」——その瞬間を即座に修正するための、親向けデイリーワークシートです。<strong>毎朝、塾長からの「マインドセット音声」が届き、3ヶ月間、親の環境維持を強制的に伴走します。</strong>親の軸が揺らがない限り、子どもの脳は必ず変わります。逆に、いかに正しい理論を理解しても、日常のストレスで親が崩れた瞬間にすべてが元に戻るのが、子育てプログラムの最大のリスクです。このアセットは、そのリスクを構造的に排除するための仕組みです。
+    </p>
+  </div>
+
+  <!-- ── アセット3 ── -->
+  <div class="asset">
+    <div class="num">アセット 03</div>
+    <h3>【完全審査制・エリート限定コミュニティ】</h3>
+    <p>
+      本講座は完全審査制です。<strong>同じ世帯年収・同じ高い志を持つ首都圏のエリート層の親御様だけ</strong>が参加するクローズドグループへの招待権が付与されます。ノイズの多いママ友の情報戦や、エビデンスが不明な受験SNSとは一線を画した、「本物の教育投資戦略」だけをギブし合えるプレミアムな環境です。「3人全員東大」のシステムを我が家に移植しようとしている、同じ目標を持つ本物の仲間が横にいることが、3ヶ月の実践を貫く精神的な支柱になります。
+    </p>
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S09｜ベネフィットの確約（得られる未来）
+     背景：淡いブルーグラデーション（#EFF5FB → #D8EDFB）
+     目的：3ヶ月後の明るい未来像を親・子ども・東大ルートの3軸で
+           具体的に描き、申し込みへのワクワク感をダメ押しする
+=================================================================== -->
+<div class="sec" id="s09">
+  <span class="sec-label">S09｜ベネフィットの確約（得られる未来）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2>3ヶ月後、あなたとわが家が得られる<br>「確実なリターン」</h2>
+
+  <!-- ── ベネフィット3カード ── -->
+  <p style="font-size:12px; color:#888; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    ［コーダーへ：以下3枠を横3列のカードUIで表示。背景白、枠線#B8D5EE、角丸8px。アイコンは上部中央に大きく。］
+  </p>
+
+  <div class="benefit-row">
+    <div class="b-card">
+      <div class="ico">🕊</div>
+      <h4>親の解放</h4>
+      <p>「勉強しなさい！」「宿題やったの！？」の怒鳴り合いが家庭内から完全に消えます。洗練された、心穏やかで知的な母親としての日常が戻ってきます。あなたが本来なりたかった「余裕のある親」が、ここで初めて実現します。</p>
+    </div>
+    <div class="b-card">
+      <div class="ico">⚡</div>
+      <h4>子どもの覚醒</h4>
+      <p>子どもが自分で時間を管理し、誰に言われなくてもお片付けやお皿洗いを進んで行う「自走型人間」に変貌します。これは一時的な習慣ではなく、脳の配線が書き変わった状態です。この体質が、偏差値70超の体質と同一線上にあります。</p>
+    </div>
+    <div class="b-card">
+      <div class="ico">🎓</div>
+      <h4>東大ルートへの接続</h4>
+      <p>塾が始まったその日から、親が指示しなくてもみずから最高難度テキストをゲームのように解き明かし、堂々と最上位クラスを突き進む基盤が完成します。3人全員東大現役合格を生んだシステムが、今日からわが家に移植されます。</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S10｜希少性と緊急性（今動くべき理由）
+     背景：ダーク（#1C1C1C）
+     テキスト：白・グレー
+     目的：「来月でもいいか……」という先延ばしを完全に遮断する
+           タイムリミットと補習コストの残酷な現実を提示
+=================================================================== -->
+<div class="sec" id="s10">
+  <span class="sec-label">S10｜希少性と緊急性（今動くべき理由）</span>
+  <p style="font-size:12px; color:#888; font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    ［コーダーへ：セクション全体をダーク（#1C1C1C）背景に。テキストは白・グレー系。金色ボーダーの警告ボックスあり。］
+  </p>
+
+  <!-- ── セクション見出し ── -->
+  <h2 style="color:#fff; border-color:#444;">幼児期・低学年の「今」しか、<br>この舵は切れません。</h2>
+
+  <!-- ── リード文 ── -->
+  <p style="color:#C0C0C0;">
+    前頭葉の発達には、臨界期があります。小3で大手塾の本格的な受験カリキュラムが始まった瞬間、子どもの脳は「課題をこなすモード」に固定されていきます。それ以前のこの時期だけが、脳の土台を根本から作り変えられる唯一のウィンドウです。
+  </p>
+
+  <!-- ── 補習コストの現実 ── -->
+  <div class="urgency-box">
+    <p>
+      一度、塾の過酷な課金ゲームが始まり、子どもが「指示待ちの勉強嫌い」になってから軌道を修正するには、今回の何倍もの時間と、<em>個別指導・家庭教師などの数百万円に及ぶ血の滲むような補習コスト</em>がかかります。
+    </p>
+    <p>
+      私が30年間のカルテで繰り返し目撃してきたのは、「もう少し早く来てくれていれば」という言葉です。小3で来た子が東大へ行き、小5で来た子は間に合わなかった。<strong>この差は、親の動いたタイミングだけです。</strong>
+    </p>
+    <p>
+      修正コストは、予防コストの比ではありません。
+    </p>
+  </div>
+
+  <!-- ── 限定性 ── -->
+  <p style="color:#C0C0C0; margin-top:24px;">
+    本講座は、3人の子どもを東大へ現役合格させた塾長が1軒1軒のカルテを直接診るという性質上、同時にお受けできる家庭数に<strong style="color:#fff;">厳格な上限</strong>を設けています。また完全審査制のため、ご意向をお伺いした上でご参加の可否をご案内させていただきます。
+  </p>
+
+  <div style="text-align:center; margin-top:20px;">
+    <span class="limit">限定○名・完全審査制</span>
+    <p style="color:#666; font-size:13px; margin-top:12px;">定員に達し次第、予告なく募集を締め切ります。</p>
+  </div>
+</div>
+
+
+<!-- ===================================================================
+     S11｜行動喚起（CTA × 公式LINE登録）
+     背景：#F8FBFF（淡いブルー）
+     目的：心理的ハードルを完全にゼロにして公式LINEへ誘導する
+           「登録するだけ」の入口を明示し、成約への第一歩を踏ませる
+=================================================================== -->
+<div class="sec" id="s11">
+  <span class="sec-label">S11｜行動喚起（CTA × 公式LINE登録）</span>
+
+  <!-- ── セクション見出し ── -->
+  <h2 style="font-size:clamp(20px,3.5vw,30px);">才能のせいにするのは、もう終わりにしましょう。<br>東大ルートの切符は、LINEの向こう側にあります。</h2>
+
+  <!-- ── 本文 ── -->
+  <p>
+    本プログラムの<strong>次回開催予定日</strong>、受講前の<strong>個別相談のご案内</strong>、そして今日からわが子に実践すべき<strong>「地頭チェックポイント（日々の実践ヒント）」</strong>の発信は、すべて公式LINE内でのみ限定告知・配信・相談受付を行っています。
+  </p>
+
+  <p>
+    3人全員を東大へ現役合格させたシステムを我が家に移植する第一歩は、下記のボタンひとつです。難しい手続きは一切ありません。LINEを登録した瞬間から、わが子の教育は変わり始めます。
+  </p>
+
+  <p>
+    才能のせいにするのをやめた親御様が、今日もLINEの先で動き始めています。
+  </p>
+
+  <!-- ── LINE登録ボタン ── -->
+  <div class="btn-box">
+    <b>【CTA ボタン — コーダーへの指示】<br>
+    背景色：LINE公式グリーン（#06C755）、テキスト色：白、幅：PC最大500px・SP100%、角丸：6px、上下パディング24px、シャドウあり（rgba 06C755 35%）。ホバー時は#05A847へ暗化。LINEロゴアイコンを左端に配置推奨。</b>
+    <div class="btn-text">
+      公式LINEに登録して、次回開催スケジュールと<br>
+      「わが子の地頭チェックポイント」を今すぐ受け取る
+    </div>
+    <div class="btn-sub">▶ 登録は無料です。個別相談もLINE内にて受付中。</div>
+    <div class="btn-spec">※ 本プログラムへのご参加は完全審査制です。LINEご登録後、担当者よりご連絡いたします。</div>
+  </div>
+
+  <!-- ── サブCTA（中間ページにも設置する場合用） ── -->
+  <hr>
+  <p style="font-size:13px; color:#666; text-align:center; margin-bottom:8px;">
+    ── すでに「LINEを登録するか迷っている」方へ ──
+  </p>
+  <p style="font-size:14px; color:#444; text-align:center; line-height:1.9;">
+    LINEの登録・退会はいつでも自由です。<br>
+    まず「地頭チェックポイント」の情報だけを受け取ってから、ご判断いただいても構いません。<br>
+    ただ、<strong>次回開催の枠は、LINEご登録順にご案内</strong>しています。<br>
+    一度満席になった枠は、再募集の保証はありません。
+  </p>
+
+  <!-- ── 2つ目のLINEボタン（念押し） ── -->
+  <div class="btn-box" style="margin-top:16px;">
+    <b>【CTA ボタン 2（セカンドCTA）— コーダーへの指示】<br>
+    デザインは上記と同一。テキストのみ変更。</b>
+    <div class="btn-text">
+      まずは無料で登録する ―― わが子の「地頭チェックポイント」を受け取る
+    </div>
+    <div class="btn-sub">▶ 次回開催のご案内は、LINE登録者限定で先行告知しています。</div>
+  </div>
+
+  <!-- ── フッター注意書き ── -->
+  <p style="font-size:12px; color:#999; text-align:center; margin-top:20px; line-height:1.8;">
+    ※ 公式LINEへのご登録はいつでも解除できます。<br>
+    ※ 本プログラムへのご参加は完全審査制となります。LINEご登録後、担当者より個別にご連絡いたします。<br>
+    ※ 開催日時・受講費等の詳細はLINE内にてご案内します。
+  </p>
+</div>
+
+
+<!-- ===================================================================
+  APPENDIX｜ページ内中間CTA（S05〜S10の要所に挿入推奨）
+  ─ S05（新事実提示）後 ・ S06（実績）後 ・ S09（ベネフィット）後の
+    3箇所に以下の「差し込みCTA」を配置することを推奨します。
+  ─ 読者が「いいな」と思った瞬間に即アクションできる仕掛けです。
+=================================================================== -->
+<div class="sec" id="inline-cta" style="background:#F0FFF4; border-color:#06C755;">
+  <span class="sec-label" style="background:#06C755;">INLINE CTA｜差し込みCTA（S05後／S06後／S09後に設置）</span>
+
+  <p style="font-size:13px; color:#555; margin-bottom:12px;">
+    ［コーダーへ：このCTAブロックを、S05・S06・S09の直後にそれぞれ1回ずつ差し込んでください。背景は#F0FFF4（薄緑）、ボーダー#06C755。テキストは簡潔に。］
+  </p>
+
+  <p style="text-align:center; font-size:15px; color:#1A3F6F; font-weight:bold; margin-bottom:4px;">
+    3人全員東大現役合格のシステムを、わが家に移植する。
+  </p>
+  <p style="text-align:center; font-size:13px; color:#555; margin-bottom:16px;">
+    次回開催スケジュールと「地頭チェックポイント」は、公式LINEにて限定配信中。
+  </p>
+
+  <div class="btn-box" style="margin:0;">
+    <b>【差し込みCTA ボタン — コーダーへの指示】LINE公式グリーン（#06C755）、幅100%、上下パディング16px。コンパクトなシングルラインボタン。</b>
+    <div class="btn-text" style="font-size:15px;">
+      公式LINEに登録する（無料）
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

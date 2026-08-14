@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「勉強しなさい」と言わない家庭へ ｜ スクールオーク 高木美保</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+img{display:block;max-width:100%}
+
+:root{
+  --navy:   #0D2650;
+  --royal:  #1E3A8A;
+  --blue:   #3B6CB0;
+  --mist:   #B8CFE8;
+  --pale:   #E8F0F9;
+  --ivory:  #F7F5F0;
+  --warm:   #F0EBE1;
+  --gold:   #B8922A;
+  --gold-l: #D4AA50;
+  --text:   #1A1A2E;
+  --sub:    #4A5568;
+  --light:  #7A8FA6;
+  --white:  #FFFFFF;
+  --serif: 'Noto Sans JP', sans-serif;
+  --sans:  'Noto Sans JP', sans-serif;
+}
+
+body{font-family:var(--sans);color:var(--text);background:var(--white);-webkit-font-smoothing:antialiased;line-height:1.85;font-size:17px;word-break:normal;line-break:strict;overflow-wrap:break-word;letter-spacing:.01em}
+
+/* ── TOPBAR ── */
+#topbar{
+  position:sticky;top:0;z-index:400;
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(30,58,138,0.1);
+  padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.tb-logo{display:flex;align-items:center;gap:10px}
+.tb-logo img{height:24px;width:auto}
+.tb-title{font-family:var(--serif);font-size:12px;font-weight:700;color:var(--navy)}
+.tb-btn{
+  background:var(--navy);color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;
+  padding:10px 20px;border-radius:30px;text-decoration:none;white-space:nowrap;
+  letter-spacing:.04em;
+}
+
+/* ── STICKY BOTTOM CTA (モバイル) ── */
+#sticky-cta{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:var(--navy);
+  padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  transform:translateY(100%);
+  transition:transform 0.3s ease;
+  box-shadow:0 -4px 20px rgba(13,38,80,0.25);
+}
+#sticky-cta.show{transform:translateY(0)}
+.sc-txt{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.6);line-height:1.5}
+.sc-txt strong{display:block;font-size:13px;color:#fff}
+.sc-btn{
+  flex-shrink:0;background:var(--gold-l);color:var(--navy);
+  font-family:var(--sans);font-size:12px;font-weight:900;
+  padding:12px 20px;border-radius:30px;text-decoration:none;
+  white-space:nowrap;letter-spacing:.02em;
+}
+
+/* ── IMAGE PLACEHOLDER ── */
+.img-req{
+  background:linear-gradient(135deg,#E8EFF5 0%,#D8E5F0 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:32px 20px;text-align:center;
+  color:#7A8FA6;font-family:var(--sans);font-size:11px;line-height:1.75;
+  border:1.5px dashed #B8CFE8;border-radius:2px;
+}
+.img-req::before{
+  content:'';display:block;width:44px;height:44px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B8CFE8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'%2F%3E%3Ccircle cx='12' cy='13' r='4'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;
+  opacity:0.45;
+}
+
+/* ══════════════════════════════════════
+   § FV — 画面の40-60%を写真が占める
+══════════════════════════════════════ */
+#fv{
+  position:relative;min-height:100svh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+  background:var(--navy);
+}
+.fv-left{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:100px 48px 80px 5vw;
+}
+.fv-right{
+  position:relative;overflow:hidden;
+}
+.fv-right img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  display:block;
+}
+.fv-right::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to right, var(--navy) 0%, rgba(13,38,80,0.3) 60%, transparent 100%);
+}
+.fv-eyebrow{
+  font-family:var(--sans);font-size:9.5px;font-weight:700;
+  letter-spacing:.28em;color:rgba(163,202,232,0.65);
+  text-transform:uppercase;display:block;margin-bottom:20px;
+}
+.fv-h1{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(30px,4.2vw,52px);line-height:1.35;
+  color:#fff;margin-bottom:22px;
+  text-wrap:balance;letter-spacing:0;
+}
+.fv-h1 em{font-style:normal;color:rgba(232,217,160,0.95)}
+.fv-sub{
+  font-family:var(--sans);font-size:clamp(13px,1.4vw,15.5px);
+  color:rgba(200,220,240,0.55);line-height:1.95;
+  margin-bottom:36px;max-width:420px;
+  text-wrap:pretty;
+}
+.fv-price-badge{
+  display:inline-flex;align-items:baseline;gap:6px;
+  background:rgba(232,217,160,0.12);border:1px solid rgba(232,217,160,0.28);
+  border-radius:6px;padding:10px 18px;margin-bottom:28px;
+}
+.fv-price-badge span:first-child{font-family:var(--sans);font-size:10px;color:rgba(232,217,160,0.75);font-weight:700;letter-spacing:.12em}
+.fv-price-badge strong{font-family:var(--sans);font-size:clamp(28px,3.5vw,40px);font-weight:900;color:rgba(232,217,160,0.95);line-height:1;letter-spacing:-.02em}
+.fv-price-badge small{font-family:var(--sans);font-size:12px;color:rgba(232,217,160,0.6)}
+.fv-btn{
+  display:inline-block;background:rgba(232,217,160,0.95);color:var(--navy);
+  font-family:var(--sans);font-weight:900;font-size:clamp(14px,1.6vw,17px);
+  padding:20px clamp(20px,3.5vw,36px);border-radius:50px;text-decoration:none;
+  letter-spacing:.02em;max-width:400px;text-align:center;
+  box-shadow:0 8px 32px rgba(184,146,42,0.3);
+  transition:opacity .2s,transform .18s;
+}
+.fv-btn:hover{opacity:.88;transform:translateY(-2px)}
+.fv-note{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.3);margin-top:12px}
+.fv-stats{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  background:rgba(13,38,80,0.85);backdrop-filter:blur(8px);
+  border-top:1px solid rgba(163,202,232,0.12);
+  display:grid;grid-template-columns:repeat(3,1fr);
+  padding:18px 5vw;
+}
+.fv-stat{text-align:center;border-right:1px solid rgba(163,202,232,0.12)}
+.fv-stat:last-child{border-right:none}
+.fv-stat-n{font-family:var(--sans);font-size:clamp(26px,3.5vw,40px);font-weight:900;color:rgba(232,217,160,0.9);line-height:1;display:block}
+.fv-stat-l{font-family:var(--sans);font-size:10px;color:rgba(163,202,232,0.5);margin-top:3px;display:block}
+
+/* mobile FV */
+@media(max-width:768px){
+  #fv{grid-template-columns:1fr;min-height:100svh;position:relative}
+  .fv-right{position:absolute;inset:0;z-index:0}
+  .fv-right::after{background:linear-gradient(to top, var(--navy) 50%, rgba(13,38,80,0.65) 80%, rgba(13,38,80,0.4) 100%)}
+  .fv-left{position:relative;z-index:2;padding:80px 24px 100px;justify-content:flex-end}
+  .fv-h1{font-size:clamp(28px,8vw,40px)}
+  .fv-stats{grid-template-columns:repeat(3,1fr);padding:14px 20px}
+  .fv-stat-n{font-size:clamp(22px,7vw,32px)}
+}
+
+/* ══════════════════════════════════════
+   § PAIN — 写真 + 吹き出し浮遊
+══════════════════════════════════════ */
+#pain{position:relative;background:var(--ivory);overflow:hidden;padding:0}
+.pain-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:90vh;align-items:center;
+}
+.pain-photo{
+  position:relative;height:100%;min-height:520px;overflow:hidden;
+}
+.pain-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+/* 吹き出し */
+.bubble{
+  position:absolute;
+  background:#fff;border-radius:22px 22px 22px 4px;
+  padding:12px 18px;
+  font-family:var(--serif);font-weight:700;
+  box-shadow:0 4px 20px rgba(13,38,80,0.14);
+  white-space:nowrap;
+}
+.bubble--1{top:18%;left:50%;transform:translateX(-30%);font-size:clamp(15px,2vw,20px);color:var(--navy)}
+.bubble--2{top:38%;left:48%;transform:translateX(-20%);font-size:clamp(13px,1.7vw,17px);color:var(--sub)}
+.bubble--3{top:57%;left:52%;transform:translateX(-30%);font-size:clamp(12px,1.5vw,15px);color:var(--sub)}
+.pain-copy{
+  padding:60px 48px 60px 40px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.pain-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;margin-bottom:20px}
+.pain-main{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(26px,3.5vw,44px);color:var(--navy);
+  line-height:1.4;margin-bottom:28px;
+  text-wrap:balance;letter-spacing:0;
+}
+.pain-body{font-family:var(--sans);font-size:clamp(13.5px,1.6vw,15.5px);color:var(--sub);line-height:2.05;text-wrap:pretty;max-inline-size:34em}
+
+@media(max-width:768px){
+  .pain-inner{grid-template-columns:1fr}
+  .pain-photo{min-height:380px;height:380px}
+  .bubble--1{top:14%;left:42%}
+  .bubble--2{top:35%;left:38%}
+  .bubble--3{top:55%;left:44%}
+  .pain-copy{padding:40px 24px}
+}
+
+/* ══════════════════════════════════════
+   § TIMELINE — 朝のバトル時間軸
+══════════════════════════════════════ */
+#timeline{
+  background:var(--navy);
+  padding:clamp(72px,10vw,110px) clamp(24px,6vw,80px);
+  position:relative;overflow:hidden;
+}
+.tl-bg-word{
+  position:absolute;right:-0.05em;top:50%;transform:translateY(-50%);
+  font-family:var(--sans);font-size:clamp(120px,25vw,260px);font-weight:900;
+  color:rgba(255,255,255,0.025);line-height:1;pointer-events:none;user-select:none;
+}
+.tl-inner{max-width:680px;margin:0 auto;position:relative;z-index:1}
+.tl-eyebrow{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:rgba(163,202,232,0.45);font-weight:700;text-transform:uppercase;display:block;margin-bottom:28px}
+.tl-item{display:grid;grid-template-columns:90px 1fr;gap:0 28px;margin-bottom:0;padding:28px 0;border-bottom:1px solid rgba(163,202,232,0.1);align-items:start}
+.tl-item:last-child{border-bottom:none}
+.tl-time{
+  font-family:var(--sans);font-size:clamp(22px,3vw,30px);font-weight:900;
+  color:rgba(163,202,232,0.3);line-height:1;padding-top:4px;letter-spacing:.03em;
+}
+.tl-quote{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(18px,2.5vw,26px);color:#fff;line-height:1.45;
+  margin-bottom:6px;text-wrap:balance;letter-spacing:0;
+}
+.tl-inner-voice{font-family:var(--sans);font-size:clamp(12px,1.5vw,13.5px);color:rgba(163,202,232,0.45);line-height:1.8;font-style:italic;text-wrap:pretty}
+.tl-closing{
+  margin-top:44px;padding:32px 0 0;
+  border-top:1px solid rgba(232,217,160,0.2);
+  text-align:center;
+}
+.tl-closing p{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(18px,2.8vw,26px);color:rgba(232,217,160,0.88);
+  line-height:1.6;text-wrap:balance;
+}
+
+@media(max-width:560px){
+  .tl-item{grid-template-columns:70px 1fr;gap:0 16px}
+  .tl-time{font-size:clamp(18px,5vw,24px)}
+}
+
+/* ══════════════════════════════════════
+   § DECLARATION — それはあなたのせいじゃない
+══════════════════════════════════════ */
+#decl{
+  background:var(--navy);
+  padding:clamp(90px,14vw,140px) clamp(24px,8vw,100px);
+  text-align:center;position:relative;overflow:hidden;
+}
+#decl::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 60% at 50% 50%, rgba(30,58,138,0.5) 0%, transparent 100%);
+}
+.decl-inner{position:relative;z-index:1}
+.decl-pre{font-family:var(--sans);font-size:clamp(12px,1.8vw,15px);color:rgba(163,202,232,0.38);letter-spacing:.1em;margin-bottom:32px}
+.decl-main{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(54px,13vw,120px);color:#fff;
+  line-height:1.22;margin-bottom:40px;letter-spacing:-.01em;
+  /* 意図的改行（詩的コピー）のため text-wrap 指定なし */
+}
+.decl-main span{
+  display:block;
+  background:linear-gradient(180deg,#fff 60%,rgba(255,255,255,0.7) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.decl-main u{text-decoration:underline;text-decoration-color:rgba(163,202,232,0.4);text-underline-offset:clamp(6px,1.5vw,14px);-webkit-text-fill-color:#fff}
+.decl-sub{font-family:var(--serif);font-size:clamp(14px,2vw,20px);color:rgba(163,202,232,0.4);line-height:1.9;letter-spacing:.02em;text-wrap:balance}
+
+/* ══════════════════════════════════════
+   § 4TYPES — カラー2×2グリッド
+══════════════════════════════════════ */
+#types{background:var(--ivory);padding:clamp(72px,10vw,104px) 0;overflow:hidden}
+.types-head{text-align:center;padding:0 24px;margin-bottom:48px}
+.types-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;margin-bottom:14px}
+.types-h{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4vw,34px);color:var(--navy);line-height:1.5;margin-bottom:10px;text-wrap:balance;letter-spacing:0}
+.types-body{font-family:var(--sans);font-size:clamp(13.5px,1.8vw,15px);color:var(--sub);line-height:1.95;max-width:540px;margin:0 auto;text-wrap:pretty}
+.type-q-grid{display:grid;grid-template-columns:1fr 1fr;max-width:720px;margin:0 auto;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(13,38,80,0.14)}
+.type-q{
+  padding:clamp(32px,5vw,56px) clamp(24px,4vw,44px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  min-height:240px;position:relative;overflow:hidden;
+}
+.type-q:nth-child(1){background:#1A3A70}
+.type-q:nth-child(2){background:#0D2650}
+.type-q:nth-child(3){background:#2A5298}
+.type-q:nth-child(4){background:#1B4F8A}
+.type-q-bg{
+  position:absolute;top:-0.1em;right:-0.1em;
+  font-family:var(--sans);font-size:clamp(80px,14vw,140px);font-weight:900;
+  color:rgba(255,255,255,0.06);line-height:1;pointer-events:none;
+}
+.type-icon{width:clamp(28px,4vw,40px);height:clamp(28px,4vw,40px);margin-bottom:14px;display:block;color:rgba(163,202,232,0.7);flex-shrink:0}
+.type-icon svg{width:100%;height:100%}
+.type-name{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.5vw,26px);color:#fff;display:block;margin-bottom:6px;line-height:1.2}
+.type-key{font-family:var(--sans);font-size:clamp(12px,1.5vw,14px);color:rgba(163,202,232,0.7);display:block;line-height:1.6}
+.type-result-strip{
+  background:linear-gradient(90deg,var(--gold),var(--gold-l));
+  text-align:center;padding:20px 24px;max-width:720px;margin:0 auto;
+  font-family:var(--serif);font-weight:700;font-size:clamp(14px,2.2vw,18px);color:var(--navy);
+}
+
+@media(max-width:560px){
+  .type-q{min-height:180px;padding:24px 20px}
+  .type-q-bg{font-size:80px}
+}
+
+/* ══════════════════════════════════════
+   § BEFORE / AFTER — 写真 + 巨大「4ヶ月」
+══════════════════════════════════════ */
+#ba{background:var(--white);padding:clamp(72px,10vw,104px) 0;overflow:hidden}
+.ba-label-sec{text-align:center;padding:0 24px;margin-bottom:44px}
+.ba-label-sec p{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;margin-bottom:12px}
+.ba-label-sec h2{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4vw,32px);color:var(--navy);line-height:1.5;text-wrap:balance;letter-spacing:0}
+.ba-split{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:stretch;max-width:900px;margin:0 auto;
+}
+.ba-side{position:relative;overflow:hidden;min-height:480px}
+.ba-side img{width:100%;height:100%;object-fit:cover;display:block}
+.ba-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:28px 24px;
+}
+.ba-side.before .ba-overlay{background:linear-gradient(to top,rgba(13,38,80,0.85) 0%,rgba(13,38,80,0.2) 60%,transparent 100%)}
+.ba-side.after  .ba-overlay{background:linear-gradient(to top,rgba(30,58,138,0.75) 0%,rgba(30,58,138,0.1) 60%,transparent 100%)}
+.ba-tag{font-family:var(--sans);font-size:9px;letter-spacing:.22em;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px}
+.ba-copy{font-family:var(--serif);font-weight:700;font-size:clamp(14px,2vw,18px);color:#fff;line-height:1.55;text-wrap:balance;letter-spacing:0}
+.ba-items-list{margin-top:10px;display:grid;gap:5px}
+.ba-items-list span{font-family:var(--sans);font-size:clamp(11px,1.5vw,13px);color:rgba(255,255,255,0.7);line-height:1.6;display:flex;align-items:center;gap:7px}
+.ba-icon{width:16px;height:16px;flex-shrink:0}
+.ba-icon svg{width:100%;height:100%}
+.ba-center{
+  width:clamp(60px,8vw,90px);
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;
+  flex-shrink:0;
+}
+.ba-center-num{font-family:var(--sans);font-size:clamp(28px,5vw,52px);font-weight:900;color:var(--navy);line-height:1;letter-spacing:-.02em}
+.ba-center-lbl{font-family:var(--sans);font-size:9px;color:rgba(13,38,80,0.7);font-weight:700;letter-spacing:.1em}
+
+@media(max-width:660px){
+  .ba-split{grid-template-columns:1fr;grid-template-rows:1fr auto 1fr}
+  .ba-side{min-height:280px}
+  .ba-center{width:100%;height:56px;flex-direction:row;gap:8px;padding:0 20px}
+  .ba-center-num{font-size:32px}
+}
+
+/* ══════════════════════════════════════
+   § STORY — インストラクター
+══════════════════════════════════════ */
+#story{background:var(--ivory);padding:0;overflow:hidden}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;min-height:80vh;align-items:stretch}
+.story-photo-col{position:relative;overflow:hidden;min-height:560px}
+.story-photo-col img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.story-photo-col::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--ivory) 100%)}
+.book-overlap{
+  position:absolute;bottom:32px;left:28px;z-index:2;
+  width:clamp(80px,10vw,110px);border-radius:6px;overflow:hidden;
+  box-shadow:0 8px 28px rgba(13,38,80,0.3);
+}
+.book-overlap img{width:100%;display:block}
+.story-text-col{
+  padding:clamp(56px,8vw,96px) clamp(36px,5vw,64px) clamp(56px,8vw,96px) clamp(28px,3vw,40px);
+  display:flex;flex-direction:column;justify-content:center;
+}
+.story-eyebrow{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;margin-bottom:20px}
+.story-name-ruby{font-family:var(--sans);font-size:10px;color:var(--light);letter-spacing:.12em;display:block;margin-bottom:2px}
+.story-name{font-family:var(--serif);font-weight:900;font-size:clamp(36px,5vw,56px);color:var(--navy);line-height:1.1;display:block;margin-bottom:6px;letter-spacing:0}
+.story-tagline{font-family:var(--serif);font-size:clamp(15px,2vw,19px);color:var(--sub);line-height:1.75;margin-bottom:28px;text-wrap:balance;letter-spacing:0}
+.story-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px}
+.story-num{text-align:center;padding:14px 8px;background:var(--navy);border-radius:10px}
+.story-n{font-family:var(--sans);font-size:clamp(24px,3.5vw,36px);font-weight:900;color:rgba(232,217,160,0.9);line-height:1;display:block}
+.story-nl{font-family:var(--sans);font-size:9px;color:rgba(163,202,232,0.45);margin-top:3px;display:block;line-height:1.5}
+.story-body{font-family:var(--sans);font-size:clamp(13px,1.6vw,15px);color:var(--sub);line-height:2.05;text-wrap:pretty;max-inline-size:36em}
+.story-body strong{color:var(--text);font-weight:700}
+.story-quote{
+  border-left:4px solid var(--gold);
+  padding:16px 20px;margin-top:22px;
+  background:rgba(184,146,42,0.04);border-radius:0 8px 8px 0;
+}
+.story-quote p{font-family:var(--serif);font-size:clamp(14px,1.8vw,16.5px);font-weight:700;color:var(--navy);line-height:1.8;text-wrap:pretty}
+.story-creds{margin-top:22px;display:grid;gap:4px}
+.story-cred{font-family:var(--sans);font-size:11.5px;color:var(--light);padding-left:12px;position:relative;line-height:1.7;text-wrap:pretty}
+.story-cred::before{content:'—';position:absolute;left:0;color:var(--gold)}
+
+@media(max-width:768px){
+  .story-grid{grid-template-columns:1fr}
+  .story-photo-col{min-height:360px;height:360px}
+  .story-photo-col::after{background:linear-gradient(to top,var(--ivory) 5%,transparent 50%)}
+  .story-text-col{padding:32px 24px 56px}
+  .book-overlap{width:80px;bottom:20px;left:20px}
+}
+
+/* ══════════════════════════════════════
+   § CTA MID
+══════════════════════════════════════ */
+.cta-mid{
+  background:var(--white);
+  padding:clamp(56px,8vw,80px) clamp(24px,6vw,80px);
+  text-align:center;
+}
+.cta-label{font-family:var(--sans);font-size:11px;color:var(--light);letter-spacing:.14em;display:block;margin-bottom:18px}
+.cta-main-btn{
+  display:block;background:var(--navy);color:#fff;
+  font-family:var(--serif);font-weight:700;font-size:clamp(16px,2.5vw,22px);
+  padding:24px clamp(20px,4vw,48px);border-radius:50px;text-decoration:none;
+  box-shadow:0 8px 32px rgba(13,38,80,0.25);letter-spacing:.01em;
+  transition:opacity .2s,transform .18s;
+  width:100%;max-width:520px;margin:0 auto;text-align:center;
+}
+.cta-main-btn:hover{opacity:.85;transform:translateY(-2px)}
+.cta-note{font-family:var(--sans);font-size:11px;color:var(--light);margin-top:10px}
+
+/* ══════════════════════════════════════
+   § 3 STEPS — 交互レイアウト
+══════════════════════════════════════ */
+#steps{background:var(--white)}
+.step-section{
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:520px;align-items:stretch;
+}
+.step-section.rev{direction:rtl}
+.step-section.rev > *{direction:ltr}
+.step-photo{position:relative;overflow:hidden}
+.step-photo img{width:100%;height:100%;object-fit:cover;display:block;min-height:400px}
+.step-photo .img-req{height:100%;min-height:400px;border-radius:0;border:none}
+.step-text{
+  padding:clamp(48px,7vw,88px) clamp(32px,5vw,68px);
+  display:flex;flex-direction:column;justify-content:center;
+  background:var(--white);position:relative;overflow:hidden;
+}
+.step-section:nth-child(2) .step-text{background:var(--pale)}
+.step-section:nth-child(3) .step-text{background:var(--ivory)}
+.step-bg-word{
+  position:absolute;bottom:-0.12em;right:-0.05em;
+  font-family:var(--sans);font-size:clamp(80px,14vw,140px);font-weight:900;
+  color:rgba(30,58,138,0.05);line-height:1;pointer-events:none;letter-spacing:-.03em;
+  text-transform:uppercase;
+}
+.step-n{
+  font-family:var(--sans);font-size:clamp(60px,9vw,100px);font-weight:900;
+  color:rgba(30,58,138,0.08);line-height:1;display:block;margin-bottom:-8px;
+}
+.step-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--gold);font-weight:700;text-transform:uppercase;display:block;margin-bottom:10px}
+.step-title{font-family:var(--serif);font-weight:700;font-size:clamp(20px,2.8vw,30px);color:var(--navy);line-height:1.4;margin-bottom:14px;text-wrap:balance;letter-spacing:0}
+.step-body{font-family:var(--sans);font-size:clamp(13px,1.5vw,15px);color:var(--sub);line-height:2.05;text-wrap:pretty;max-inline-size:36em}
+
+@media(max-width:768px){
+  .step-section{grid-template-columns:1fr}
+  .step-section.rev{direction:ltr}
+  .step-photo img,.step-photo .img-req{min-height:280px;height:280px}
+  .step-text{padding:36px 24px}
+  .step-bg-word{font-size:80px}
+}
+
+/* ══════════════════════════════════════
+   § CURRICULUM — 縦タイムライン
+══════════════════════════════════════ */
+#curriculum{
+  background:var(--navy);
+  padding:clamp(72px,10vw,110px) clamp(24px,6vw,80px);
+}
+.curr-head{text-align:center;margin-bottom:56px}
+.curr-head-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:rgba(163,202,232,0.45);font-weight:700;text-transform:uppercase;display:block;margin-bottom:14px}
+.curr-head h2{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4vw,34px);color:#fff;line-height:1.5;text-wrap:balance;letter-spacing:0}
+.curr-timeline{max-width:660px;margin:0 auto;position:relative}
+.curr-timeline::before{
+  content:'';position:absolute;left:28px;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,rgba(163,202,232,0.25) 0%,rgba(184,146,42,0.4) 100%);
+}
+.curr-month{padding-left:72px;padding-bottom:48px;position:relative}
+.curr-month:last-child{padding-bottom:0}
+.curr-dot{
+  position:absolute;left:18px;top:10px;
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid rgba(163,202,232,0.35);
+  background:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+}
+.curr-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.curr-month-num{font-family:var(--sans);font-size:10px;letter-spacing:.22em;color:rgba(163,202,232,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:6px}
+.curr-month-title{font-family:var(--serif);font-weight:700;font-size:clamp(17px,2.5vw,22px);color:#fff;line-height:1.45;margin-bottom:8px;text-wrap:balance;letter-spacing:0}
+.curr-month-sub{font-family:var(--sans);font-size:clamp(13px,1.6vw,15px);color:rgba(163,202,232,0.55);line-height:1.9;margin-bottom:12px;text-wrap:pretty;max-inline-size:36em}
+/* アコーディオン */
+.curr-acc summary{
+  list-style:none;cursor:pointer;
+  font-family:var(--sans);font-size:12px;color:rgba(163,202,232,0.4);
+  letter-spacing:.06em;display:inline-flex;align-items:center;gap:6px;
+  padding:4px 0;
+  transition:color .15s;
+}
+.curr-acc summary::-webkit-details-marker{display:none}
+.curr-acc summary::before{content:'▶';font-size:9px;transition:transform .2s}
+.curr-acc[open] summary::before{transform:rotate(90deg)}
+.curr-acc[open] summary{color:rgba(163,202,232,0.7)}
+.curr-acc-body{margin-top:12px;display:grid;gap:8px}
+.curr-sess{background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 16px;display:grid;grid-template-columns:38px 1fr;gap:0 12px;align-items:start}
+.curr-sess-n{font-family:var(--sans);font-size:10px;font-weight:700;color:rgba(232,217,160,0.6);padding-top:2px}
+.curr-sess-title{font-family:var(--sans);font-size:13px;color:rgba(200,220,240,0.75);line-height:1.75}
+
+/* ══════════════════════════════════════
+   § LINE — スマホモックアップ
+══════════════════════════════════════ */
+#line-sec{
+  background:var(--ivory);
+  padding:clamp(72px,10vw,104px) clamp(24px,6vw,80px);
+  overflow:hidden;
+}
+.line-layout{
+  max-width:800px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,64px);align-items:center;
+}
+.line-copy{}
+.line-copy-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;margin-bottom:16px}
+.line-copy h2{font-family:var(--serif);font-weight:700;font-size:clamp(22px,3.5vw,32px);color:var(--navy);line-height:1.5;margin-bottom:16px;text-wrap:balance;letter-spacing:0}
+.line-copy p{font-family:var(--sans);font-size:clamp(13px,1.6vw,15px);color:var(--sub);line-height:2.05}
+/* スマホフレーム */
+.phone-frame{
+  width:clamp(200px,28vw,260px);margin:0 auto;
+  background:#1A1A2E;border-radius:36px;padding:12px;
+  box-shadow:0 16px 60px rgba(13,38,80,0.28),inset 0 0 0 1px rgba(255,255,255,0.08);
+  position:relative;
+}
+.phone-notch{width:90px;height:22px;background:#1A1A2E;border-radius:0 0 14px 14px;margin:0 auto 6px;position:relative;z-index:1}
+.phone-screen{background:#DCE7EF;border-radius:24px;overflow:hidden}
+.phone-header{background:#1E8A3A;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.phone-av{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:11px;font-weight:700;color:#1E8A3A;flex-shrink:0}
+.phone-name{font-size:12px;font-weight:700;color:#fff;display:block}
+.phone-status{font-size:9px;color:rgba(255,255,255,0.65)}
+.phone-body{padding:12px 10px;display:grid;gap:7px}
+.p-msg{max-width:82%;padding:8px 12px;border-radius:14px;font-family:var(--sans);font-size:11px;line-height:1.6}
+.p-msg.t{background:#fff;color:var(--text);border-radius:3px 14px 14px 14px;align-self:flex-start}
+.p-msg.u{background:#AAD559;color:#1A2A00;border-radius:14px 14px 3px 14px;margin-left:auto}
+.p-row{display:flex;align-items:flex-end;gap:6px}
+.p-row.r{flex-direction:row-reverse}
+.p-time{font-size:8.5px;color:#999;flex-shrink:0}
+
+@media(max-width:640px){
+  .line-layout{grid-template-columns:1fr}
+  .phone-frame{width:min(240px,80vw)}
+}
+
+/* ══════════════════════════════════════
+   § VOICES — 巨大引用 + 動画1枠 + カード
+══════════════════════════════════════ */
+#voices{background:var(--white);padding:clamp(72px,10vw,110px) clamp(24px,6vw,80px)}
+.voices-inner{max-width:780px;margin:0 auto}
+.voices-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;text-align:center;margin-bottom:14px}
+.voices-h{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4vw,32px);color:var(--navy);text-align:center;line-height:1.5;margin-bottom:60px;text-wrap:balance;letter-spacing:0}
+/* 巨大引用 */
+.big-quote{
+  position:relative;padding:0 24px;margin-bottom:64px;
+}
+.big-quote::before{
+  content:'\201C';
+  position:absolute;top:-0.15em;left:0;
+  font-family:var(--serif);font-size:clamp(80px,14vw,140px);
+  color:rgba(30,58,138,0.1);line-height:1;pointer-events:none;
+}
+.big-quote-text{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(24px,4.5vw,42px);color:var(--navy);
+  line-height:1.45;position:relative;
+  text-wrap:balance;letter-spacing:0;
+}
+.big-quote-credit{
+  font-family:var(--sans);font-size:13px;color:var(--light);
+  margin-top:16px;display:flex;align-items:center;gap:12px;
+}
+.big-quote-credit::before{content:'';width:32px;height:1px;background:var(--mist)}
+/* 動画（1枠のみ） */
+.video-card{border-radius:16px;overflow:hidden;margin-bottom:48px;box-shadow:0 4px 24px rgba(13,38,80,0.14)}
+.video-player{background:var(--navy);aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.video-player video{width:100%;height:100%;object-fit:cover;display:block}
+.play-btn{width:54px;height:54px;border-radius:50%;background:rgba(163,202,232,0.18);border:2px solid rgba(163,202,232,0.4);display:flex;align-items:center;justify-content:center}
+.video-ph-lbl{font-family:var(--sans);font-size:11px;color:rgba(163,202,232,0.4);letter-spacing:.06em}
+.video-caption{background:var(--pale);padding:16px 22px}
+.video-caption p:first-child{font-family:var(--serif);font-weight:700;font-size:clamp(14px,2vw,17px);color:var(--royal);margin-bottom:3px;line-height:1.55}
+.video-caption p:last-child{font-family:var(--sans);font-size:11.5px;color:var(--light)}
+/* テキスト証言 */
+.tv-grid{display:grid;gap:18px}
+.tv-card{padding:28px 26px 22px;position:relative;border-bottom:1px solid rgba(163,202,232,0.2)}
+.tv-card:last-child{border-bottom:none}
+.tv-card::before{content:'\201C';font-family:var(--serif);font-size:50px;color:rgba(163,202,232,0.2);position:absolute;top:12px;left:14px;line-height:1}
+.tv-body{font-family:var(--sans);font-size:clamp(13px,1.7vw,15px);color:var(--sub);line-height:2.05;margin-bottom:16px;position:relative;text-wrap:pretty}
+.tv-body strong{color:var(--royal);font-weight:700}
+.tv-foot{display:flex;align-items:center;gap:10px}
+.tv-av{width:36px;height:36px;border-radius:50%;background:var(--pale);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;font-weight:700;color:var(--royal);flex-shrink:0}
+.tv-name{font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--text)}
+.tv-detail{font-family:var(--sans);font-size:11px;color:var(--light)}
+.tv-tag{margin-left:auto;font-family:var(--sans);font-size:10.5px;font-weight:700;color:var(--royal);background:var(--pale);padding:3px 10px;border-radius:4px;border:1px solid rgba(30,58,138,0.15);white-space:nowrap}
+.tv-placeholder{text-align:center;padding:32px 20px;border:1.5px dashed rgba(163,202,232,0.4);border-radius:10px}
+.tv-placeholder p{font-family:var(--sans);font-size:13px;color:var(--light);line-height:1.9}
+
+/* ══════════════════════════════════════
+   § FAQ
+══════════════════════════════════════ */
+#faq{background:var(--ivory);padding:clamp(72px,10vw,104px) clamp(24px,6vw,80px)}
+.faq-inner{max-width:680px;margin:0 auto}
+.faq-h{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4vw,32px);color:var(--navy);text-align:center;margin-bottom:48px;text-wrap:balance;letter-spacing:0}
+.faq-item{border-bottom:1px solid rgba(163,202,232,0.25)}
+.faq-q{display:flex;align-items:flex-start;gap:14px;padding:22px 0;cursor:pointer;font-family:var(--serif);font-size:clamp(14.5px,2.2vw,17px);font-weight:700;color:var(--text);line-height:1.55;list-style:none;user-select:none;text-wrap:balance;letter-spacing:0}
+.faq-q::marker,.faq-q::-webkit-details-marker{display:none}
+.faq-qi{color:var(--gold);font-size:18px;font-weight:900;flex-shrink:0;line-height:1.4;font-family:var(--serif)}
+details[open] .faq-q{color:var(--royal)}
+.faq-a{padding:0 0 22px 32px;font-family:var(--sans);font-size:clamp(13px,1.8vw,15px);color:var(--sub);line-height:2.1;text-wrap:pretty;max-inline-size:38em}
+
+/* ══════════════════════════════════════
+   § CONSULT — 暗いCTAセクション
+══════════════════════════════════════ */
+#consult{
+  background:var(--navy);
+  padding:clamp(80px,12vw,120px) clamp(24px,6vw,80px);
+  text-align:center;position:relative;overflow:hidden;
+}
+#consult::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(30,58,138,0.6) 0%,transparent 100%);
+}
+.consult-inner{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.consult-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:rgba(163,202,232,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:20px}
+.consult-h{font-family:var(--serif);font-weight:700;font-size:clamp(26px,5.5vw,46px);color:#fff;line-height:1.45;margin-bottom:14px;text-wrap:balance;letter-spacing:0}
+.consult-h em{font-style:normal;color:rgba(232,217,160,0.9)}
+.consult-p{font-family:var(--sans);font-size:clamp(13px,1.8vw,15.5px);color:rgba(163,202,232,0.45);line-height:2;margin-bottom:40px;text-wrap:pretty}
+.consult-flow{display:grid;gap:8px;margin-bottom:44px;text-align:left}
+.cf{background:rgba(255,255,255,0.06);border-radius:10px;padding:16px 20px;display:flex;gap:16px;align-items:flex-start}
+.cf-n{font-family:var(--serif);font-size:22px;font-weight:900;color:rgba(163,202,232,0.35);line-height:1;flex-shrink:0;width:24px}
+.cf-body h4{font-family:var(--serif);font-weight:700;font-size:clamp(14px,2vw,16px);color:#fff;margin-bottom:2px;text-wrap:balance}
+.cf-body p{font-family:var(--sans);font-size:clamp(11px,1.6vw,13px);color:rgba(163,202,232,0.38);line-height:1.75;text-wrap:pretty}
+.consult-price-box{
+  background:rgba(255,255,255,0.05);border:1px solid rgba(163,202,232,0.18);
+  border-radius:14px;padding:28px 24px;margin-bottom:36px;
+}
+.consult-price-lbl{font-family:var(--sans);font-size:9px;letter-spacing:.24em;color:rgba(163,202,232,0.4);font-weight:700;text-transform:uppercase;display:block;margin-bottom:8px}
+.consult-price-num{font-family:var(--sans);font-size:clamp(64px,14vw,96px);font-weight:900;color:#fff;line-height:1;display:block;letter-spacing:-.03em;margin-bottom:4px}
+.consult-price-sub{font-family:var(--sans);font-size:12px;color:rgba(163,202,232,0.35)}
+.consult-btn{
+  display:block;background:rgba(232,217,160,0.92);color:var(--navy);
+  font-family:var(--serif);font-weight:700;font-size:clamp(16px,2.8vw,22px);
+  padding:24px clamp(20px,4vw,40px);border-radius:50px;text-decoration:none;
+  max-width:480px;margin:0 auto;
+  box-shadow:0 8px 32px rgba(184,146,42,0.25);
+  transition:opacity .2s,transform .18s;letter-spacing:.01em;
+}
+.consult-btn:hover{opacity:.88;transform:translateY(-2px)}
+.consult-note{font-family:var(--sans);font-size:11px;color:rgba(163,202,232,0.28);margin-top:12px;line-height:2}
+
+/* ══════════════════════════════════════
+   § PRICE
+══════════════════════════════════════ */
+#price{background:var(--white);padding:clamp(72px,10vw,110px) clamp(24px,6vw,80px)}
+.price-inner{max-width:620px;margin:0 auto}
+.price-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--light);font-weight:700;text-transform:uppercase;display:block;text-align:center;margin-bottom:14px}
+.price-h{font-family:var(--serif);font-weight:700;font-size:clamp(20px,4vw,30px);color:var(--navy);text-align:center;margin-bottom:40px;text-wrap:balance;letter-spacing:0}
+.price-card{
+  background:var(--white);border-radius:20px;padding:44px 36px;text-align:center;
+  box-shadow:0 2px 0 var(--gold),0 4px 40px rgba(13,38,80,0.12);
+  border:1px solid rgba(163,202,232,0.18);
+  margin-bottom:24px;
+}
+.pc-product{font-family:var(--sans);font-size:9.5px;letter-spacing:.2em;color:var(--gold);font-weight:700;text-transform:uppercase;display:block;margin-bottom:10px}
+.pc-name{font-family:var(--serif);font-size:clamp(13px,1.8vw,15px);color:var(--sub);line-height:1.85;margin-bottom:24px}
+.pc-orig{font-family:var(--sans);font-size:14px;color:var(--light);text-decoration:line-through;display:block;margin-bottom:6px}
+.pc-badge{display:block;background:#C0392B;color:#fff;font-family:var(--sans);font-size:11px;font-weight:700;padding:4px 14px;border-radius:3px;letter-spacing:.06em;margin-bottom:12px;width:fit-content;margin-left:auto;margin-right:auto}
+.pc-price{font-family:var(--sans);font-size:clamp(60px,13vw,92px);font-weight:900;color:var(--navy);line-height:1;display:block;letter-spacing:-.03em;margin-bottom:5px}
+.pc-price small{font-size:.38em;font-weight:600;vertical-align:middle;letter-spacing:0}
+.pc-tax{font-family:var(--sans);font-size:12px;color:var(--light);display:block;margin-bottom:8px}
+.pc-saving{display:block;background:#FBF5E6;border:1px solid rgba(184,146,42,0.35);border-radius:4px;padding:5px 16px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:28px;width:fit-content;margin-left:auto;margin-right:auto}
+.pc-split{font-family:var(--sans);font-size:13px;color:var(--sub);background:var(--pale);border-radius:6px;padding:8px 16px;display:inline-block;margin-bottom:28px}
+.pc-rows{text-align:left;border-top:1px solid rgba(163,202,232,0.2);padding-top:18px;display:grid;gap:8px}
+.pc-row{font-family:var(--sans);font-size:13px;display:flex;gap:12px}
+.pc-row span:first-child{color:var(--sub);font-weight:700;min-width:68px;flex-shrink:0}
+.pc-row span:last-child{color:var(--light)}
+.price-note{
+  border-left:4px solid var(--gold);background:#FFFEF9;
+  padding:20px 22px;margin-bottom:22px;border-radius:0 8px 8px 0;
+}
+.price-note p{font-family:var(--serif);font-size:clamp(13px,1.8vw,15px);color:var(--text);line-height:2;text-wrap:pretty}
+.price-note strong{display:block;margin-bottom:6px}
+.price-note strong{color:var(--navy)}
+.urgency{background:var(--navy);border-radius:12px;padding:22px 24px;margin-bottom:32px}
+.urgency p{font-family:var(--sans);font-size:clamp(13px,1.7vw,15px);color:rgba(200,220,240,0.8);line-height:2;margin-bottom:8px}
+.urgency p:last-child{margin-bottom:0}
+.urgency strong{color:#fff}
+.urgency em{font-style:normal;color:rgba(232,217,160,0.9)}
+
+/* ══════════════════════════════════════
+   § CLOSING
+══════════════════════════════════════ */
+#closing{
+  position:relative;overflow:hidden;
+  min-height:70vh;display:flex;align-items:flex-end;
+}
+.closing-photo{position:absolute;inset:0}
+.closing-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.closing-photo .img-req{height:100%;border-radius:0;border:none}
+.closing-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(13,38,80,0.94) 0%,rgba(13,38,80,0.4) 60%,rgba(13,38,80,0.15) 100%)}
+.closing-body{position:relative;z-index:2;width:100%;padding:clamp(56px,10vw,100px) clamp(24px,6vw,80px);text-align:center}
+.closing-pre{font-family:var(--sans);font-size:clamp(13px,1.8vw,15.5px);color:rgba(200,220,240,0.45);line-height:2;margin-bottom:20px;text-wrap:pretty}
+.closing-h{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(24px,5.5vw,46px);color:#fff;
+  line-height:1.55;margin-bottom:44px;
+  text-wrap:balance;letter-spacing:0;
+}
+.closing-h span{text-decoration:underline;text-decoration-color:rgba(163,202,232,0.4);text-underline-offset:8px}
+.closing-btn{
+  display:block;background:rgba(232,217,160,0.92);color:var(--navy);
+  font-family:var(--serif);font-weight:700;font-size:clamp(16px,2.5vw,22px);
+  padding:22px clamp(20px,4vw,48px);border-radius:50px;text-decoration:none;
+  box-shadow:0 8px 32px rgba(184,146,42,0.25);max-width:480px;width:100%;text-align:center;
+  margin:0 auto;letter-spacing:.01em;
+  transition:opacity .2s,transform .18s;
+}
+.closing-btn:hover{opacity:.88;transform:translateY(-2px)}
+.closing-note{font-family:var(--sans);font-size:11px;color:rgba(163,202,232,0.28);margin-top:12px}
+.closing-sig{font-family:var(--serif);font-size:12px;color:rgba(163,202,232,0.25);letter-spacing:.1em;margin-top:48px}
+
+footer{background:#071828;padding:28px 24px;text-align:center}
+footer p{font-family:var(--sans);font-size:10.5px;color:rgba(163,202,232,0.22);line-height:2.3}
+
+/* ── UTILITY ── */
+.gold-line{width:36px;height:2px;background:var(--gold);margin:16px 0 24px;display:block}
+.gold-line-c{margin:16px auto 24px}
+
+/* ══════════════════════════════════════
+   § ROI — 投資対効果セクション
+══════════════════════════════════════ */
+#roi{background:var(--ivory);padding:clamp(72px,10vw,110px) clamp(24px,6vw,80px)}
+.roi-inner{max-width:740px;margin:0 auto}
+.roi-label{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--blue);font-weight:700;text-transform:uppercase;display:block;text-align:center;margin-bottom:14px}
+.roi-h{font-family:var(--serif);font-weight:700;font-size:clamp(20px,4vw,30px);color:var(--navy);text-align:center;margin-bottom:12px;text-wrap:balance;letter-spacing:0}
+.roi-lead{font-family:var(--serif);font-size:clamp(14px,1.9vw,16px);color:var(--text);text-align:center;line-height:1.9;margin-bottom:clamp(48px,7vw,72px);text-wrap:pretty;max-inline-size:36em;margin-inline:auto}
+.roi-blocks{display:flex;flex-direction:column;gap:clamp(56px,8vw,80px)}
+.roi-block{}
+.roi-block-label{font-family:var(--sans);font-size:9px;letter-spacing:.22em;font-weight:700;color:var(--blue);text-transform:uppercase;display:block;margin-bottom:8px}
+.roi-block-h{font-family:var(--serif);font-weight:700;font-size:clamp(17px,2.8vw,22px);color:var(--navy);margin-bottom:10px;text-wrap:balance;letter-spacing:0}
+.roi-block-pre{font-family:var(--serif);font-size:clamp(13.5px,1.8vw,15px);color:var(--text);line-height:1.9;margin-bottom:20px;text-wrap:pretty;max-inline-size:38em}
+.roi-img-wrap{border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(13,38,80,.10)}
+.roi-img-wrap img{width:100%;height:auto;display:block}
+.roi-img-wrap .img-req{border-radius:12px;min-height:280px}
+.roi-block-post{font-family:var(--serif);font-size:clamp(13px,1.7vw,14.5px);color:var(--text);line-height:1.9;margin-top:16px;text-wrap:pretty;max-inline-size:38em}
+.roi-calc{background:#fff;border:1px solid rgba(30,58,138,.1);border-radius:10px;padding:20px 24px;margin:20px 0;font-family:var(--sans)}
+.roi-calc-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(30,58,138,.06);font-size:clamp(12px,1.6vw,13.5px);color:var(--text);gap:16px}
+.roi-calc-row:last-child{border-bottom:none;padding-top:12px;margin-top:4px}
+.roi-calc-row.total{font-weight:700;color:var(--navy);font-size:clamp(13.5px,1.8vw,15px)}
+.roi-calc-row span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.roi-calc-row.total span:last-child{color:#cc2200;font-size:clamp(16px,2.4vw,20px)}
+.roi-divider{border:none;border-top:1px solid rgba(30,58,138,.1);margin:clamp(48px,7vw,72px) 0}
+.roi-bottom{background:var(--navy);border-radius:14px;padding:clamp(32px,5vw,52px) clamp(24px,5vw,48px);text-align:center;margin-top:clamp(48px,7vw,72px)}
+.roi-bottom-pre{font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:rgba(163,202,232,0.4);margin-bottom:14px;display:block}
+.roi-bottom-h{font-family:var(--serif);font-weight:700;font-size:clamp(18px,3.2vw,26px);color:#fff;margin-bottom:10px;text-wrap:balance;letter-spacing:0;line-height:1.5}
+.roi-bottom-num{font-family:var(--sans);font-weight:900;font-size:clamp(44px,9vw,72px);color:var(--gold-l);letter-spacing:-.03em;line-height:1;display:block;margin:16px 0 6px}
+.roi-bottom-num small{font-size:.42em;font-weight:600;vertical-align:middle;letter-spacing:0}
+.roi-bottom-sub{font-family:var(--serif);font-size:clamp(13px,1.8vw,15px);color:rgba(184,207,232,0.7);line-height:1.9;text-wrap:pretty}
+.roi-bottom-arrow{font-family:var(--sans);font-size:clamp(12px,1.6vw,13.5px);color:rgba(163,202,232,0.5);margin-top:20px;letter-spacing:.04em}
+@media(max-width:374px){
+  #roi{padding-left:18px;padding-right:18px}
+  .roi-calc{padding:16px 14px}
+}
+
+/*
+══════════════════════════════════════
+   § 超小画面（320px〜374px）対応
+══════════════════════════════════════ */
+@media(max-width:374px){
+  .fv-left{padding-left:18px;padding-right:18px}
+  .pain-copy{padding:32px 18px}
+  .step-text{padding:28px 18px}
+  #timeline{padding-left:18px;padding-right:18px}
+  #decl{padding-left:18px;padding-right:18px}
+  #types{padding-left:0;padding-right:0}
+  .types-head{padding:0 18px}
+  #line-sec{padding-left:18px;padding-right:18px}
+  #voices{padding-left:18px;padding-right:18px}
+  .faq-inner{padding:0 18px}
+  #consult{padding-left:18px;padding-right:18px}
+  #price .price-inner{max-width:100%;padding:0 18px}
+  .closing-body{padding-left:18px;padding-right:18px}
+  .price-card{padding:28px 20px}
+  .tl-item{grid-template-columns:60px 1fr;gap:0 12px}
+  .tl-time{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── STICKY BOTTOM CTA ─── -->
+<div id="sticky-cta">
+  <div class="sc-txt">
+    <strong>まず1,000円の個別相談から</strong>
+    45分オンライン ／ 強引な勧誘なし
+  </div>
+  <a href="#consult" class="sc-btn">申し込む →</a>
+</div>
+
+<!-- ─── TOPBAR ─── -->
+<header id="topbar">
+  <div class="tb-logo">
+    <img src="images/logo.png" alt="スクールオーク" onerror="this.style.display='none'">
+    <span class="tb-title">スクールオーク ／ 4ヶ月プログラム</span>
+  </div>
+  <a href="#consult" class="tb-btn">》1,000円相談</a>
+</header>
+
+
+<!-- ═══════════════════════════════════
+  § FV
+═══════════════════════════════════ -->
+<section id="fv">
+  <div class="fv-left">
+    <span class="fv-eyebrow">School Oak · 高木美保 · 金沢片町</span>
+    <h1 class="fv-h1">「言わないと動かない子」を<em>「自分から机に向かう子」</em>に変える4ヶ月</h1>
+    <p class="fv-sub">子ども3人全員を東大に合格させた母親が直接指導する、親の声かけを変えるマンツーマンプログラム。</p>
+    <div class="fv-price-badge">
+      <span>第1期特別価格</span>
+      <strong>198,000<small>円</small></strong>
+    </div>
+    <a href="#consult" class="fv-btn">》1,000円の個別相談をする</a>
+    <p class="fv-note">45分オンライン ／ 相談だけでもOK</p>
+  </div>
+  <div class="fv-right">
+    <img src="images/image5.png" alt="穏やかに歩く母と子" onerror="this.classList.add('img-req');this.alt='[IMAGE REQUIRED: 桜の木の下、小学生の子どもと笑顔のお母さんが並んで歩いている。日本人親子。自然な光。女性誌のような写真。縦長。]'">
+  </div>
+  <div class="fv-stats">
+    <div class="fv-stat"><span class="fv-stat-n">3人</span><span class="fv-stat-l">子ども全員 東大現役合格</span></div>
+    <div class="fv-stat"><span class="fv-stat-n">30年</span><span class="fv-stat-l">金沢での塾長指導実績</span></div>
+    <div class="fv-stat"><span class="fv-stat-n">91%</span><span class="fv-stat-l">第一志望合格率</span></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § PAIN — 写真 + 吹き出し
+═══════════════════════════════════ -->
+<section id="pain">
+  <div class="pain-inner">
+    <div class="pain-photo">
+      <img src="images/image1.png" alt="子どものことで悩むお母さん" onerror="this.parentElement.innerHTML='<div class=\'img-req\' style=\'height:100%;min-height:520px;\'>［IMAGE REQUIRED: 自然光の入る部屋。30〜40代の日本人女性が一人、テーブルに手を当てて考え込んでいる。疲れと心配が表情に出ている。ライフスタイル誌のような自然な写真。縦長。］</div>'">
+      <div class="bubble bubble--1">「宿題、した？」</div>
+      <div class="bubble bubble--2">「早くしなさい！」</div>
+      <div class="bubble bubble--3">「なんでやらないの」</div>
+    </div>
+    <div class="pain-copy">
+      <span class="pain-label">毎日の苦しさ</span>
+      <h2 class="pain-main">今日こそ<br>言わないつもり<br>だったのに。</h2>
+      <span class="gold-line"></span>
+      <p class="pain-body">愛情があるからこそ、言い続けてしまう。でも言えば言うほど、子どもは動かなくなる。そのループから、抜け出せないでいる。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § TIMELINE — 朝のバトル時間軸
+═══════════════════════════════════ -->
+<section id="timeline">
+  <div class="tl-bg-word">繰り返し</div>
+  <div class="tl-inner">
+    <span class="tl-eyebrow">Every Day · 毎日の繰り返し</span>
+
+    <div class="tl-item">
+      <span class="tl-time">07:15</span>
+      <div>
+        <p class="tl-quote">「早く準備して。宿題はちゃんとやったの？」</p>
+        <p class="tl-inner-voice">（また朝から怒鳴ってしまった。今日は穏やかにしようと思っていたのに）</p>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <span class="tl-time">18:40</span>
+      <div>
+        <p class="tl-quote">「勉強しなさい。何回言ったらわかるの！」</p>
+        <p class="tl-inner-voice">（ゲームをしている。声をかけても返事すらない。どうすればいいのか）</p>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <span class="tl-time">22:58</span>
+      <div>
+        <p class="tl-quote">「また言ってしまった。」</p>
+        <p class="tl-inner-voice">（子どもが寝た後、一人でソファに座っている。明日もまた同じことをしてしまう気がする）</p>
+      </div>
+    </div>
+
+    <div class="tl-closing">
+      <p>この繰り返しに、出口はあります。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § DECLARATION
+═══════════════════════════════════ -->
+<section id="decl">
+  <div class="decl-inner">
+    <p class="decl-pre">はっきり言わせてください。</p>
+    <div class="decl-main">
+      <span>それは</span>
+      <span><u>あなたの</u></span>
+      <span>せいじゃない。</span>
+    </div>
+    <p class="decl-sub">「声かけの正解」を、誰も教えてくれなかっただけです。</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § 4 TYPES — カラーグリッド
+═══════════════════════════════════ -->
+<section id="types">
+  <div class="types-head">
+    <span class="types-label">The Root Cause</span>
+    <h2 class="types-h">子どもが動かないのは「声かけのパターン」で決まっている</h2>
+    <span class="gold-line gold-line-c"></span>
+    <p class="types-body">子どもには4つのタイプがあります。タイプに合っていない声かけが、脳の防衛反応を起こし「やる気スイッチ」を切っています。</p>
+  </div>
+  <div class="type-q-grid">
+    <div class="type-q">
+      <div class="type-q-bg">01</div>
+      <!-- こだわり型：整然とした4分割ブロック -->
+      <span class="type-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="18" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="2" y="18" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="18" y="18" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </span>
+      <span class="type-name">こだわり型</span>
+      <span class="type-key">命令すると反発する</span>
+    </div>
+    <div class="type-q">
+      <div class="type-q-bg">02</div>
+      <!-- 共感型：ハートアウトライン -->
+      <span class="type-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 28C16 28 3 19.5 3 10.5C3 6.9 5.9 4 9.5 4C12.1 4 14.3 5.5 16 7.8C17.7 5.5 19.9 4 22.5 4C26.1 4 29 6.9 29 10.5C29 19.5 16 28 16 28Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="type-name">共感型</span>
+      <span class="type-key">一緒に、が鍵</span>
+    </div>
+    <div class="type-q">
+      <div class="type-q-bg">03</div>
+      <!-- 目標型：同心円ターゲット -->
+      <span class="type-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="16" cy="16" r="7.5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="type-name">目標型</span>
+      <span class="type-key">ゴールが見えると動く</span>
+    </div>
+    <div class="type-q">
+      <div class="type-q-bg">04</div>
+      <!-- 自由型：五芒星アウトライン -->
+      <span class="type-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 2L19.5 11.5L30 11.5L21.5 17.5L25 27L16 21L7 27L10.5 17.5L2 11.5L12.5 11.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="type-name">自由型</span>
+      <span class="type-key">自分で決めると動く</span>
+    </div>
+  </div>
+  <div class="type-result-strip">
+    わが子のタイプに合った声かけに変えるだけで、子どもは自分から動き出す
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § BEFORE / AFTER
+═══════════════════════════════════ -->
+<section id="ba">
+  <div class="ba-label-sec">
+    <p>Transformation</p>
+    <h2>4ヶ月で、毎日が変わる</h2>
+  </div>
+  <div class="ba-split">
+    <div class="ba-side before">
+      <img src="images/image1.png" alt="悩む母親" onerror="this.parentElement.innerHTML='<div class=\'img-req\' style=\'height:100%;min-height:480px;\'>［IMAGE REQUIRED: 暗めのトーン。日本人の母親が一人、疲れた様子でテーブルに寄りかかっている。冷たい光。感情的な重さが伝わる写真。］</div>'">
+      <div class="ba-overlay">
+        <span class="ba-tag">Before · 今の毎日</span>
+        <p class="ba-copy">「宿題した？」「早く！」バトルの朝。後悔の夜。</p>
+        <div class="ba-items-list">
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><line x1="5.5" y1="5.5" x2="10.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="10.5" y1="5.5" x2="5.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/></svg></span>声をかけるまで動かない</span>
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><line x1="5.5" y1="5.5" x2="10.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="10.5" y1="5.5" x2="5.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/></svg></span>怒鳴って、罪悪感で眠れない</span>
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><line x1="5.5" y1="5.5" x2="10.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="10.5" y1="5.5" x2="5.5" y2="10.5" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/></svg></span>どう変えればいいかわからない</span>
+        </div>
+      </div>
+    </div>
+    <div class="ba-center">
+      <span class="ba-center-num">4</span>
+      <span class="ba-center-lbl">ヶ月</span>
+    </div>
+    <div class="ba-side after">
+      <img src="images/image5.png" alt="穏やかな母と子" onerror="this.parentElement.innerHTML='<div class=\'img-req\' style=\'height:100%;min-height:480px;\'>［IMAGE REQUIRED: 明るい自然光。子どもが自分で机に向かっている。お母さんは近くで笑顔で自分の時間を過ごしている。穏やかな日常。ライフスタイル誌的な写真。］</div>'">
+      <div class="ba-overlay">
+        <span class="ba-tag">After · 4ヶ月後</span>
+        <p class="ba-copy">声をかけなくても、子どもが自分で動き出す。</p>
+        <div class="ba-items-list">
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(163,202,232,0.7)" stroke-width="1.2"/><polyline points="5,8 7,10.5 11,5.5" stroke="rgba(163,202,232,0.9)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>時間になると自分から始める</span>
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(163,202,232,0.7)" stroke-width="1.2"/><polyline points="5,8 7,10.5 11,5.5" stroke="rgba(163,202,232,0.9)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>穏やかな朝が戻ってくる</span>
+          <span><span class="ba-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="rgba(163,202,232,0.7)" stroke-width="1.2"/><polyline points="5,8 7,10.5 11,5.5" stroke="rgba(163,202,232,0.9)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>「手を離せる」確信を持って卒業</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § STORY — 雑誌レイアウト
+═══════════════════════════════════ -->
+<section id="story">
+  <div class="story-grid">
+    <div class="story-photo-col">
+      <img src="images/representative.jpg" alt="高木美保" onerror="this.parentElement.innerHTML='<div class=\'img-req\' style=\'height:100%;min-height:560px;\'>高木美保先生のポートレート写真</div>'">
+      <div class="book-overlap">
+        <img src="images/book.jpg" alt="著書：強い脳をつくる育て方" onerror="this.parentElement.style.display='none'">
+      </div>
+    </div>
+    <div class="story-text-col">
+      <span class="story-eyebrow">Instructor · 指導者</span>
+      <span class="story-name-ruby">たかぎ みほ</span>
+      <span class="story-name">高木 美保</span>
+      <p class="story-tagline">30年間、親子を見てきました。</p>
+      <div class="story-nums">
+        <div class="story-num"><span class="story-n">3人</span><span class="story-nl">東大現役合格<br>（母子家庭）</span></div>
+        <div class="story-num"><span class="story-n">30年</span><span class="story-nl">塾長<br>指導実績</span></div>
+        <div class="story-num"><span class="story-n">91%</span><span class="story-nl">第一志望<br>合格率</span></div>
+      </div>
+      <p class="story-body">国立大学で<strong>発達認知学・言語発達学・大脳生理学</strong>を専攻後、教員・河合塾指導員を経て金沢・片町にてスクールオーク開設。</p>
+      <div class="story-quote">
+        <p>私も最初は、「勉強しなさい」しか言えなかった——母子家庭で必死になるほど、子どもとの関係がギクシャクしていた。それを変えたのが「声かけのパターン」。その結果が、<strong>3人全員の東大現役合格</strong>です。</p>
+      </div>
+      <div class="story-creds">
+        <p class="story-cred">国立大学 発達認知学・言語発達学・大脳生理学 専攻</p>
+        <p class="story-cred">元教員・元河合塾指導員</p>
+        <p class="story-cred">スクールオーク（金沢・片町）塾長 30年超</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─── CTA MID ─── -->
+<div class="cta-mid">
+  <span class="cta-label">先着順 ／ 合わなければそこで終わりにできます</span>
+  <a href="#consult" class="cta-main-btn">》1,000円相談でまず話してみる</a>
+  <p class="cta-note">相談だけでもOK ／ 強引な勧誘は一切しません</p>
+</div>
+
+
+<!-- ═══════════════════════════════════
+  § 3 STEPS — 交互レイアウト
+═══════════════════════════════════ -->
+<section id="steps">
+
+  <!-- STEP 01: SPEAK -->
+  <div class="step-section">
+    <div class="step-photo">
+      <img src="images/image2.png" alt="お母さんと子どもが穏やかに話す" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: 日本人の母親と小学生の子どもがダイニングテーブルで穏やかに向かい合っている。会話している様子。温かい光。自然な写真。横長16:9。］</div>'">
+    </div>
+    <div class="step-text">
+      <div class="step-bg-word">SPEAK</div>
+      <span class="step-n">01</span>
+      <span class="step-label">Month 1–2 · 声かけを変える</span>
+      <h3 class="step-title">「言う」をやめる。どう言わないかを設計する。</h3>
+      <p class="step-body">口癖を1つ特定して封印する。わが子のタイプに合ったひと言を渡し、その場で練習。隔週で効果を検証・微調整します。感覚ではなく行動の変化を記録します。</p>
+    </div>
+  </div>
+
+  <!-- STEP 02: SPACE -->
+  <div class="step-section rev">
+    <div class="step-photo">
+      <img src="images/image3.png" alt="学習ノートと机の環境" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: 整った学習デスク。ノートとペン。子どもが自分で使いやすい環境。物撮り。自然光。シンプルで清潔感のある写真。横長16:9。］</div>'">
+    </div>
+    <div class="step-text">
+      <div class="step-bg-word">SPACE</div>
+      <span class="step-n">02</span>
+      <span class="step-label">Month 2–3 · 環境を整える</span>
+      <h3 class="step-title">声かけなしでも子どもが動ける仕組みをつくる。</h3>
+      <p class="step-body">机まわり・持ち物・生活動線を点検。30年の塾現場から見えた「自走する子の部屋の共通点」を、わが家版に落とし込みます。</p>
+    </div>
+  </div>
+
+  <!-- STEP 03: LET GO -->
+  <div class="step-section">
+    <div class="step-photo">
+      <img src="images/image4.png" alt="学習ワークシートと教材" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: 日本人の母親が、子どもが勉強している部屋から少し離れた場所で、自分のことをしながら穏やかに見守っている。手を離している様子。温かい光。ライフスタイル誌的。横長16:9。］</div>'">
+    </div>
+    <div class="step-text">
+      <div class="step-bg-word">LET GO</div>
+      <span class="step-n">03</span>
+      <span class="step-label">Month 3–4 · 手を離す</span>
+      <h3 class="step-title">言いたくなっても、15分待つ練習をする。</h3>
+      <p class="step-body">一番難しいのがこの段階。「口を出したくなる」場面で待つ練習を段階的に行います。卒業ゴールは「親がいなくても子どもが動く状態」。</p>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § CURRICULUM — 縦タイムライン
+═══════════════════════════════════ -->
+<section id="curriculum">
+  <div class="curr-head">
+    <span class="curr-head-label">Program · 4ヶ月全8回</span>
+    <h2>4ヶ月のカリキュラム</h2>
+  </div>
+  <div class="curr-timeline">
+
+    <div class="curr-month">
+      <div class="curr-dot"></div>
+      <span class="curr-month-num">Month 01</span>
+      <h3 class="curr-month-title">4タイプ診断 → 声かけを1つ変える</h3>
+      <p class="curr-month-sub">環境チェックシートで現状把握。わが子のパターンを特定し、タイプに合った声かけを1つ渡して練習します。</p>
+      <details class="curr-acc">
+        <summary>面談①② 詳細を見る</summary>
+        <div class="curr-acc-body">
+          <div class="curr-sess">
+            <span class="curr-sess-n">面①</span>
+            <p class="curr-sess-title">初回：現状把握 / ゴール設定。「まず1週間、何も言わずに観察」の課題設定。</p>
+          </div>
+          <div class="curr-sess">
+            <span class="curr-sess-n">面②</span>
+            <p class="curr-sess-title">4タイプ診断でパターン特定 → タイプ別の声かけを1つ渡す・その場で練習。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="curr-month">
+      <div class="curr-dot"></div>
+      <span class="curr-month-num">Month 02</span>
+      <h3 class="curr-month-title">声かけ検証 + 環境を整える</h3>
+      <p class="curr-month-sub">前月の声かけの効果を数字で確認。次に机まわり・生活動線を点検し、環境から動線を設計します。</p>
+      <details class="curr-acc">
+        <summary>面談③④ 詳細を見る</summary>
+        <div class="curr-acc-body">
+          <div class="curr-sess">
+            <span class="curr-sess-n">面③</span>
+            <p class="curr-sess-title">声かけの効果検証・微調整。「何回言った→何回動いた」を記録から読み解く。</p>
+          </div>
+          <div class="curr-sess">
+            <span class="curr-sess-n">面④</span>
+            <p class="curr-sess-title">学習環境・持ち物・生活動線を点検 → まず1箇所から改善導入。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="curr-month">
+      <div class="curr-dot"></div>
+      <span class="curr-month-num">Month 03</span>
+      <h3 class="curr-month-title">手を離す練習 + 自走の仕組み化</h3>
+      <p class="curr-month-sub">環境変化の効果確認と並行し、「1日1回、黙って待つ」練習をスタート。子どもが自分で動いた場面を記録します。</p>
+      <details class="curr-acc">
+        <summary>面談⑤⑥ 詳細を見る</summary>
+        <div class="curr-acc-body">
+          <div class="curr-sess">
+            <span class="curr-sess-n">面⑤</span>
+            <p class="curr-sess-title">環境変化の効果確認・次の改善箇所へ。「手を離す練習」スタート。</p>
+          </div>
+          <div class="curr-sess">
+            <span class="curr-sess-n">面⑥</span>
+            <p class="curr-sess-title">自走できた場面を記録・「わが家のルール」を明文化。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="curr-month">
+      <div class="curr-dot"></div>
+      <span class="curr-month-num">Month 04</span>
+      <h3 class="curr-month-title">定着確認 → ビフォーアフターで卒業</h3>
+      <p class="curr-month-sub">1週間「完全放任」でテスト。初回チェックシートで変化を数値化し、確信とともに卒業。</p>
+      <details class="curr-acc">
+        <summary>面談⑦⑧ 詳細を見る</summary>
+        <div class="curr-acc-body">
+          <div class="curr-sess">
+            <span class="curr-sess-n">面⑦</span>
+            <p class="curr-sess-title">「完全放任週間」実施。崩れた場合は原因分析・最終微調整。</p>
+          </div>
+          <div class="curr-sess">
+            <span class="curr-sess-n">面⑧</span>
+            <p class="curr-sess-title">チェックシート再診断でビフォーアフター可視化 → 確信を持って卒業。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § LINE — スマホモックアップ
+═══════════════════════════════════ -->
+<section id="line-sec">
+  <div class="line-layout">
+    <div class="line-copy">
+      <span class="line-copy-label">Chat Support · 伴走</span>
+      <h2>面談がない日も、ひとりにしません。</h2>
+      <span class="gold-line"></span>
+      <p>「今まさに困った！」——その瞬間に即レスできるのが、このプログラムの強みです。面談は月2回ですが、4ヶ月間ずっとそばにいます。</p>
+    </div>
+    <div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-header">
+            <div class="phone-av">先</div>
+            <div>
+              <span class="phone-name">高木 美保 先生</span>
+              <span class="phone-status">オンライン</span>
+            </div>
+          </div>
+          <div class="phone-body">
+            <div class="p-row">
+              <div class="p-msg t">今週の声かけはどうでしたか？</div>
+              <span class="p-time">19:32</span>
+            </div>
+            <div class="p-row r">
+              <span class="p-time">19:40</span>
+              <div class="p-msg u">昨日、言わなかったら自分から始めました！</div>
+            </div>
+            <div class="p-row">
+              <div class="p-msg t">素晴らしい！ その変化を記録しておきましょう。何か変えましたか？</div>
+              <span class="p-time">19:41</span>
+            </div>
+            <div class="p-row r">
+              <span class="p-time">19:45</span>
+              <div class="p-msg u">「勉強しなさい」の代わりに「今日は何時から始める？」と聞いてみました</div>
+            </div>
+            <div class="p-row">
+              <div class="p-msg t">完璧です。その一言の違いが全部を変えます。</div>
+              <span class="p-time">19:46</span>
+            </div>
+            <div class="p-row r">
+              <span class="p-time">19:47</span>
+              <div class="p-msg u">ありがとうございます。（泣いています）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § VOICES — 巨大引用 + 動画 + カード
+═══════════════════════════════════ -->
+<section id="voices">
+  <div class="voices-inner">
+    <span class="voices-label">Testimonials · お客様の声</span>
+    <h2 class="voices-h">受講したお母さんたちの生の声</h2>
+
+    <!-- 巨大引用 -->
+    <div class="big-quote">
+      <p class="big-quote-text">「得るものしかありません。もっと子供が小さい頃に知りたかった。」</p>
+      <p class="big-quote-credit">中学3年生のお子さんを持つ母 ／ 受講者アンケートより</p>
+    </div>
+
+    <!-- 動画（1枠のみ） -->
+    <div class="video-card">
+      <div class="video-player">
+        <!--
+          動画ファイルが用意できたら下を解除してください：
+          <video src="videos/voice1.mp4" controls poster="images/thumb1.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+        -->
+        <div class="play-btn">
+          <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M4 2L18 11L4 20V2Z" fill="rgba(163,202,232,0.9)"/></svg>
+        </div>
+        <span class="video-ph-lbl">動画ファイルをここに挿入してください</span>
+      </div>
+      <div class="video-caption">
+        <p>「子供自身で計画を立てて、できたかを自分でチェックするようになった」</p>
+        <p>中学3年生の母 ／ 受講後アンケート</p>
+      </div>
+    </div>
+
+    <!-- テキスト証言 -->
+    <div class="tv-grid">
+      <div class="tv-card">
+        <div class="tv-body">
+          <p style="margin-bottom:1em;">自分から勉強せず、親が言っても取り掛かりが遅い。集中せず、文句ばかり。親が計画を立てて勉強させていましたが、成績も上がらず、親子での勉強に限界を感じていました。</p>
+          <p style="margin-bottom:.6em;">受講後、4つの変化が起きました。</p>
+          <p style="margin-bottom:.5em;"><strong>①「勉強しなさい」と言わなくなったら、前より短時間でも集中して勉強するようになった。</strong></p>
+          <p style="margin-bottom:.5em;">②子供自身で勉強計画を立てられるようになり、できたかを自分でチェックするようになった。</p>
+          <p style="margin-bottom:.5em;">③分からない所を親が教えることをやめ、聞かれても「うーん、どうかな？」と答えを言わなかったら、自分で調べて、教えてくれる様になった。</p>
+          <p>④みほ先生が「暗記ものは大きな声を出した方が覚えやすい」と伝えると、大きな声で言いながら勉強するようになった。</p>
+        </div>
+        <div class="tv-foot">
+          <div class="tv-av">匿</div>
+          <div><p class="tv-name">匿名希望</p><p class="tv-detail">中学3年生の母 ／ 受講後アンケート</p></div>
+          <span class="tv-tag">4つの変化</span>
+        </div>
+      </div>
+
+      <div class="tv-card" style="background:var(--pale);border-radius:12px;padding:28px 26px;">
+        <p class="tv-body" style="font-family:var(--serif);font-size:clamp(14px,1.9vw,16px);line-height:2.0;color:var(--navy);">
+          <p style="margin-bottom:1em;">「今まで、子育てを苦しいと感じていたし、レールを敷いてあげるのが親の役目と思い込んでいたけれど、<strong>もっと親は肩の力を抜いて、子供を信じていいということを学びました。</strong></p>
+          <p>今からは、心配だけど以前より楽になって見守ることができると思います。できれば継続して、相談したいくらいです。」</p>
+        </p>
+        <div class="tv-foot" style="margin-top:18px;">
+          <div class="tv-av">匿</div>
+          <div><p class="tv-name">同・受講後アンケート（続き）</p><p class="tv-detail">こんな方に勧めたい：子供に勉強しなさいと怒って関係がうまくいかない方／勉強方法がわからないお子さんや親御さん／成績に関わる子育てに悩んでいるママ</p></div>
+        </div>
+      </div>
+
+      <div class="tv-placeholder">
+        <p>お客様の声は随時更新しています。受講者の許可をいただいた声のみ掲載しています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § FAQ
+═══════════════════════════════════ -->
+<section id="faq">
+  <div class="faq-inner">
+    <h2 class="faq-h">よくあるご質問</h2>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「相談だけで本当に変わりますか？」</summary>
+      <p class="faq-a">はい。声かけを「1つ変えるだけ」で子どもが動き始めた経験をされているお母さんが多くいます。1,000円の相談でも、今日から使える声かけを1つお持ち帰りいただけます。</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「第1期特別価格198,000円とは？」</summary>
+      <p class="faq-a">本プログラムの通常価格は250,000円（税込）ですが、初回開講（第1期）限り198,000円の特別価格です。第2期以降は通常価格に戻ります。分割払いは2〜4回払いでご相談に応じます。</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「子どもへの直接指導はありますか？」</summary>
+      <p class="faq-a">いいえ。このプログラムは「親の関わり方を変える」ことに特化しています。子どもへの学習指導は他の塾・家庭教師にお任せください。</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「強引な勧誘はありませんか？」</summary>
+      <p class="faq-a">一切しません。「合わない」と思ったら、そこで終わりにしていただいて構いません。「本気の家庭だけお受けする」というスタンスです。</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「どんな学年でも対象になりますか？」</summary>
+      <p class="faq-a">小学校低学年〜高校生の子どもを持つお母さんが対象です。「勉強しなさいと言い続けている」状況であれば、学年・成績に関わらずご相談ください。</p>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-q"><span class="faq-qi">Q</span>「1,000円相談だけで終わっても大丈夫？」</summary>
+      <p class="faq-a">もちろんです。45分の相談で今日から使える声かけを1つお持ち帰りいただけます。その後プログラムに進むかどうかはご自身で決めてください。急かしません。</p>
+    </details>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § ROI — 今の状況を一緒に見てみる
+═══════════════════════════════════ -->
+<section id="roi">
+  <div class="roi-inner">
+    <span class="roi-label">A Gentle Look · 現状を一緒に見てみませんか</span>
+    <h2 class="roi-h">毎日頑張っているのに、なぜ変わらないんだろう——その答えが、ここにあります。</h2>
+    <p class="roi-lead">責めたいわけではありません。ただ、あなたが今一人で背負っているものを、少し一緒に確かめさせてください。見えていなかった重さが見えたとき、きっと「変えてみよう」と思えるはずです。</p>
+
+    <div class="roi-blocks">
+
+      <!-- GRAPH 1 -->
+      <div class="roi-block">
+        <span class="roi-block-label">Graph 01 · 見えていなかった重さ</span>
+        <h3 class="roi-block-h">あなたが今、静かに使い続けているもの</h3>
+        <p class="roi-block-pre">お母さんの時給を5,000円と仮定してみましょう。毎日2時間、子どもの勉強のために費やしているとしたら——それだけで年間365万円の時間価値が、静かに消えていきます。悪者はいません。ただ、その重さを一度、数字で見てみてほしいのです。</p>
+        <div class="roi-calc">
+          <div class="roi-calc-row"><span>お母さんの時間（5,000円 × 2時間 × 365日）</span><span>365万円／年</span></div>
+          <div class="roi-calc-row"><span>思うような成果が出ない塾代・教材費</span><span>35万円／年</span></div>
+          <div class="roi-calc-row"><span>このまま続いた場合の受験・浪人リスク</span><span>200万円以上</span></div>
+          <div class="roi-calc-row total"><span>今の状況が続いた場合の累積コスト</span><span>600万円超</span></div>
+        </div>
+        <div class="roi-img-wrap">
+          <img src="images/graph1.png" alt="今の状況のコストとプログラム投資額の比較グラフ" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: graph1.png — 積み上げ棒グラフ。左：現状の年間コスト600万円（赤）。右：プログラム198,000円（金）。高さ比30:1。モバイル最適化。］</div>'">
+        </div>
+        <p class="roi-block-post">左がこのまま続けた場合の年間コスト、右が本プログラムへの投資額です。「高い」と感じていたものが、少し違って見えませんか。</p>
+      </div>
+
+      <hr class="roi-divider">
+
+      <!-- GRAPH 2 -->
+      <div class="roi-block">
+        <span class="roi-block-label">Graph 02 · その2時間の行き先</span>
+        <h3 class="roi-block-h">毎日の2時間が、あなた自身の時間に変わる</h3>
+        <p class="roi-block-pre">「勉強しなさい」と言い続けた夜、何度ため息をついたでしょう。その2時間は、本来あなた自身のものです。仕事、趣味、ただぼーっとする時間——お母さんにだって、そういう時間が必要です。4ヶ月後、その2時間が変わります。</p>
+        <div class="roi-img-wrap">
+          <img src="images/graph2.png" alt="1日2時間の質的変化：Before/After" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: graph2.png — Before/After円グラフ。左（赤）：叱る・教える2時間。右（金）：自分時間・笑顔2時間。モバイル最適化。］</div>'">
+        </div>
+        <p class="roi-block-post">子どもが自分で机に向かえるようになれば、あなたは子どもを信頼して、自分の時間を生きることができます。それがこのプログラムの、一番大切な目的です。</p>
+      </div>
+
+      <hr class="roi-divider">
+
+      <!-- GRAPH 3 -->
+      <div class="roi-block">
+        <span class="roi-block-label">Graph 03 · 時間と変化の関係</span>
+        <h3 class="roi-block-h">早ければ早いほど、子どもは自分を取り戻せる</h3>
+        <p class="roi-block-pre">「もう少し様子を見よう」——その気持ち、よくわかります。でも、子どもが自分から動けない習慣は、学年が上がるにつれて変えにくくなっていきます。早い段階で「声かけのパターン」を変えることが、いちばん子どもにやさしい選択です。</p>
+        <div class="roi-img-wrap">
+          <img src="images/graph3.png" alt="学年が上がるにつれた累積コストの推移グラフ" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'img-req\'>［IMAGE REQUIRED: graph3.png — 折れ線グラフ。赤：このまま続けた場合の累積コスト。金バッジ：受講時点。青/金：受講後の安定した軌道。横軸：小4〜大学受験。縦軸：累積コスト。モバイル最適化。］</div>'">
+        </div>
+        <p class="roi-block-post">赤い線が「今の状態が続いた場合」の軌道です。今関わり方を変えることで、子どもの自立と、あなた自身の時間を、同時に取り戻すことができます。</p>
+      </div>
+
+    </div><!-- /roi-blocks -->
+
+    <div class="roi-bottom">
+      <span class="roi-bottom-pre">Our Promise</span>
+      <h3 class="roi-bottom-h">あなたが変わることで、子どもが動き出す。そのプロセスを、4ヶ月かけて一緒に歩みます。</h3>
+      <p class="roi-bottom-sub">このプログラムは「子どもを変える」ものではなく、「お母さんの声かけを変える」ものです。変わるのはあなたです——だからこそ、確実に結果がついてきます。</p>
+      <p class="roi-bottom-arrow">▼ まずは、1,000円の個別相談から聞かせてください</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § CONSULT — 暗いCTA
+═══════════════════════════════════ -->
+<section id="consult">
+  <div class="consult-inner">
+    <span class="consult-label">First Step · はじめの一歩</span>
+    <h2 class="consult-h">まず、<em>1,000円</em>の個別相談から。</h2>
+    <p class="consult-p">いきなり決断しなくて大丈夫です。まず45分、あなたの状況を話してみてください。</p>
+
+    <div class="consult-flow">
+      <div class="cf"><span class="cf-n">①</span><div class="cf-body"><h4>受け止める（10分）</h4><p>まず聞きます。アドバイスは我慢。受け止めることから始めます。</p></div></div>
+      <div class="cf"><span class="cf-n">②</span><div class="cf-body"><h4>本質を当てる（15分）</h4><p>質問を重ねて「本当の原因」をあなた自身に言語化してもらいます。</p></div></div>
+      <div class="cf"><span class="cf-n">③</span><div class="cf-body"><h4>1個だけ効かせる（12分）</h4><p>今日から使える声かけを1つ渡して、その場で練習します。</p></div></div>
+      <div class="cf"><span class="cf-n">④</span><div class="cf-body"><h4>続きに橋を架ける（8分）</h4><p>「この先どうなれるか」を一緒に見て、必要ならプログラムをご案内。</p></div></div>
+    </div>
+
+    <div class="consult-price-box">
+      <span class="consult-price-lbl">個別相談 料金</span>
+      <span class="consult-price-num">1,000<small style="font-size:.38em;vertical-align:middle;font-weight:600;">円</small></span>
+      <span class="consult-price-sub">オンライン 45分 ／ 税込</span>
+    </div>
+
+    <a href="#" class="consult-btn">》1,000円で個別相談する</a>
+    <p class="consult-note">先着順 ／ 相談だけでもOK ／ 強引な勧誘は一切しません</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § PRICE
+═══════════════════════════════════ -->
+<section id="price">
+  <div class="price-inner">
+    <span class="price-label">Investment · 料金</span>
+    <h2 class="price-h">4ヶ月プログラム 料金</h2>
+
+    <div class="price-card">
+      <span class="pc-product">4-Month 1-on-1 Program</span>
+      <p class="pc-name">「言わないと勉強しない子を、自分から机に向かう子に変える」4ヶ月マンツーマンプログラム</p>
+      <p class="pc-orig">通常価格 ¥250,000（税込）</p>
+      <span class="pc-badge">第1期限定 特別価格</span>
+      <span class="pc-price">198,000<small>円</small></span>
+      <span class="pc-tax">税込 ¥198,000</span>
+      <span class="pc-saving">通常比 ¥52,000 OFF</span>
+      <span class="pc-split">分割払い 応相談（2〜4回払い）</span>
+      <div class="pc-rows">
+        <div class="pc-row"><span>期間</span><span>4ヶ月（隔週面談・全8回）</span></div>
+        <div class="pc-row"><span>形式</span><span>オンライン 各45〜60分</span></div>
+        <div class="pc-row"><span>伴走</span><span>チャットサポート（即レス）</span></div>
+        <div class="pc-row"><span>定員</span><span>同時3家庭まで（選考制）</span></div>
+      </div>
+    </div>
+
+    <div class="price-note">
+      <p><strong>なぜ通常250,000円なのか。</strong>学術的背景・30年の塾現場・3人東大合格の実体験——この掛け算は他に存在しません。「世に他に存在しない枠」に正直な値段をつけています。</p>
+    </div>
+
+    <div class="urgency">
+      <p><strong>現在の空き：残り1〜2枠</strong></p>
+      <p>同時3家庭が埋まれば次の募集は未定です。第1期の特別価格（198,000円）でお受けできるのもこの枠のみ。<em>迷っているなら、まず1,000円の相談からどうぞ。</em></p>
+    </div>
+
+    <a href="#consult" class="cta-main-btn">》1,000円の相談を申し込む</a>
+    <p class="cta-note" style="margin-top:10px;text-align:center;">無理な勧誘なし ／ 相談だけで終わっても大丈夫です</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════
+  § CLOSING — 写真 + 最終コピー
+═══════════════════════════════════ -->
+<section id="closing">
+  <div class="closing-photo">
+    <img src="images/image2.png" alt="穏やかな母と子" onerror="this.parentElement.innerHTML='<div class=\'img-req\' style=\'height:100%;min-height:70vh;\'>［IMAGE REQUIRED: 穏やかな自然光の中。日本人の母親が子どもと並んで座っている。子どもは自分で本を読んでいる。お母さんは微笑んでそれを見ている。静かで温かい日常。ライフスタイル誌のような写真。横長。］</div>'">
+  </div>
+  <div class="closing-body">
+    <p class="closing-pre">私が3人の子どもで実証したことを、あなたの家庭でも再現します。</p>
+    <h2 class="closing-h">
+      4ヶ月後、<span>「勉強しなさい」と言わなくなっていた</span>——そんな自分に、なれます。
+    </h2>
+    <a href="#consult" class="closing-btn">》1,000円で相談を申し込む</a>
+    <p class="closing-note">相談だけでもOK ／ まず話してみるだけでいい</p>
+    <p class="closing-sig">スクールオーク 塾長 高木美保</p>
+  </div>
+</section>
+
+<footer>
+  <p>スクールオーク ｜ 金沢市片町 ｜ 塾長 高木美保<br>© 2025 School Oak. All rights reserved.</p>
+</footer>
+
+<script>
+// スティッキーCTA
+const stickyCta = document.getElementById('sticky-cta');
+let shown = false;
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 400 && !shown) {
+    stickyCta.classList.add('show');
+    shown = true;
+  } else if (window.scrollY <= 100 && shown) {
+    stickyCta.classList.remove('show');
+    shown = false;
+  }
+}, { passive: true });
+</script>
+</body>
+</html>
