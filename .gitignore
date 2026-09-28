@@ -1,0 +1,7 @@
+.env.local
+.env*.local
+.env
+node_modules/
+.vercel/
+.DS_Store
+.neon

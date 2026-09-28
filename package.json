@@ -1,0 +1,20 @@
+{
+  "name": "parents-school",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "admin": "node --env-file=.env.local scripts/admin.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "@vercel/functions": "^3.9.9",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  }
+}
