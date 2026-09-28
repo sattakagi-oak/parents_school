@@ -60,7 +60,7 @@ export async function sendTracked({ lineUserId, campaignKey, messageType, messag
   const row = await claim(lineUserId, campaignKey, messageType, scheduledFor);
   if (!row) return 'already_sent';
 
-  const perm = sendPermission(lineUserId);
+  const perm = await sendPermission(lineUserId);
   if (!perm.ok) {
     await finish(row.id, perm.reason);
     log.info('送信をスキップ', { reason: perm.reason, campaignKey, messageType });

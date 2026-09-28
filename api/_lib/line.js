@@ -37,7 +37,7 @@ class LineApiError extends Error {
 
 /** @returns {{sent: true} | {sent: false, reason: string}} */
 export async function replyMessage(lineUserId, replyToken, messages) {
-  const perm = sendPermission(lineUserId);
+  const perm = await sendPermission(lineUserId);
   if (!perm.ok) return { sent: false, reason: perm.reason };
   const res = await fetch(`${API}/message/reply`, {
     method: 'POST',
@@ -50,7 +50,7 @@ export async function replyMessage(lineUserId, replyToken, messages) {
 
 /** retryKey（UUID）を付けると、LINE側で同一リクエストの重複配信が防がれる */
 export async function pushMessage(lineUserId, messages, retryKey) {
-  const perm = sendPermission(lineUserId);
+  const perm = await sendPermission(lineUserId);
   if (!perm.ok) return { sent: false, reason: perm.reason };
   const res = await fetch(`${API}/message/push`, {
     method: 'POST',

@@ -153,7 +153,7 @@ test('既存友だち: キーワード「3問に回答する」またはstart po
 
 // ---------- 送信モード ----------
 
-test('送信モード判定', () => {
+test('送信モード判定', async () => {
   baseEnv({ LINE_SEND_MODE: '' });
   assert.equal(sendMode(), 'disabled');
   baseEnv({ LINE_SEND_MODE: 'typo' });
@@ -163,8 +163,8 @@ test('送信モード判定', () => {
   baseEnv({ LINE_SEND_MODE: 'production', LINE_SEND_ENABLED: 'true' });
   assert.equal(sendMode(), 'production');
   baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: `${OWNER}, invalid` });
-  assert.deepEqual(sendPermission(OWNER), { ok: true });
-  assert.deepEqual(sendPermission(OTHER), { ok: false, reason: 'skipped_not_test_user' });
+  assert.deepEqual(await sendPermission(OWNER), { ok: true });
+  assert.deepEqual(await sendPermission(OTHER), { ok: false, reason: 'skipped_not_test_user' });
 });
 
 test('testモード: テスト対象外ユーザーには返信・Cronとも送らない', async () => {
@@ -365,4 +365,56 @@ test('LINE送信APIはreply/pushのみ（broadcast/multicastを呼ばない）',
   await shiftStart(OWNER, 1);
   await runEducation();
   for (const c of calls.sends()) assert.match(c.url, /\/message\/(reply|push)$/);
+});
+
+// ---------- LINEからのテスト用アカウント登録 ----------
+
+const CODE = 'test-register-code-1234567890';
+const text = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
+const registered = async (userId) =>
+  (await db.query('select 1 from parent_line_test_users where line_user_id = $1', [userId])).rows.length > 0;
+
+test('テスト登録: 正しい合言葉で登録され、その人にだけ送れる', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_REGISTER_CODE: CODE });
+  await send(text(OWNER, `テスト登録 ${CODE}`));
+  assert.ok(await registered(OWNER));
+  assert.match(calls.sends().at(-1).body.messages[0].text, /テスト用アカウントとして登録しました/);
+
+  await send(text(OWNER, '3問に回答する'));
+  assert.match(calls.sends().at(-1).body.messages[0].text, /^Q1\./);
+
+  const n = calls.sends().length;
+  await send(text(OTHER, '3問に回答する'));
+  assert.equal(calls.sends().length, n, '未登録ユーザーには送らない');
+});
+
+test('テスト登録: 合言葉違い・未設定・短すぎは登録されず無反応', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_REGISTER_CODE: CODE });
+  await send(text(OTHER, 'テスト登録 wrong-code'));
+  await send(text(OTHER, 'テスト登録'));
+  baseEnv({ LINE_SEND_MODE: 'test' });
+  await send(text(OTHER, 'テスト登録 '));
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_REGISTER_CODE: 'short' });
+  await send(text(OTHER, 'テスト登録 short'));
+  assert.equal(await registered(OTHER), false);
+  assert.equal(calls.sends().length, 0);
+});
+
+test('テスト登録: disabledでは登録だけされ、返信も送らない', async () => {
+  baseEnv({ LINE_TEST_REGISTER_CODE: CODE });
+  await send(text(OWNER, `テスト登録 ${CODE}`));
+  assert.ok(await registered(OWNER));
+  assert.equal(calls.sends().length, 0);
+});
+
+test('テスト解除: 解除の返信後、以降は送らない', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_REGISTER_CODE: CODE });
+  await send(text(OWNER, `テスト登録 ${CODE}`));
+  await send(text(OWNER, 'テスト解除'));
+  assert.match(calls.sends().at(-1).body.messages[0].text, /解除しました/);
+  assert.equal(await registered(OWNER), false);
+  const n = calls.sends().length;
+  await send(text(OWNER, '3問に回答する'));
+  await send(text(OTHER, 'テスト解除'));
+  assert.equal(calls.sends().length, n);
 });

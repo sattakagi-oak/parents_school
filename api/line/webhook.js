@@ -2,10 +2,13 @@
 // 署名検証 → イベント処理。bodyはDBに保存しない。
 
 import { verifySignature, getDisplayName } from '../_lib/line.js';
-import { isValidLineUserId } from '../_lib/config.js';
-import { markFollowed, markBlocked, upsertUser, recordEvent } from '../_lib/users.js';
+import { isValidLineUserId, matchesTestRegisterCode } from '../_lib/config.js';
+import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser } from '../_lib/users.js';
 import { parsePostback, askFirstQuestion, handleSegmentAnswer, firstUnanswered } from '../_lib/segment.js';
-import { START_KEYWORDS } from '../_lib/messages.js';
+import { replyUntracked } from '../_lib/delivery.js';
+import {
+  START_KEYWORDS, TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
+} from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 
 const MAX_BODY_BYTES = 256 * 1024;
@@ -42,6 +45,8 @@ export async function handleEvent(event) {
     }
     case 'message': {
       const text = event.message?.type === 'text' ? event.message.text?.trim() : null;
+      const testResult = text && await handleTestRegistration(userId, replyToken, text);
+      if (testResult) return testResult;
       if (text && START_KEYWORDS.includes(text)) {
         await upsertUser(userId);
         await askFirstQuestion(userId, replyToken, { withIntro: false });
@@ -53,6 +58,28 @@ export async function handleEvent(event) {
     default:
       return 'ignored';
   }
+}
+
+// 「テスト登録 <合言葉>」→ テスト送信対象に登録。合言葉が違う場合は何も返さない（存在を知らせない）。
+// 「テスト解除」→ 登録済みなら解除。メッセージ本文はログに出さない。
+async function handleTestRegistration(userId, replyToken, text) {
+  if (text.startsWith(TEST_REGISTER_PREFIX)) {
+    const code = text.slice(TEST_REGISTER_PREFIX.length).trim();
+    if (!matchesTestRegisterCode(code)) return 'message:test_register_rejected';
+    await addTestUser(userId);
+    await recordEvent(userId, 'test_user_registered');
+    await replyUntracked(userId, replyToken, [{ type: 'text', text: TEST_REGISTERED }], 'test:registered');
+    return 'message:test_registered';
+  }
+  if (text === TEST_UNREGISTER_TEXT) {
+    if (!(await isRegisteredTestUser(userId))) return 'message:ignored';
+    // 解除前に返信（解除後はテスト対象外になり返信できないため）
+    await replyUntracked(userId, replyToken, [{ type: 'text', text: TEST_UNREGISTERED }], 'test:unregistered');
+    await removeTestUser(userId);
+    await recordEvent(userId, 'test_user_unregistered');
+    return 'message:test_unregistered';
+  }
+  return null;
 }
 
 export async function POST(request) {

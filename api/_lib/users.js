@@ -74,3 +74,21 @@ export async function recordEvent(lineUserId, eventType, detail = null) {
     [lineUserId, eventType, detail ? JSON.stringify(detail) : null],
   );
 }
+
+export async function addTestUser(lineUserId) {
+  await getDb().query(
+    `insert into parent_line_test_users (line_user_id) values ($1) on conflict do nothing`, [lineUserId]);
+}
+
+/** @returns {Promise<boolean>} 削除したら true */
+export async function removeTestUser(lineUserId) {
+  const { rowCount } = await getDb().query(
+    'delete from parent_line_test_users where line_user_id = $1', [lineUserId]);
+  return rowCount > 0;
+}
+
+export async function isRegisteredTestUser(lineUserId) {
+  const { rows } = await getDb().query(
+    'select 1 from parent_line_test_users where line_user_id = $1', [lineUserId]);
+  return rows.length > 0;
+}

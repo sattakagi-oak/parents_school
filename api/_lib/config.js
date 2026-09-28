@@ -1,6 +1,9 @@
 // 環境変数の読み取りと送信モード判定。
 // ここ以外で LINE_SEND_MODE / LINE_SEND_ENABLED を直接読まないこと。
 
+import { timingSafeEqual } from 'node:crypto';
+import { isRegisteredTestUser } from './users.js';
+
 const USER_ID_RE = /^U[0-9a-f]{32}$/;
 
 function env(name) {
@@ -33,12 +36,30 @@ export function testUserIds() {
   );
 }
 
+/** テスト送信対象か: LINE_TEST_USER_IDS またはLINEから登録済み（parent_line_test_users） */
+export async function isTestUser(lineUserId) {
+  if (!isValidLineUserId(lineUserId)) return false;
+  return testUserIds().has(lineUserId) || isRegisteredTestUser(lineUserId);
+}
+
 /** 送信直前に必ず呼ぶ。{ ok: true } 以外なら絶対に送らない。 */
-export function sendPermission(lineUserId) {
+export async function sendPermission(lineUserId) {
   const mode = sendMode();
   if (mode === 'disabled') return { ok: false, reason: 'skipped_disabled' };
-  if (mode === 'test' && !testUserIds().has(lineUserId)) return { ok: false, reason: 'skipped_not_test_user' };
+  if (mode === 'test' && !(await isTestUser(lineUserId))) return { ok: false, reason: 'skipped_not_test_user' };
   return { ok: true };
+}
+
+/**
+ * LINEからのテスト登録用の合言葉。16文字未満・未設定なら登録機能は無効。
+ * メッセージ本文と定数時間比較する。
+ */
+export function matchesTestRegisterCode(given) {
+  const expected = env('LINE_TEST_REGISTER_CODE');
+  if (expected.length < 16 || typeof given !== 'string') return false;
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export function isValidLineUserId(id) {

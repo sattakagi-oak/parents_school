@@ -122,7 +122,8 @@ Cron（1日1回）で `segmentation_completed_at` あり・ブロックなし・
 | `LINE_CHANNEL_ACCESS_TOKEN` | 長期チャネルアクセストークン | |
 | `LINE_SEND_MODE` | `disabled` | テスト時のみ `test` |
 | `LINE_SEND_ENABLED` | `false` | 本番配信許可が出るまで false |
-| `LINE_TEST_USER_IDS` | 運営者の userId | 下記「userIdの確認」 |
+| `LINE_TEST_USER_IDS` | 運営者の userId | 任意（LINEからの「テスト登録」でも可） |
+| `LINE_TEST_REGISTER_CODE` | 16文字以上の合言葉 | テスト登録用。テスト後は削除推奨 |
 | `DATABASE_URL` | Neon pooled 接続文字列 | Production=productionブランチ / Preview=developmentブランチ |
 | `DATABASE_URL_UNPOOLED` | Neon 直結接続文字列 | 任意（マイグレーション用） |
 | `CRON_SECRET` | 32文字以上のランダム文字列 | Vercel Cron が自動で送る |
@@ -147,17 +148,20 @@ Cron（1日1回）で `segmentation_completed_at` あり・ブロックなし・
 
 ### 4. 運営者本人でのテスト（`LINE_SEND_MODE=test`）
 
-1. Vercel で `LINE_SEND_MODE=test`、`LINE_TEST_USER_IDS=<本人のuserId>` にして Redeploy。
-2. 本人のLINEで公式アカウントをブロック → ブロック解除（follow イベントが発生）→ Q1 が届く。
-3. Q1→Q2→Q3 をタップ → 完了メッセージ + Day0 が届く。
-4. Neon Console **Tables** → `parent_line_users` で回答・`segmentation_completed_at`・`education_step=1` を確認。
-5. 翌日以降の確認を早めたい場合は Neon Console の **SQL Editor** で
+1. Vercel で `LINE_SEND_MODE=test`、`LINE_TEST_REGISTER_CODE=<16文字以上の合言葉>` にして Redeploy。
+2. 本人のLINEから公式アカウントへ `テスト登録 <合言葉>` と送る →「テスト用アカウントとして登録しました」が届く（DBの `parent_line_test_users` に登録）。
+   - 合言葉が違う場合は無反応。`LINE_TEST_USER_IDS` にuserIdを直接書く方法も併用可。
+   - 解除は `テスト解除`。
+3. `3問に回答する` と送る（またはブロック → ブロック解除）→ Q1 が届く。
+4. Q1→Q2→Q3 をタップ → 完了メッセージ + Day0 が届く。
+5. Neon Console **Tables** → `parent_line_users` で回答・`segmentation_completed_at`・`education_step=1` を確認。
+6. 翌日以降の確認を早めたい場合は Neon Console の **SQL Editor** で
    `update parent_line_users set education_started_at = education_started_at - interval '1 day' where line_user_id = '<本人>';`
    → Vercel **Settings → Cron Jobs** の **Run** で手動実行 → Day1 が届く。
-6. `education_step` を 6 にして同様に実行 → CTA が届く → ボタンを押す → `diagnosis_cta_clicked_at` が入り申込ページへ遷移。
-7. もう一度 Cron を実行しても同じメッセージが届かないこと（`parent_line_message_logs` が `sent`）。
-8. 他の友だちには何も届いていないこと（`parent_line_message_logs` の `skipped_not_test_user`）。
-9. テスト後は `LINE_SEND_MODE=disabled` に戻しておく。
+7. `education_step` を 6 にして同様に実行 → CTA が届く → ボタンを押す → `diagnosis_cta_clicked_at` が入り申込ページへ遷移。
+8. もう一度 Cron を実行しても同じメッセージが届かないこと（`parent_line_message_logs` が `sent`）。
+9. 他の友だちには何も届いていないこと（`parent_line_message_logs` の `skipped_not_test_user`）。
+10. テスト後は `LINE_SEND_MODE=disabled` に戻しておく。
 
 ### 5. 本番配信の開始（明示的な許可が出てから）
 

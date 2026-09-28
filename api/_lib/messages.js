@@ -44,6 +44,13 @@ export const QUESTIONS = [
 /** このテキストをユーザーが送ると3問を最初から開始（既存友だち向け導線用） */
 export const START_KEYWORDS = ['3問に回答する', '診断スタート'];
 
+/** テスト用アカウント登録（運営者のみ）。「テスト登録 <合言葉>」「テスト解除」 */
+export const TEST_REGISTER_PREFIX = 'テスト登録';
+export const TEST_UNREGISTER_TEXT = 'テスト解除';
+export const TEST_REGISTERED =
+  'テスト用アカウントとして登録しました。\n\n「3問に回答する」と送ると、3問セグメントのテストを始められます。\n解除するときは「テスト解除」と送ってください。';
+export const TEST_UNREGISTERED = 'テスト用アカウントの登録を解除しました。';
+
 export const SEGMENT_INTRO =
   'ご登録ありがとうございます。\n\nお子さんに合った情報をお届けするため、かんたんな3つの質問にお答えください（ボタンを選ぶだけ・約10秒）。';
 
