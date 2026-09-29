@@ -205,7 +205,7 @@ DATABASE_URL_UNPOOLED='<productionの直結URL>' node scripts/migrate.mjs   # �
 | `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | Neon 接続文字列 | Production=production / Preview=development |
 | `ADMIN_API_TOKEN` | 32文字以上のランダム文字列 | 管理API用 |
 | `PARENT_DIAGNOSIS_URL` | 個別分析の申込ページURL（https） | 未設定ならカードなし |
-| `PUBLIC_BASE_URL` | このサイトの公開URL | 画像URL・CTAリンク生成用（未設定だと画像が送れない） |
+| `PUBLIC_BASE_URL` | 本番の公開URL | 画像URL・CTAリンク生成用（本番で未設定だと画像が送れない）。Preview では無視され、Vercel が自動設定するブランチURL（`VERCEL_BRANCH_URL`）を使う |
 
 環境変数を変えたら、対象ブランチのデプロイを Redeploy。Deployment Protection の Vercel Authentication は OFF（ON だと Webhook が 401、画像も取得できない）。
 

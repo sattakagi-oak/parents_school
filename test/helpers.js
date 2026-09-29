@@ -11,7 +11,7 @@ export const OTHER = 'U' + '1'.repeat(32);
 
 export function baseEnv(overrides = {}) {
   for (const k of Object.keys(process.env)) {
-    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL)/.test(k)) delete process.env[k];
+    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_)/.test(k)) delete process.env[k];
   }
   Object.assign(process.env, {
     LINE_CHANNEL_SECRET: SECRET,

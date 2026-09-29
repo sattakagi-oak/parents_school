@@ -450,3 +450,23 @@ test('管理API: 年代・シート・個数・対応状況で抽出、申込済
     assert.equal((await adminUsers(adminReq(`/api/admin/line/users?${bad}`))).status, 400, bad);
   }
 });
+
+test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（PUBLIC_BASE_URLが本番URLでも）', async () => {
+  testMode({
+    PUBLIC_BASE_URL: 'https://parents-school.vercel.app',
+    VERCEL_ENV: 'preview', VERCEL_BRANCH_URL: 'parents-school-git-feature-x.vercel.app',
+  });
+  await send(ev('follow', OWNER));
+  await send(stage(OWNER, 'preschool'));
+  assert.equal(lastMessages()[0].originalContentUrl,
+    'https://parents-school-git-feature-x.vercel.app/images/parent-check/present-1.png');
+  await send(count(OWNER, 3));
+  const u = await user(db, OWNER);
+  assert.equal(lastMessages()[1].contents.footer.contents[0].action.uri,
+    `https://parents-school-git-feature-x.vercel.app/api/line/cta?t=${u.cta_token}`);
+
+  // production では PUBLIC_BASE_URL を使う
+  testMode({ PUBLIC_BASE_URL: 'https://parents-school.vercel.app/', VERCEL_ENV: 'production', VERCEL_BRANCH_URL: 'x.vercel.app' });
+  await send(stage(OWNER, 'junior_high_plus'));
+  assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-2.png');
+});

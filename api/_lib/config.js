@@ -72,6 +72,11 @@ export function diagnosisUrl() {
 
 /** CTAリダイレクトURLの組み立てに使う公開URL（例: https://example.vercel.app） */
 export function publicBaseUrl() {
+  // Vercel の Preview では、そのブランチ自身のURL（Vercelが自動設定する VERCEL_BRANCH_URL）を必ず使う。
+  // PUBLIC_BASE_URL が本番URLのままだと、画像・CTAリンクが新コードの無い本番側を指して 404 になるため。
+  if (env('VERCEL_ENV') === 'preview' && env('VERCEL_BRANCH_URL')) {
+    return `https://${env('VERCEL_BRANCH_URL')}`;
+  }
   return env('PUBLIC_BASE_URL').replace(/\/+$/, '');
 }
 
