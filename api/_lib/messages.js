@@ -1,201 +1,159 @@
 // ============================================================
-// LINE自動返信の文面・選択肢はすべてこのファイルで管理します。
+// LINE自動返信の文面・ボタンはすべてこのファイルで管理します。
 // 文面を変えるときはこのファイルだけ編集すればOKです。
-// 注意: 選択肢の value（内部値）はDBに保存される値なので、変更しないでください。
+// 注意: 内部値（value / sheet）はDBに保存される値なので、変更しないでください。
 //
-// 自動で送るのは「友だち追加後の質問 → Q1→Q2→Q3 → 完了メッセージ＋診断CTA」まで。
-// それ以降は美穂先生が LINE Official Account Manager から個別に手動返信します。
-//
-// トーン: 「悩み相談・問題解決」ではなく「わが子をもっと伸ばしたい・可能性を広げたい」。
-//         中学受験は選択肢の一つとして扱い、中学受験だけに限定しない。
+// 自動で送るのは次の返信（reply）だけです:
+//   友だち追加 → 挨拶＋年代ボタン → [年代タップ] シート画像＋案内＋0〜10個ボタン
+//   → [個数タップ] お礼＋「わが子の強み・伸ばし方 個別分析」カード
+// それ以降は美穂先生が LINE Official Account Manager から個別に手動コメントします。
+// ステップ配信・自動追客・AIによる個別コメントはありません。
 // ============================================================
 
-/**
- * 3問アンケート。配列の順番が出題順。
- * - key: DBカラム名（意味は下記。Migrationリスク回避のためカラム名は流用）
- *     grade       … 学年
- *     exam_intent … 進路・教育方針（education_path_intent）。Q1の学年で選択肢を出し分け（variants）
- *     interest    … 子どもについて伸ばしたいこと（growth_interest）
- * - tag: 回答時にトーク画面へ残る表示「【tag】選択肢」（美穂先生がトーク履歴で回答を確認するため）
- */
-export const QUESTIONS = [
-  {
-    key: 'grade',
-    tag: '学年',
-    text: 'お子さんの学年を教えてください。',
-    options: [
-      { value: 'preschool', label: '年長以下' },
-      { value: 'grade_1', label: '小1' },
-      { value: 'grade_2', label: '小2' },
-      { value: 'grade_3', label: '小3' },
-      { value: 'grade_4_plus', label: '小4以上' },
-    ],
-  },
-  {
-    key: 'exam_intent', // = 進路・教育方針
-    tag: '進路',
-    variants: [
-      {
-        grades: ['preschool'],
-        text: 'これからのお子さんの学びについて、一番近いものを教えてください。',
-        options: [
-          { value: 'expand_future_options', label: '将来の選択肢をできるだけ広げたい' },
-          { value: 'junior_exam_considering', label: '中学受験も視野に入れている' },
-          { value: 'build_learning_foundation', label: 'まずは学ぶことを楽しめる土台をつくりたい' },
-          { value: 'not_decided_yet', label: 'まだ具体的な進路は考えていない' },
-        ],
-      },
-      {
-        grades: ['grade_1', 'grade_2'],
-        text: 'これからの進路について、今のお考えに一番近いものを教えてください。',
-        options: [
-          { value: 'junior_exam_planned', label: '中学受験を考えている' },
-          { value: 'junior_exam_considering', label: '中学受験も含めて幅広く検討している' },
-          { value: 'expand_future_options', label: 'まだ決めていないが、将来の選択肢を広げたい' },
-          { value: 'public_school_main', label: '公立中心で考えている' },
-          { value: 'not_decided_yet', label: 'まだ特に決めていない' },
-        ],
-      },
-      {
-        grades: ['grade_3'],
-        text: 'これからの進路について、今のお考えに一番近いものを教えてください。',
-        options: [
-          { value: 'junior_exam_planned', label: '中学受験をする予定' },
-          { value: 'junior_exam_considering', label: '中学受験を前向きに検討している' },
-          { value: 'junior_exam_undecided', label: '中学受験をするかまだ迷っている' },
-          { value: 'public_school_main', label: '公立中への進学を中心に考えている' },
-          { value: 'not_decided_yet', label: 'まだ決めていない' },
-        ],
-      },
-      {
-        grades: ['grade_4_plus'],
-        text: '現在の進路について、一番近いものを教えてください。',
-        options: [
-          { value: 'junior_exam_in_progress', label: '中学受験に向けて準備している' },
-          { value: 'junior_exam_considering', label: '中学受験を検討している' },
-          { value: 'high_school_exam', label: '高校受験を見据えている' },
-          { value: 'not_decided_yet', label: 'まだ進路は決めていない' },
-          { value: 'other', label: 'その他の進路を考えている' },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'interest', // = これから伸ばしたいこと
-    tag: '伸ばしたいこと',
-    text: 'これから、お子さんについて一番伸ばしていきたいことはどれですか？',
-    subText: '今困っていることではなく、「これからこうなってほしい」というお気持ちに近いもので大丈夫です。',
-    options: [
-      { value: 'independent_thinking', label: '自分から考えて学ぶ力を伸ばしたい' },
-      { value: 'learning_habits', label: '勉強を楽しめる習慣をつくりたい' },
-      { value: 'develop_strengths', label: '得意なこと・好きなことをもっと伸ばしたい' },
-      { value: 'expand_future_options', label: '将来の選択肢を広げられる力をつけたい' },
-      { value: 'parenting_fit', label: '子どものタイプに合った関わり方を知りたい' },
-      { value: 'what_to_prioritize', label: '今の年齢で何を優先すればいいか知りたい' },
-    ],
-  },
+/** チェックリスト（プレゼント）。画像は静的ファイル（PUBLIC_BASE_URL + path）。DBには sheet の識別値のみ保存。 */
+export const SHEETS = {
+  present_1: { label: 'プレゼント1（未就学〜小学校低学年まで）', path: '/images/parent-check/present-1.png' },
+  present_2: { label: 'プレゼント2（小学校中学年以降）', path: '/images/parent-check/present-2.png' },
+};
+
+/** 年代区分（education_stage）。sheet: その年代に送るチェックリスト */
+export const STAGES = [
+  { value: 'preschool', label: '幼稚園・保育園', sheet: 'present_1' },
+  { value: 'elementary_lower', label: '小学校低学年', sub: '小1〜2', sheet: 'present_1' },
+  { value: 'elementary_middle', label: '小学校中学年', sub: '小3〜4', sheet: 'present_2' },
+  { value: 'elementary_upper', label: '小学校高学年', sub: '小5〜6', sheet: 'present_2' },
+  { value: 'junior_high_plus', label: '中学生以上', sheet: 'present_2' },
 ];
 
+export const CHECK_COUNT_MAX = 10;
+
 /**
- * ユーザーの状態に応じた質問（text / options）を返す。Q2は学年で出し分け。
- * 学年が未回答でQ2を解決できない場合は null。
+ * 旧導線（既存の挨拶メッセージで「①/②を送ってください」と案内済み）との互換。
+ * 厳密な年代は分からないので、シートだけ決める。
  */
-export function resolveQuestion(key, user) {
-  const q = QUESTIONS.find((x) => x.key === key);
-  if (!q) return null;
-  if (!q.variants) return q;
-  const v = q.variants.find((x) => x.grades.includes(user?.grade));
-  return v ? { ...q, ...v } : null;
-}
+export const LEGACY_SHEET_INPUTS = {
+  present_1: ['①', '1', '１'],
+  present_2: ['②', '2', '２'],
+};
 
-/** 全学年を通じた選択肢の内部値（DB検証・セグメント抽出用） */
-export function allOptionValues(key) {
-  const q = QUESTIONS.find((x) => x.key === key);
-  const options = q.variants ? q.variants.flatMap((v) => v.options) : q.options;
-  return new Set(options.map((o) => o.value));
-}
-
-/** 内部値 → 表示ラベル（Q2は学年に応じたラベル） */
-export function optionLabel(key, value, user) {
-  const q = resolveQuestion(key, user) || QUESTIONS.find((x) => x.key === key);
-  const options = q.options || q.variants.flatMap((v) => v.options);
-  return options.find((o) => o.value === value)?.label || value || '';
-}
-
-/** このテキストをユーザーが送ると3問を最初から開始（既存友だち向け導線用） */
-export const START_KEYWORDS = ['3問に回答する', '診断スタート'];
+/** テスト用ユーザーだけが使う開発用コマンド（production では無効） */
+export const TEST_START_TEXT = 'テスト開始';
+export const TEST_RESET_TEXT = 'テストリセット';
+export const TEST_RESET_DONE =
+  'テスト用に回答をリセットしました。\n「テスト開始」と送ると、友だち追加直後の挨拶から確認できます。';
 
 /** テスト用アカウント登録（運営者のみ）。「テスト登録 <合言葉>」「テスト解除」 */
 export const TEST_REGISTER_PREFIX = 'テスト登録';
 export const TEST_UNREGISTER_TEXT = 'テスト解除';
 export const TEST_REGISTERED =
-  'テスト用アカウントとして登録しました。\n\n「3問に回答する」と送ると、3問アンケートのテストを始められます。\n解除するときは「テスト解除」と送ってください。';
+  'テスト用アカウントとして登録しました。\n\n「テスト開始」と送ると、友だち追加直後の挨拶から新しい導線を確認できます。\n解除するときは「テスト解除」と送ってください。';
 export const TEST_UNREGISTERED = 'テスト用アカウントの登録を解除しました。';
-export const TEST_RESET_TEXT = 'テストリセット';
-export const TEST_RESET_DONE =
-  'テスト用に回答をリセットしました。\n「3問に回答する」と送ると、最初からテストできます。';
 
-export const SEGMENT_INTRO =
-  'ご登録ありがとうございます。\n\nお子さんのことを少し教えてください。\nボタンを選ぶだけの3つの質問です（約10秒）。';
+/** 友だち追加直後の挨拶（follow への reply） */
+export const GREETING = `はじめまして、みほ先生です♪
+友だち追加、ありがとうございます😊
 
-/** 3問完了直後の自動返信（Q3への返信として送る） */
-export const SEGMENT_COMPLETE = `ありがとうございます。
+さっそくですが、
+プレゼントをお受け取りください🎁
 
-お子さんの年齢や、これからどんな力を伸ばしていきたいかによって、
-今大切にしたいことは一人ひとり違います。
+＼わが子をみずから伸びる子にする／
+「親の習慣」チェックリスト
 
-いただいた内容は、美穂先生が直接確認します。
+10個の項目をチェックするだけで、
 
-「うちの子の場合、今どんなことを大切にするといい？」
-と具体的に知りたい方には、個別診断もご用意しています。
+・今できていること
+・これから意識すると、さらに伸ばせること
+・親として大切にしたい関わり方
 
-もしお子さんについて具体的に気になっていることがあれば、
-このままLINEで一言送っていただいても大丈夫です。`;
+を振り返ることができます。
 
-/** 3問完了後に回答し直したとき */
-export const SEGMENT_UPDATED = '回答を更新しました。ありがとうございます。';
+お子さんの年代に合わせたチェックリストをお送りします。
+
+まずは、下からお子さんの学年を選んでください👇
+
+いただいた回答は、
+みほ先生が直接確認します😊`;
+
+export const STAGE_TITLE = 'お子さんの学年を選んでください';
+
+/** 年代タップ後、シート画像の次に送る案内（0〜10個ボタン付き） */
+export const SHEET_GUIDE = `ありがとうございます😊
+
+こちらのチェックリストを見ながら、
+10項目をチェックしてみてください。
+
+終わったら、
+当てはまった個数を下から選んでください👇`;
+
+/** 個数タップ後のお礼（初回） */
+export const CHECK_THANKS = `ご回答ありがとうございます😊
+
+いただいた内容は、
+みほ先生が直接確認して、
+個別にコメントをお返しします。`;
+
+/** 個数を選び直したとき */
+export const CHECK_UPDATED = 'チェック数を更新しました。ありがとうございます😊';
+
+/** 旧入力（①/②）から入った人に、任意で年代を聞く */
+export const STAGE_SUPPLEMENT_TITLE = 'よろしければ、お子さんの学年も教えてください（任意）';
+export const STAGE_SUPPLEMENT_THANKS = 'ありがとうございます😊 学年を登録しました。';
 
 /**
- * 1,000円個別診断CTA。遷移先は環境変数 PARENT_DIAGNOSIS_URL。
- * buttonLabel: 遷移先が申込ページに直結する場合は「1,000円個別診断を申し込む」に変更。
+ * 1,000円商品カード。遷移先は環境変数 PARENT_DIAGNOSIS_URL（クリック計測URL経由）。
+ * 「個別相談」「お悩み相談」を主名称にしない。60分後に何が分かるかを示す。
  */
-export const DIAGNOSIS = {
-  name: 'わが子の伸ばし方 個別診断',
+export const ANALYSIS = {
+  name: 'わが子の強み・伸ばし方 個別分析',
   priceLabel: '60分 1,000円',
-  lead: '60分で、',
+  lead: '今のお子さんについてお話を伺いながら、',
   points: [
-    '今の年齢で大切にしたいこと',
-    'お子さんの強みや得意の伸ばし方',
-    '今はまだ急がなくていいこと',
-    '将来の選択肢を広げるための準備',
+    '今どんな力が伸びているか',
+    'お子さんの強み・得意',
+    '次に何を伸ばすとよいか',
+    '今やること／まだ急がなくていいこと',
     'お子さんに合った親の関わり方',
     '今後6〜12か月の方向性',
   ],
   tail: 'を一緒に整理します。',
-  buttonLabel: '個別診断の内容を見る',
+  buttonLabel: '強みと伸ばし方を整理する',
 };
+
+// ------------------------------------------------------------
+// ラベル・判定（通常は編集不要）
+// ------------------------------------------------------------
+
+export function stageByValue(value) {
+  return STAGES.find((s) => s.value === value) || null;
+}
+
+export function stageLabel(value) {
+  const s = stageByValue(value);
+  return s ? (s.sub ? `${s.label}（${s.sub}）` : s.label) : value || '';
+}
+
+/** 旧入力テキスト → sheet（該当しなければ null） */
+export function legacySheetFor(text) {
+  for (const [sheet, inputs] of Object.entries(LEGACY_SHEET_INPUTS)) {
+    if (inputs.includes(text)) return sheet;
+  }
+  return null;
+}
 
 // ------------------------------------------------------------
 // LINEメッセージオブジェクトの組み立て（通常は編集不要）
 // ------------------------------------------------------------
 
-/** トーク画面に残る回答表示。例: 【学年】小1 */
-export function answerDisplayText(question, option) {
-  return `【${question.tag}】${option.label}`;
-}
-
 /**
- * 質問をFlexメッセージで出す。選択肢は折り返し表示できるボックス（長い選択肢も全文表示）。
- * タップ → postback（DB保存はこの data を正とする）＋ displayText（トーク画面に回答が残る）
- * @param {object} user Q2の出し分けに使う（grade）
+ * 年代ボタン（Flex）。各ボタン = postback（DB保存はこの data を正とする）＋
+ * displayText（トーク画面に「【学年】小学校低学年」と残り、美穂先生が履歴で確認できる）。
+ * supplement: 旧入力の人に任意で年代だけ聞く場合（シートは再送しない）
  */
-export function questionMessage(questionKey, { user, withIntro = false } = {}) {
-  const q = resolveQuestion(questionKey, user);
-  if (!q) throw new Error(`cannot resolve question: ${questionKey}`);
-  const idx = QUESTIONS.findIndex((x) => x.key === questionKey);
-  const msg = {
+export function stageMessage({ supplement = false } = {}) {
+  const title = supplement ? STAGE_SUPPLEMENT_TITLE : STAGE_TITLE;
+  return {
     type: 'flex',
-    altText: `Q${idx + 1}. ${q.text}`,
+    altText: title,
     contents: {
       type: 'bubble',
       body: {
@@ -203,12 +161,10 @@ export function questionMessage(questionKey, { user, withIntro = false } = {}) {
         layout: 'vertical',
         spacing: 'md',
         contents: [
-          { type: 'text', text: `Q${idx + 1} / ${QUESTIONS.length}`, size: 'xs', color: '#888888' },
-          { type: 'text', text: q.text, weight: 'bold', size: 'md', wrap: true },
-          ...(q.subText ? [{ type: 'text', text: q.subText, size: 'sm', color: '#666666', wrap: true }] : []),
-          ...q.options.map((o) => ({
+          { type: 'text', text: title, weight: 'bold', size: 'md', wrap: true },
+          ...STAGES.map((s) => ({
             type: 'box',
-            layout: 'vertical',
+            layout: 'horizontal',
             paddingAll: '12px',
             cornerRadius: '8px',
             borderWidth: '1px',
@@ -216,26 +172,57 @@ export function questionMessage(questionKey, { user, withIntro = false } = {}) {
             backgroundColor: '#FAF7F2',
             action: {
               type: 'postback',
-              label: o.label.slice(0, 20),
-              data: `action=segment&question=${q.key}&value=${o.value}`,
-              displayText: answerDisplayText(q, o),
+              label: s.label,
+              data: `action=stage&value=${s.value}${supplement ? '&supplement=1' : ''}`,
+              displayText: `【学年】${s.label}`,
             },
-            contents: [{ type: 'text', text: o.label, size: 'sm', wrap: true, color: '#333333' }],
+            contents: [
+              { type: 'text', text: s.label, size: 'md', weight: 'bold', color: '#333333', flex: 0 },
+              ...(s.sub ? [{ type: 'text', text: `（${s.sub}）`, size: 'sm', color: '#777777', gravity: 'center' }] : []),
+            ],
           })),
         ],
       },
     },
   };
-  return withIntro ? [{ type: 'text', text: SEGMENT_INTRO }, msg] : [msg];
 }
 
-/** 3問完了メッセージ＋診断CTA。ctaUrl が無い場合（申込URL未設定など）はテキストのみ。 */
-export function completionMessages({ ctaUrl } = {}) {
-  const messages = [{ type: 'text', text: SEGMENT_COMPLETE }];
-  if (!ctaUrl) return messages;
-  messages.push({
+/** 挨拶＋年代ボタン */
+export function greetingMessages() {
+  return [{ type: 'text', text: GREETING }, stageMessage()];
+}
+
+/** 0〜10個のクイックリプライ */
+export function checkCountQuickReply() {
+  return {
+    items: Array.from({ length: CHECK_COUNT_MAX + 1 }, (_, n) => ({
+      type: 'action',
+      action: {
+        type: 'postback',
+        label: `${n}個`,
+        data: `action=check_count&value=${n}`,
+        displayText: `【チェック数】${n}個`,
+      },
+    })),
+  };
+}
+
+/** チェックリスト画像＋案内＋0〜10個ボタン。baseUrl が無ければ画像は付けない。 */
+export function sheetMessages(sheet, { baseUrl } = {}) {
+  const messages = [];
+  if (baseUrl) {
+    const url = `${baseUrl}${SHEETS[sheet].path}`;
+    messages.push({ type: 'image', originalContentUrl: url, previewImageUrl: url });
+  }
+  messages.push({ type: 'text', text: SHEET_GUIDE, quickReply: checkCountQuickReply() });
+  return messages;
+}
+
+/** 「わが子の強み・伸ばし方 個別分析」カード */
+export function analysisCard(ctaUrl) {
+  return {
     type: 'flex',
-    altText: `${DIAGNOSIS.name}（${DIAGNOSIS.priceLabel}）`,
+    altText: `${ANALYSIS.name}（${ANALYSIS.priceLabel}）`,
     contents: {
       type: 'bubble',
       body: {
@@ -243,22 +230,32 @@ export function completionMessages({ ctaUrl } = {}) {
         layout: 'vertical',
         spacing: 'sm',
         contents: [
-          { type: 'text', text: DIAGNOSIS.name, weight: 'bold', size: 'lg', wrap: true },
-          { type: 'text', text: DIAGNOSIS.priceLabel, size: 'sm', color: '#666666' },
+          { type: 'text', text: ANALYSIS.name, weight: 'bold', size: 'lg', wrap: true },
+          { type: 'text', text: ANALYSIS.priceLabel, size: 'sm', color: '#666666' },
           { type: 'separator', margin: 'md' },
-          { type: 'text', text: DIAGNOSIS.lead, size: 'sm', margin: 'md' },
-          ...DIAGNOSIS.points.map((p) => ({ type: 'text', text: `・${p}`, size: 'sm', wrap: true })),
-          { type: 'text', text: DIAGNOSIS.tail, size: 'sm' },
+          { type: 'text', text: ANALYSIS.lead, size: 'sm', margin: 'md', wrap: true },
+          ...ANALYSIS.points.map((p) => ({ type: 'text', text: `・${p}`, size: 'sm', wrap: true })),
+          { type: 'text', text: ANALYSIS.tail, size: 'sm' },
         ],
       },
       footer: {
         type: 'box',
         layout: 'vertical',
         contents: [
-          { type: 'button', style: 'primary', action: { type: 'uri', label: DIAGNOSIS.buttonLabel, uri: ctaUrl } },
+          { type: 'button', style: 'primary', action: { type: 'uri', label: ANALYSIS.buttonLabel, uri: ctaUrl } },
         ],
       },
     },
-  });
+  };
+}
+
+/**
+ * 個数回答（初回）への返信: お礼＋個別分析カード（＋旧入力の人には任意で年代ボタン）。
+ * ctaUrl が無い（申込URL未設定・申込済み）場合はカードなし。
+ */
+export function checkCompleteMessages({ ctaUrl, askStage = false } = {}) {
+  const messages = [{ type: 'text', text: CHECK_THANKS }];
+  if (ctaUrl) messages.push(analysisCard(ctaUrl));
+  if (askStage) messages.push(stageMessage({ supplement: true }));
   return messages;
 }

@@ -38,31 +38,66 @@ export async function markBlocked(lineUserId) {
   );
 }
 
-export async function setAnswer(lineUserId, column, value) {
-  if (!SEGMENT_COLUMNS.has(column)) throw new Error('invalid segment column');
+/** 年代ボタン: 年代とシートを保存（新導線） */
+export async function setStageAndSheet(lineUserId, stage, sheet) {
   const { rows } = await getDb().query(
-    `insert into parent_line_users (line_user_id, ${column}) values ($1, $2)
-     on conflict (line_user_id) do update set ${column} = excluded.${column}, updated_at = now()
+    `insert into parent_line_users (line_user_id, education_stage, parenting_check_sheet,
+                                    parenting_check_sheet_source, parenting_check_sheet_sent_at)
+     values ($1, $2, $3, 'stage_button', now())
+     on conflict (line_user_id) do update
+       set education_stage = excluded.education_stage,
+           parenting_check_sheet = excluded.parenting_check_sheet,
+           parenting_check_sheet_source = 'stage_button',
+           parenting_check_sheet_sent_at = now(),
+           updated_at = now()
      returning *`,
-    [lineUserId, value],
+    [lineUserId, stage, sheet],
   );
   return rows[0];
 }
 
+/** 旧入力の人が任意で年代だけ登録（シートは変えない） */
+export async function setStageOnly(lineUserId, stage) {
+  const { rows } = await getDb().query(
+    `update parent_line_users set education_stage = $2, updated_at = now()
+      where line_user_id = $1 returning *`,
+    [lineUserId, stage],
+  );
+  return rows[0] || null;
+}
+
+/** 旧入力（①/②）: シートだけ保存。まだシート未取得の人のみ（既に取得済みなら null） */
+export async function setLegacySheet(lineUserId, sheet) {
+  const { rows } = await getDb().query(
+    `insert into parent_line_users (line_user_id, parenting_check_sheet,
+                                    parenting_check_sheet_source, parenting_check_sheet_sent_at)
+     values ($1, $2, 'legacy_text', now())
+     on conflict (line_user_id) do update
+       set parenting_check_sheet = excluded.parenting_check_sheet,
+           parenting_check_sheet_source = 'legacy_text',
+           parenting_check_sheet_sent_at = now(),
+           updated_at = now()
+       where parent_line_users.parenting_check_sheet is null
+     returning *`,
+    [lineUserId, sheet],
+  );
+  return rows[0] || null;
+}
+
 /**
- * 3問完了の記録（初回のみ）。完了日時を入れ、美穂先生の個別対応待ち（pending）にする。
- * 既に完了済みなら null（再回答では状態を変えない）。
+ * チェック数の保存（選び直しは最新値で上書き）。初回は回答日時を入れて美穂先生の対応待ち（pending）にする。
+ * シート未取得のユーザーは更新しない（null を返す）。
  */
-export async function completeSegmentation(lineUserId) {
+export async function setCheckCount(lineUserId, count) {
   const { rows } = await getDb().query(
     `update parent_line_users
-        set segmentation_completed_at = now(),
+        set parenting_check_count = $2,
+            parenting_check_answered_at = coalesce(parenting_check_answered_at, now()),
             manual_followup_status = coalesce(manual_followup_status, 'pending'),
             updated_at = now()
-      where line_user_id = $1 and segmentation_completed_at is null
-        and grade is not null and exam_intent is not null and interest is not null
+      where line_user_id = $1 and parenting_check_sheet is not null
       returning *`,
-    [lineUserId],
+    [lineUserId, count],
   );
   return rows[0] || null;
 }
@@ -108,12 +143,14 @@ export async function isRegisteredTestUser(lineUserId) {
   return rows.length > 0;
 }
 
-/** テスト用: 回答・完了・対応状況・CTAクリック・完了メッセージの送信記録を消して、未回答の状態に戻す */
+/** テスト用: 年代・シート・チェック数・対応状況・CTAクリック・1回限りの送信記録を消して、友だち追加直後の状態に戻す */
 export async function resetTestUserProgress(lineUserId) {
   await getDb().query(
     `update parent_line_users
-        set grade = null, exam_intent = null, interest = null,
-            segmentation_completed_at = null, manual_followup_status = null, manual_followup_completed_at = null,
+        set grade = null, exam_intent = null, interest = null, segmentation_completed_at = null,
+            education_stage = null, parenting_check_sheet = null, parenting_check_sheet_source = null,
+            parenting_check_sheet_sent_at = null, parenting_check_count = null, parenting_check_answered_at = null,
+            manual_followup_status = null, manual_followup_completed_at = null,
             diagnosis_cta_clicked_at = null, updated_at = now()
       where line_user_id = $1`,
     [lineUserId],

@@ -1,18 +1,18 @@
 // 管理用スクリプト（.env.local の DATABASE_URL を使用。LINE送信は一切しない）
 //
-//   npm run admin -- pending                          美穂先生の個別対応待ち一覧（新しい順・回答は日本語表示）
+//   npm run admin -- pending                          美穂先生の対応待ち一覧（チェック数回答済み・新しい順）
 //   npm run admin -- followup-done <id>               個別対応済みにする
 //   npm run admin -- followup-not-needed <id>         対応不要にする
 //   npm run admin -- followup-pending <id>            対応待ちに戻す
-//   npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=junior_exam_planned,junior_exam_considering --diagnosis_applied=false
-//   npm run admin -- segment --interest=independent_thinking     （exam_intent=進路・教育方針 / interest=伸ばしたいこと）
+//   npm run admin -- segment --education_stage=preschool,elementary_lower --count_min=5 --diagnosis_applied=false
+//   npm run admin -- segment --parenting_check_sheet=present_2 --manual_followup_status=pending
 //   npm run admin -- mark-applied <id> / unmark-applied <id>   診断申込済みの登録・取消
 //   npm run admin -- stats                            件数集計
 //   npm run admin -- audit                            送信監査（テストユーザー以外への送信が0件か）
 import { getDb } from '../api/_lib/db.js';
 import { buildSegmentQuery } from '../api/_lib/segments.js';
 import { setManualFollowup } from '../api/_lib/users.js';
-import { optionLabel } from '../api/_lib/messages.js';
+import { stageLabel, SHEETS } from '../api/_lib/messages.js';
 import { testUserIds } from '../api/_lib/config.js';
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -20,7 +20,6 @@ const flags = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) 
 const args = rest.filter((a) => !a.startsWith('--'));
 const db = getDb();
 
-const label = (key, value, user) => (value ? optionLabel(key, value, user) : '');
 const date = (d) => (d ? new Date(d).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }) : '');
 
 try {
@@ -31,11 +30,11 @@ try {
       console.log([
         '────────────────────────',
         `名前: ${r.display_name || '(不明)'}    id: ${r.id}`,
-        `【学年】${label('grade', r.grade)}`,
-        `【進路】${label('exam_intent', r.education_path_intent, r)}`,
-        `【伸ばしたいこと】${label('interest', r.growth_interest)}`,
-        `回答日時: ${date(r.segmentation_completed_at)}`,
-        `診断CTAクリック: ${date(r.diagnosis_cta_clicked_at) || 'なし'}    診断申込: ${date(r.diagnosis_applied_at) || 'なし'}`,
+        `【学年】${r.education_stage ? stageLabel(r.education_stage) : '(未回答・旧①②入力)'}`,
+        `【シート】${SHEETS[r.parenting_check_sheet]?.label || ''}${r.parenting_check_sheet_source === 'legacy_text' ? '（旧①②入力）' : ''}`,
+        `【チェック数】${r.parenting_check_count}個`,
+        `回答日時: ${date(r.parenting_check_answered_at)}`,
+        `個別分析CTAクリック: ${date(r.diagnosis_cta_clicked_at) || 'なし'}    申込: ${date(r.diagnosis_applied_at) || 'なし'}`,
       ].join('\n'));
     }
   } else if (['followup-done', 'followup-not-needed', 'followup-pending'].includes(cmd)) {
@@ -46,8 +45,9 @@ try {
     const { rows: [c] } = await db.query(q.countSql, q.params);
     const { rows } = await db.query(q.listSql, q.params);
     console.log(`count: ${c.count}`);
-    console.table(rows.map(({ id, display_name, grade, education_path_intent, growth_interest, manual_followup_status, diagnosis_applied_at }) =>
-      ({ id, display_name, grade, education_path_intent, growth_interest, followup: manual_followup_status, applied: Boolean(diagnosis_applied_at) })));
+    console.table(rows.map((r) => ({
+      id: r.id, display_name: r.display_name, stage: r.education_stage, sheet: r.parenting_check_sheet,
+      count: r.parenting_check_count, followup: r.manual_followup_status, applied: Boolean(r.diagnosis_applied_at) })));
   } else if (cmd === 'mark-applied' || cmd === 'unmark-applied') {
     const value = cmd === 'mark-applied' ? 'coalesce(diagnosis_applied_at, now())' : 'null';
     const { rowCount } = await db.query(
@@ -56,7 +56,8 @@ try {
   } else if (cmd === 'stats') {
     const { rows } = await db.query(`
       select count(*)::int as users,
-             count(segmentation_completed_at)::int as segmented,
+             count(parenting_check_sheet)::int as sheet_sent,
+             count(parenting_check_answered_at)::int as check_answered,
              count(*) filter (where manual_followup_status = 'pending')::int as followup_pending,
              count(*) filter (where manual_followup_status = 'completed')::int as followup_completed,
              count(diagnosis_cta_clicked_at)::int as cta_clicked,

@@ -4,11 +4,11 @@
 import { verifySignature, getDisplayName } from '../_lib/line.js';
 import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from '../_lib/config.js';
 import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress } from '../_lib/users.js';
-import { parsePostback, askFirstQuestion, handleSegmentAnswer, firstUnanswered } from '../_lib/segment.js';
+import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
 import {
-  START_KEYWORDS, TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
-  TEST_RESET_TEXT, TEST_RESET_DONE,
+  TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
+  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 
@@ -23,12 +23,10 @@ export async function handleEvent(event) {
     case 'follow': {
       const user = await markFollowed(userId, await getDisplayName(userId));
       await recordEvent(userId, 'follow');
-      // 回答途中・未回答なら最初の質問から（完了済みの再追加では再質問しない）
-      if (firstUnanswered(user)) {
-        await askFirstQuestion(userId, replyToken);
-        return 'follow:asked';
-      }
-      return 'follow:already_segmented';
+      // チェック数まで回答済みの人の再追加（ブロック解除）では挨拶を送り直さない
+      if (user.parenting_check_answered_at) return 'follow:already_answered';
+      await sendGreeting(userId, replyToken);
+      return 'follow:greeting';
     }
     case 'unfollow':
       await markBlocked(userId);
@@ -36,24 +34,27 @@ export async function handleEvent(event) {
       return 'unfollow';
     case 'postback': {
       const p = parsePostback(event.postback?.data);
-      if (p?.action !== 'segment') return 'postback:ignored';
-      await upsertUser(userId);
-      if (p.question === 'start') {
-        await askFirstQuestion(userId, replyToken, { withIntro: false });
-        return 'postback:start';
+      if (p?.action === 'stage') {
+        await upsertUser(userId);
+        return `postback:${await handleStage(userId, replyToken, p.value, { supplement: p.supplement })}`;
       }
-      return `postback:${await handleSegmentAnswer(userId, replyToken, p.question, p.value)}`;
+      if (p?.action === 'check_count') {
+        return `postback:${await handleCheckCount(userId, replyToken, p.value)}`;
+      }
+      return 'postback:ignored';
     }
     case 'message': {
       const text = event.message?.type === 'text' ? event.message.text?.trim() : null;
-      const testResult = text && await handleTestRegistration(userId, replyToken, text);
-      if (testResult) return testResult;
-      if (text && START_KEYWORDS.includes(text)) {
-        await upsertUser(userId);
-        await askFirstQuestion(userId, replyToken, { withIntro: false });
-        return 'message:start';
+      if (!text) return 'message:ignored';
+      const devResult = await handleDevCommand(userId, replyToken, text);
+      if (devResult) return devResult;
+      // 旧導線の「①/②/1/2」（シート未取得の人のみ）
+      const legacy = legacySheetFor(text);
+      if (legacy) {
+        const r = await handleLegacySheet(userId, replyToken, legacy);
+        if (r) return `message:${r}`;
       }
-      // それ以外のメッセージはLINE公式アカウント側のチャット対応に任せる
+      // それ以外のメッセージは美穂先生（LINE公式アカウントのチャット）が対応する。自動返信しない。
       return 'message:ignored';
     }
     default:
@@ -61,10 +62,14 @@ export async function handleEvent(event) {
   }
 }
 
-// 「テスト登録 <合言葉>」→ テスト送信対象に登録。合言葉が違う場合は何も返さない（存在を知らせない）。
-// 「テスト解除」→ 登録済みなら解除。メッセージ本文はログに出さない。
-// 「テストリセット」→ テスト用ユーザーの回答を未回答に戻す（テストを繰り返すため）。
-async function handleTestRegistration(userId, replyToken, text) {
+// 開発用コマンド（production では全て無効 = 通常のメッセージとして扱い、何もしない）
+//   「テスト登録 <合言葉>」→ テスト送信対象に登録。合言葉が違う場合は何も返さない（存在を知らせない）
+//   「テスト解除」→ 登録済みなら解除
+//   「テストリセット」→ テスト用ユーザー本人の状態を友だち追加直後に戻す
+//   「テスト開始」→ テスト用ユーザーに友だち追加直後の挨拶＋年代ボタンを送る（既存の自動応答ONのままテストするため）
+// メッセージ本文はログに出さない。
+async function handleDevCommand(userId, replyToken, text) {
+  if (sendMode() === 'production') return null;
   if (text.startsWith(TEST_REGISTER_PREFIX)) {
     const code = text.slice(TEST_REGISTER_PREFIX.length).trim();
     if (!matchesTestRegisterCode(code)) return 'message:test_register_rejected';
@@ -81,13 +86,18 @@ async function handleTestRegistration(userId, replyToken, text) {
     await recordEvent(userId, 'test_user_unregistered');
     return 'message:test_unregistered';
   }
-  // 「テストリセット」→ テスト用ユーザー本人の回答状態を未回答に戻す（production では無効）
-  if (text === TEST_RESET_TEXT) {
-    if (sendMode() === 'production' || !(await isTestUser(userId))) return 'message:ignored';
-    await resetTestUserProgress(userId);
-    await recordEvent(userId, 'test_user_reset');
-    await replyUntracked(userId, replyToken, [{ type: 'text', text: TEST_RESET_DONE }], 'test:reset');
-    return 'message:test_reset';
+  if (text === TEST_RESET_TEXT || text === TEST_START_TEXT) {
+    if (!(await isTestUser(userId))) return 'message:ignored';
+    if (text === TEST_RESET_TEXT) {
+      await resetTestUserProgress(userId);
+      await recordEvent(userId, 'test_user_reset');
+      await replyUntracked(userId, replyToken, [{ type: 'text', text: TEST_RESET_DONE }], 'test:reset');
+      return 'message:test_reset';
+    }
+    await upsertUser(userId);
+    await recordEvent(userId, 'test_start');
+    await sendGreeting(userId, replyToken);
+    return 'message:test_start';
   }
   return null;
 }

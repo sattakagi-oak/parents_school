@@ -1,136 +1,147 @@
-# 親の学習塾 LINE自動化
+# 親の学習塾 LINE自動化（「親の習慣」チェックリスト導線）
 
-LINE友だち追加 → Q1 学年 → Q2 進路・教育方針（学年別に出し分け）→ Q3 これから伸ばしたいこと → 短い自動返信＋1,000円個別診断CTA
-→ **美穂先生が回答を確認し、LINE公式アカウントから個別に手動返信** → 必要な方を1,000円個別診断へ → 4か月講座へ。
+既存の「親の習慣」チェックリスト（プレゼント）導線を残しつつ、文字入力をボタンに置き換えたもの。
+新規ユーザーの操作は **友だち追加 → 学年を1タップ → チェック数を1タップ** の2操作で完了する。
 
-ターゲットは「問題があって困っている親」ではなく、**わが子をもっと伸ばしたい・可能性を広げたい**教育意識の高い親。
-中学受験は重要な選択肢の一つだが、中学受験家庭だけに限定しない。アンケート・メッセージは悩み相談や問題解決に寄せない。
+```
+友だち追加 → 挨拶＋学年ボタン(5区分)
+  → [学年タップ] 学年・シートをDB保存 → チェックリスト画像＋案内＋0〜10個ボタン
+  → [個数タップ] 個数・pending をDB保存 → お礼＋「わが子の強み・伸ばし方 個別分析」カード
+  → 美穂先生が LINE Official Account Manager から本人として手動コメント
+```
 
-価値は「30年以上、数百組の親子を見てきた美穂先生本人が回答を見てくれること」。
-システムの役割は、美穂先生がその人に合わせて返信するための情報を集め、見やすくするところまで。
+ステップ配信（3日・7日）・自動追客・AIによる個別コメントはない。価値は「30年以上、数百組の親子を見てきた美穂先生本人がコメントすること」。
 
-LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Functions。既存LP（`index.html`）には一切手を入れていない。Cronは使わない。
+LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Functions。既存LP（`index.html`）は変更していない。Cronは使わない。
 
-## 自動で送るもの（これ以外は送らない）
+## 自動で送るもの（これ以外は送らない。すべて reply、push なし）
 
-| きっかけ | 自動返信（すべて reply。push は使わない） |
+| きっかけ | 返信 |
 |---|---|
-| 友だち追加（follow）／「3問に回答する」 | あいさつ＋Q1 |
-| Q1回答 | 学年に応じたQ2 |
-| Q2回答 | Q3 |
-| Q3回答（3問そろった初回） | 完了メッセージ＋個別診断CTA（1回だけ） |
+| 友だち追加（follow） | 挨拶＋学年ボタン |
+| 学年ボタン | チェックリスト画像＋案内＋0〜10個ボタン |
+| 旧入力「①/②/1/2」（シート未取得の人のみ） | チェックリスト画像＋案内＋0〜10個ボタン |
+| 個数ボタン（初回） | お礼＋個別分析カード（旧入力の人には任意の学年ボタンも） |
+| 個数ボタン（選び直し） | 「チェック数を更新しました」 |
 
-その後の自由入力・CTAクリック・時間経過では何も自動送信しない。翌日配信・3日間/7日間教育・CTA未クリック者への追客・自動クロージング・AI自動返信は実装しない。
+それ以外の自由入力・画像・CTAクリック・時間経過では何も送らない（美穂先生の手動コメントを邪魔しない）。
 
 ## 構成
 
 | パス | 役割 |
 |---|---|
 | `api/line/webhook.js` | `POST /api/line/webhook` 署名検証・follow/unfollow/postback/message |
+| `api/_lib/checklist.js` | 導線の本体（学年・旧入力・個数の処理） |
+| `api/_lib/messages.js` | **挨拶・案内・カードの文面、学年区分、シート対応はすべてここ** |
 | `api/line/cta.js` | `GET /api/line/cta?t=…` CTAクリック記録 → 申込ページ（`PARENT_DIAGNOSIS_URL`）へ302 |
-| `api/admin/line/users.js` | `GET /api/admin/line/users` セグメント抽出（要ADMIN_API_TOKEN・送信なし） |
+| `api/admin/line/users.js` | `GET /api/admin/line/users` 抽出（要ADMIN_API_TOKEN・送信なし） |
 | `api/admin/line/diagnosis-applied.js` | `POST /api/admin/line/diagnosis-applied` 申込済み手動登録 |
-| `api/_lib/messages.js` | **自動返信の文面・3問の選択肢はすべてここ** |
-| `api/_lib/config.js` | 送信モード判定（唯一の送信可否判断） |
+| `images/parent-check/present-1.png` / `present-2.png` | チェックリスト画像（静的ファイル） |
 | `db/migrations/*.sql` | テーブル定義 |
 | `scripts/admin.mjs` | 管理スクリプト（対応待ち一覧・対応状況更新・抽出・監査） |
 
-## 3問アンケート
+## 学年区分とシート
 
-DBカラムは流用し、意味を変えている: `exam_intent` = **進路・教育方針（education_path_intent）**、`interest` = **子どもについて伸ばしたいこと（growth_interest）**。
-
-### Q1 学年（`grade`）— 表示 `【学年】小1`
-
-お子さんの学年を教えてください。
-年長以下 `preschool` / 小1 `grade_1` / 小2 `grade_2` / 小3 `grade_3` / 小4以上 `grade_4_plus`
-
-### Q2 進路・教育方針（`exam_intent`）— 表示 `【進路】…`。Q1の学年で出し分け
-
-| 学年 | 質問 | 選択肢（内部値） |
+| ボタン | 内部値 `education_stage` | シート `parenting_check_sheet` |
 |---|---|---|
-| 年長以下 | これからのお子さんの学びについて、一番近いものを教えてください。 | 将来の選択肢をできるだけ広げたい `expand_future_options` / 中学受験も視野に入れている `junior_exam_considering` / まずは学ぶことを楽しめる土台をつくりたい `build_learning_foundation` / まだ具体的な進路は考えていない `not_decided_yet` |
-| 小1・小2 | これからの進路について、今のお考えに一番近いものを教えてください。 | 中学受験を考えている `junior_exam_planned` / 中学受験も含めて幅広く検討している `junior_exam_considering` / まだ決めていないが、将来の選択肢を広げたい `expand_future_options` / 公立中心で考えている `public_school_main` / まだ特に決めていない `not_decided_yet` |
-| 小3 | これからの進路について、今のお考えに一番近いものを教えてください。 | 中学受験をする予定 `junior_exam_planned` / 中学受験を前向きに検討している `junior_exam_considering` / 中学受験をするかまだ迷っている `junior_exam_undecided` / 公立中への進学を中心に考えている `public_school_main` / まだ決めていない `not_decided_yet` |
-| 小4以上 | 現在の進路について、一番近いものを教えてください。 | 中学受験に向けて準備している `junior_exam_in_progress` / 中学受験を検討している `junior_exam_considering` / 高校受験を見据えている `high_school_exam` / まだ進路は決めていない `not_decided_yet` / その他の進路を考えている `other` |
+| 幼稚園・保育園 | `preschool` | `present_1` |
+| 小学校低学年（小1〜2） | `elementary_lower` | `present_1` |
+| 小学校中学年（小3〜4） | `elementary_middle` | `present_2` |
+| 小学校高学年（小5〜6） | `elementary_upper` | `present_2` |
+| 中学生以上 | `junior_high_plus` | `present_2` |
 
-- 同じ意味の選択肢は学年をまたいで同じ内部値（例: 中学受験の検討 = `junior_exam_considering`）。セグメント抽出で学年横断に絞り込める。
-- その学年の選択肢に無い値（古いボタン等）は保存せず、今の学年のQ2を出し直す。学年を変えて既存のQ2回答が合わなくなった場合もQ2を聞き直す。
-
-### Q3 これから伸ばしたいこと（`interest`）— 表示 `【伸ばしたいこと】…`。全学年共通
-
-これから、お子さんについて一番伸ばしていきたいことはどれですか？
-（今困っていることではなく、「これからこうなってほしい」というお気持ちに近いもので大丈夫です。）
-
-自分から考えて学ぶ力を伸ばしたい `independent_thinking` / 勉強を楽しめる習慣をつくりたい `learning_habits` / 得意なこと・好きなことをもっと伸ばしたい `develop_strengths` / 将来の選択肢を広げられる力をつけたい `expand_future_options` / 子どものタイプに合った関わり方を知りたい `parenting_fit` / 今の年齢で何を優先すればいいか知りたい `what_to_prioritize`
+- `present_1` = 未就学〜小学校低学年まで（「先回り」チェック）→ `images/parent-check/present-1.png`
+- `present_2` = 小学校中学年以降（「管理しすぎ」チェック）→ `images/parent-check/present-2.png`
+- 画像は `PUBLIC_BASE_URL` + パスの HTTPS URL で送る（PNG 約145KB、LINE の上限内）。DBには識別値だけ保存。
+- 元ファイル（`子育て相談/images`）はファイル名と中身が逆だったため、**中身で**割り当てている
+  （`プレゼント② png.png` = 未就学〜低学年 → present-1、`プレゼント① .png` = 中学年以降 → present-2）。
 
 ### postback / displayText
 
-- 質問は Flex Message。各選択肢は折り返し表示されるボタン（長い選択肢も全文表示）。
-- タップ = postback action。`data=action=segment&question=<grade|exam_intent|interest>&value=<内部値>` を**DB保存の正**とし、
-  `displayText`（`【学年】小1` / `【進路】…` / `【伸ばしたいこと】…`）はトーク画面に回答を残すためだけに使う（パースしない）。
-  → 美穂先生は LINE Official Account Manager のトーク履歴だけで回答が分かる。
-- 値は許可リストで検証。再回答は最新値で上書き（完了日時・対応状況・完了メッセージは変えない）。
-- 「3問に回答する」「診断スタート」のテキスト、または postback `action=segment&question=start` で最初から回答できる（既存友だち用）。
+- 学年: Flex の各ボタン = postback `action=stage&value=<education_stage>`、displayText `【学年】小学校低学年`
+- 個数: Quick Reply 11個（0個〜10個）= postback `action=check_count&value=<0〜10>`、displayText `【チェック数】6個`
+- DB保存は postback data を正とし、displayText はトーク画面に回答を残すためだけに使う（パースしない）。
+  → 美穂先生は LINE Official Account Manager のトーク履歴だけで学年とチェック数が分かる。
+- 学年ボタンは Flex なのでトーク上に残る。個数ボタン（Quick Reply）が消えた場合は、学年ボタンを押し直せばシートと個数ボタンが再表示される。
 
-## 3問完了後
+## DBに保存する項目（`parent_line_users`）
 
-DB: `grade` / `exam_intent`（進路）/ `interest`（伸ばしたいこと）/ `segmentation_completed_at = now()` / `manual_followup_status = 'pending'`
+| タイミング | 項目 |
+|---|---|
+| 学年タップ | `education_stage`, `parenting_check_sheet`, `parenting_check_sheet_source='stage_button'`, `parenting_check_sheet_sent_at` |
+| 旧入力 ①/② | `parenting_check_sheet`, `parenting_check_sheet_source='legacy_text'`, `parenting_check_sheet_sent_at`（`education_stage` は空） |
+| 個数タップ | `parenting_check_count`(0〜10), `parenting_check_answered_at`（初回日時）, `manual_followup_status='pending'`（初回のみ） |
+| CTAクリック | `diagnosis_cta_clicked_at`（初回日時） |
+| 申込確認後（手動） | `diagnosis_applied_at` |
 
-自動返信（Q3への reply 1回）: 完了メッセージ（年齢や伸ばしたいことによって大切にしたいことは一人ひとり違う／美穂先生が直接確認します／個別診断のご案内／気になることがあれば一言どうぞ）＋個別診断CTA（Flex）。
+- 年代区分は厳密な学年ではないため、旧 `grade` は流用せず新カラム `education_stage` を追加（マイグレーション005、追加のみ）。
+- 旧アンケート用の `grade` / `exam_intent` / `interest` / `segmentation_completed_at`、旧7日配信用の `education_step` / `education_started_at` は未使用（残置）。
 
-### 1,000円個別診断CTA
+## 「わが子の強み・伸ばし方 個別分析」カード
 
-- 名称「わが子の伸ばし方 個別診断」／60分 1,000円（中学受験専用には見せない）
-- 「60分で、・今の年齢で大切にしたいこと・お子さんの強みや得意の伸ばし方・今はまだ急がなくていいこと・将来の選択肢を広げるための準備・お子さんに合った親の関わり方・今後6〜12か月の方向性 を一緒に整理します。」
-- ボタン「個別診断の内容を見る」（申込ページ直結なら `messages.js` の `DIAGNOSIS.buttonLabel` を「1,000円個別診断を申し込む」に）
-- ボタンのリンク先は `PUBLIC_BASE_URL/api/line/cta?t=<ユーザーごとのランダムトークン>`。クリック時に `diagnosis_cta_clicked_at`（初回のみ）を記録して `PARENT_DIAGNOSIS_URL` へ転送。URLにLINE userIdは載せない。
-- `PARENT_DIAGNOSIS_URL`（https）か `PUBLIC_BASE_URL` が未設定、または診断申込済みのユーザーには、CTAなしで完了メッセージのみ。
-- 申込が確認できたら `diagnosis_applied_at` を記録（`npm run admin -- mark-applied <id>` または管理API）。
+```
+わが子の強み・伸ばし方 個別分析
+60分 1,000円
 
-## 美穂先生の個別対応
+今のお子さんについてお話を伺いながら、
+・今どんな力が伸びているか
+・お子さんの強み・得意
+・次に何を伸ばすとよいか
+・今やること／まだ急がなくていいこと
+・お子さんに合った親の関わり方
+・今後6〜12か月の方向性
+を一緒に整理します。
 
-`manual_followup_status`: `pending`（3問完了時） → `completed`（個別返信済み。`manual_followup_completed_at` も記録）/ `not_needed`。友だち追加だけでは null。
-返信文は美穂先生が回答に触れて本人が書く（Messaging APIから自動送信しない）。
+[ 強みと伸ばし方を整理する ]
+```
+
+- ボタンのリンク先: `PUBLIC_BASE_URL/api/line/cta?t=<ユーザーごとのランダムトークン>` → `diagnosis_cta_clicked_at` を記録 → `PARENT_DIAGNOSIS_URL` へ302。URLにLINE userIdは載せない。
+- `PARENT_DIAGNOSIS_URL`（https）か `PUBLIC_BASE_URL` が未設定、または申込済みの人にはカードを出さない（お礼のみ）。
+- カードは1人1回（`parent_line_message_logs` の `check:complete`）。
+
+### 無料コメントと有料個別分析の役割分担（運用）
+
+- 無料コメント（美穂先生が手動）: 今回のチェック結果から見える **1つの気づき・方向性** だけ返す。
+- 1,000円個別分析: お子さんの強み、次に伸ばすこと、親の関わり方、今後6〜12か月の方向性まで整理する。
+- 無料コメントで有料の中身をすべて提供しない。
+
+## 旧導線（①/②）との互換
+
+現行の挨拶を受け取った既存ユーザーが「①」「②」「1」「2」（全角「１」「２」も）と送った場合:
+
+- `①/1/１` → `present_1`、`②/2/２` → `present_2` のシート画像＋0〜10個ボタンを返す。
+- 対象は **シート未取得の人だけ**（取得済みの人の「1」「2」はチェック数の手入力などの可能性があるため無視し、美穂先生が対応）。
+- 厳密な学年は分からないので、個数回答後のカードの後に「よろしければ学年も教えてください（任意）」の学年ボタンを付ける。押すと `education_stage` だけ保存（シートは再送しない）。
+
+## 美穂先生の手動フォロー
+
+`manual_followup_status`: `pending`（個数回答時） → `completed`（コメント済み。`manual_followup_completed_at` も記録）/ `not_needed`。友だち追加やシート受け取りだけでは null。
+コメントは自動化しない。美穂先生がトーク履歴（`【学年】…` `【チェック数】…`）と過去のやり取りを見て本人が送る。
 
 ### 対応待ち一覧
 
-Neon Console → SQL Editor（または Tables のビュー `parent_line_pending_followups`）:
+Neon Console → SQL Editor:
 
 ```sql
 select * from parent_line_pending_followups;
--- 列: display_name, grade, education_path_intent, growth_interest, segmentation_completed_at,
---     diagnosis_cta_clicked_at, diagnosis_applied_at, manual_followup_status（新しい回答者が上）
+-- 列: display_name, education_stage, parenting_check_sheet, parenting_check_sheet_source,
+--     parenting_check_count, parenting_check_answered_at, diagnosis_cta_clicked_at,
+--     diagnosis_applied_at, manual_followup_status（新しい回答が上）
 ```
 
-ローカルから（回答を「【学年】小1」の形で日本語表示）:
+ローカルから（日本語表示）:
 
 ```bash
 npm run admin -- pending
-npm run admin -- followup-done <id>        # 個別返信したら
+npm run admin -- followup-done <id>        # コメントしたら
 npm run admin -- followup-not-needed <id>
 ```
 
-SQLで直接更新する場合:
-
-```sql
-update parent_line_users set manual_followup_status = 'completed', manual_followup_completed_at = now() where id = '<id>';
-```
-
-### セグメント抽出例（将来の絞り込み用・送信はしない）
-
-```sql
-select id, display_name from parent_line_users
- where grade in ('grade_1','grade_2')
-   and exam_intent in ('junior_exam_planned','junior_exam_considering')   -- 進路
-   and diagnosis_applied_at is null
-   and blocked_at is null;
-
-select id, display_name from parent_line_users where interest = 'independent_thinking';  -- 伸ばしたいこと
-```
+### 抽出例（送信はしない）
 
 ```bash
-npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=junior_exam_planned,junior_exam_considering --diagnosis_applied=false
-npm run admin -- segment --interest=independent_thinking
+npm run admin -- segment --education_stage=preschool,elementary_lower --count_min=5 --diagnosis_applied=false
+npm run admin -- segment --parenting_check_sheet=present_2 --manual_followup_status=pending
 npm run admin -- mark-applied <id>
 npm run admin -- stats
 ```
@@ -139,100 +150,87 @@ npm run admin -- stats
 
 | `LINE_SEND_MODE` | 動作 |
 |---|---|
-| `disabled`（既定・未設定・typoも含む） | 誰にも送らない。回答保存・状態更新のみ |
+| `disabled`（既定・未設定・typoも含む） | 誰にも送らない。DB保存・状態更新のみ |
 | `test` | テスト用ユーザー（`LINE_TEST_USER_IDS` または LINEから「テスト登録」した人）にだけ送る |
 | `production` | 全員に送る。**`LINE_SEND_ENABLED=true` も同時に必要**（どちらか欠けたら disabled） |
 
 - 送信関数は reply のみ。push / broadcast / multicast は**コード自体が存在しない**。
-- reply のたびに送信直前でモードと宛先を再確認（follow時・質問・完了・CTAすべて）。
+- reply のたびに送信直前でモードと宛先を再確認（挨拶・シート・お礼・カード・旧入力すべて）。
 - 実際に送った返信は `parent_line_events` に `message_sent`、テスト対象外で止めた返信は `send_blocked` として記録。
   `npm run admin -- audit` で「テストユーザー以外への実送信: 0件」を確認できる。
-- 完了メッセージは `parent_line_message_logs (line_user_id, campaign_key='segment:complete')` の一意制約で1回だけ。
 - ログには userId・トークン・本文を出さない（`api/_lib/log.js` の許可キーのみ）。
+- Cron なし（`vercel.json` なし）。時間で動く自動送信は存在しない。
 
-## データ
+### 開発用コマンド（テスト用ユーザーのみ。production では全て無効）
 
-`parent_line_users`（1ユーザー1行、`line_user_id` unique）
-- 回答: `grade` / `exam_intent`（進路・教育方針）/ `interest`（伸ばしたいこと）
-- `segmentation_completed_at` / `manual_followup_status` / `manual_followup_completed_at`
-- `diagnosis_cta_clicked_at`（初回クリック）/ `diagnosis_applied_at` / `followed_at` / `blocked_at`
-- `cta_token`: CTAリンク用のランダムID
-- `education_started_at` / `education_step`: 旧7日間配信用。**未使用**（削除のMigrationリスクを避けて残置）
+| 送る文字 | 動作 |
+|---|---|
+| `テスト登録 <合言葉>` | そのアカウントをテスト用ユーザーに登録（`LINE_TEST_REGISTER_CODE`、16文字以上） |
+| `テスト開始` | 友だち追加直後の挨拶＋学年ボタンを受け取る（既存の自動応答ONのまま新導線を試すため） |
+| `テストリセット` | 学年・シート・個数・対応状況・CTAクリックを消して友だち追加直後に戻す |
+| `テスト解除` | テスト用ユーザーの登録を解除 |
 
-`parent_line_message_logs` 1回限りの返信の記録 / `parent_line_events` 行動履歴（follow・回答・CTAクリック・送信記録。Webhook bodyは保存しない）/ `parent_line_test_users` テスト用ユーザー
+## データ・マイグレーション
 
-全テーブルRLS有効・ポリシーなし（多層防御。アプリの接続ロール＝テーブル所有者には影響なし）。
+`parent_line_users`（1ユーザー1行、`line_user_id` unique）/ `parent_line_message_logs` 1回限りの返信の記録 / `parent_line_events` 行動履歴（Webhook bodyは保存しない）/ `parent_line_test_users` テスト用ユーザー。
+全テーブルRLS有効・ポリシーなし。
 
-マイグレーション: `db/migrations/*.sql` を `npm run db:migrate` で適用。適用済みファイルは `schema_migrations` に記録され、同じコマンドを開発・Preview・Production の各DBに対して実行すれば同じスキーマになる。
+`db/migrations/*.sql` を `npm run db:migrate` で適用（適用済みは `schema_migrations` に記録。開発・Preview・Production で同じコマンド）。
 
 ---
 
-## セットアップ手順（ユーザー作業）
+## セットアップ（ユーザー作業）
 
-### 1. Neon（DB）
-
-このサービス専用の Neon プロジェクトを使う（他サービスと混在させない）。ブランチで環境を分ける:
+### Neon
 
 | Neonブランチ | 用途 | 接続する場所 |
 |---|---|---|
 | `production` | 本番 | Vercel Production |
-| `development`（productionから作成） | 開発・Preview | `.env.local`、Vercel Preview |
+| `development` | 開発・Preview | `.env.local`、Vercel Preview |
 
-マイグレーション:
 ```bash
 npm run db:migrate                                   # .env.local の接続先（development）
 DATABASE_URL_UNPOOLED='<productionの直結URL>' node scripts/migrate.mjs   # 本番（本番反映時のみ）
 ```
 
-### 2. Vercel 環境変数
+### Vercel 環境変数
 
 | 変数 | 値 | 備考 |
 |---|---|---|
-| `LINE_CHANNEL_SECRET` | LINE Developers の Channel secret | |
-| `LINE_CHANNEL_ACCESS_TOKEN` | 長期チャネルアクセストークン | |
-| `LINE_SEND_MODE` | `disabled` | テスト時のみ `test` |
-| `LINE_SEND_ENABLED` | `false` | 本番配信許可が出るまで false |
+| `LINE_CHANNEL_SECRET` / `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers の値 | |
+| `LINE_SEND_MODE` | `test`（テスト中）/ `disabled` | `production` は本番切替時のみ |
+| `LINE_SEND_ENABLED` | `false` | 本番切替時のみ `true` |
 | `LINE_TEST_USER_IDS` | 運営者の userId | 任意（LINEからの「テスト登録」でも可） |
-| `LINE_TEST_REGISTER_CODE` | 16文字以上の合言葉 | テスト登録用。テスト後は削除推奨 |
-| `DATABASE_URL` | Neon pooled 接続文字列 | Production=productionブランチ / Preview=developmentブランチ |
-| `DATABASE_URL_UNPOOLED` | Neon 直結接続文字列 | 任意（マイグレーション用） |
+| `LINE_TEST_REGISTER_CODE` | 16文字以上の合言葉 | テスト登録用。本番切替時に削除 |
+| `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | Neon 接続文字列 | Production=production / Preview=development |
 | `ADMIN_API_TOKEN` | 32文字以上のランダム文字列 | 管理API用 |
-| `PARENT_DIAGNOSIS_URL` | 診断の申込ページURL（https） | 未設定ならCTAなし |
-| `PUBLIC_BASE_URL` | このサイトの公開URL | CTAリンク生成用 |
+| `PARENT_DIAGNOSIS_URL` | 個別分析の申込ページURL（https） | 未設定ならカードなし |
+| `PUBLIC_BASE_URL` | このサイトの公開URL | 画像URL・CTAリンク生成用（未設定だと画像が送れない） |
 
-環境変数を変えたら、対象ブランチのデプロイを Redeploy（Preview は Branch が `feature/parent-line-automation` のもの）。
-Settings → Deployment Protection の Vercel Authentication は OFF（ON だと LINE の Webhook が 401 になる）。
+環境変数を変えたら、対象ブランチのデプロイを Redeploy。Deployment Protection の Vercel Authentication は OFF（ON だと Webhook が 401、画像も取得できない）。
 
-> 注意: Vercel Hobby（無料）プランは商用利用不可の規約。
+### テスト手順（`LINE_SEND_MODE=test`、既存の自動応答はONのまま）
 
-### 3. LINE Developers
+1. `テスト登録 <合言葉>`（登録済みなら不要）→ `テストリセット` → `テスト開始`
+2. 挨拶＋5つの学年ボタン → 学年をタップ → 正しいシート画像＋0〜10個ボタン
+3. 個数をタップ → お礼＋個別分析カード → 「強みと伸ばし方を整理する」→ 申込ページへ遷移
+4. `select * from parent_line_pending_followups;` に表示、`npm run admin -- audit` で「テストユーザー以外への実送信: 0件」
+5. 旧入力の確認: `テストリセット` → `①` または `②` → シート → 個数 → カード＋任意の学年ボタン
 
-- **Messaging API** タブ → **Webhook URL** に `https://<VercelのURL>/api/line/webhook` → **Update** → **Verify** →「成功」→ **Use webhook** ON。
-- LINE Official Account Manager 側の「あいさつメッセージ」「応答メッセージ」は従来どおり動く。本番化の際に、3問フローと重複しないか見直す。
+※ 既存の「応答メッセージ」がONの間は、テスト用ユーザーが送った「①」「テスト開始」等に既存の自動応答も返ることがある（新導線の動作とは無関係）。
 
-### 4. 運営者本人でのテスト（`LINE_SEND_MODE=test`）
+### 本番切替（ユーザーが明示的に許可した後にのみ実施）
 
-1. Preview に `LINE_SEND_MODE=test`、`LINE_TEST_REGISTER_CODE=<合言葉>`、`PARENT_DIAGNOSIS_URL`、`PUBLIC_BASE_URL` を設定して Redeploy。
-2. 本人のLINEから `テスト登録 <合言葉>` →「テスト用アカウントとして登録しました」。解除は `テスト解除`。
-   - `テストリセット`: テスト用ユーザー本人の回答・完了・対応状況・CTAクリックを消して未回答に戻す（何度でもテスト可。production では無効）。
-3. `3問に回答する` → Q1〜Q3 をタップ（学年に応じたQ2が出る。トーク画面に `【学年】…` 等が残る）→ 完了メッセージ＋個別診断CTA。
-4. CTAボタンを押す → 申込ページへ遷移、`diagnosis_cta_clicked_at` が入る。
-5. `select * from parent_line_pending_followups;` に表示されること。
-6. その後、何を送っても自動メッセージが来ないこと。
-7. `npm run admin -- audit` で「テストユーザー以外への実送信: 0件」。
-8. テスト後は `LINE_SEND_MODE=disabled` に戻す。
+1. LINE Official Account Manager →「あいさつメッセージ」をOFF
+2. LINE Official Account Manager →「応答メッセージ」をOFF
+3. その他の自動応答（キーワード応答・AI応答等）が残っていないか確認
+4. LINE Developers → Messaging API → Webhook の利用がONであることを確認
+5. production DB へマイグレーション、`feature/parent-line-automation` を main へマージ
+6. Vercel Production の環境変数を確認（`DATABASE_URL`=productionブランチ、`PUBLIC_BASE_URL`=本番URL、`PARENT_DIAGNOSIS_URL`、`LINE_TEST_REGISTER_CODE` 削除）し、LINE Developers の Webhook URL を本番URLに変更して Verify
+7. `LINE_SEND_MODE=production` と `LINE_SEND_ENABLED=true` を設定して Production を Redeploy
+8. 別のLINEアカウントで新規友だち追加し、挨拶 → 学年 → シート → 個数 → カードまで最終確認
 
-### 5. 本番配信の開始（明示的な許可が出てから）
-
-production ブランチへマイグレーション → main へマージ → Production の環境変数に `LINE_SEND_MODE=production` と `LINE_SEND_ENABLED=true` の**両方**を設定して Redeploy。
-この時点から、新規友だち追加者に3問が届く（既存友だちには何も届かない）。
-
-## 既存の友だち（約100人）への案内（案・未実施）
-
-**「既存ユーザーにも配信してください」と明示的な指示が出るまで実施しない。**
-
-1. **リッチメニュー**（推奨・送信数ゼロ）: Official Account Manager でリッチメニューにボタンを追加し、アクション「テキスト」＝`3問に回答する`。タップした人だけにQ1が返信される。
-2. **一斉メッセージ（Official Account Manager から人間が手動）**: 「3つの質問に答えると、美穂先生がお子さんのことを確認します」＋ボタン（テキスト `3問に回答する`）。
+既存の友だち約100人には、この切替だけでは何も送られない（送信は相手の操作への返信のみ）。
 
 ## テスト
 
