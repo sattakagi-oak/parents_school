@@ -5,7 +5,6 @@ import { setDb } from '../api/_lib/db.js';
 
 // テスト専用のダミー値（本物のSecret/Tokenは使わない）
 export const SECRET = 'test-channel-secret';
-export const CRON_SECRET = 'c'.repeat(40);
 export const ADMIN_TOKEN = 'a'.repeat(40);
 export const OWNER = 'U' + '0'.repeat(32);
 export const OTHER = 'U' + '1'.repeat(32);
@@ -19,7 +18,7 @@ export function baseEnv(overrides = {}) {
     LINE_CHANNEL_ACCESS_TOKEN: 'dummy-token',
     LINE_SEND_ENABLED: 'false',
     LINE_SEND_MODE: 'disabled',
-    CRON_SECRET,
+
     ADMIN_API_TOKEN: ADMIN_TOKEN,
     PUBLIC_BASE_URL: 'https://example.test',
     PARENT_DIAGNOSIS_URL: 'https://forms.example.test/diagnosis',
@@ -29,7 +28,7 @@ export function baseEnv(overrides = {}) {
 
 export async function freshDb() {
   const db = new PGlite();
-  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql']) {
+  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql']) {
     await db.exec(await readFile(new URL(`../db/migrations/${f}`, import.meta.url), 'utf8'));
   }
   setDb(db);

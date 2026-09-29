@@ -1,5 +1,5 @@
 // LINE Messaging API の最小クライアント。
-// 送信系は reply / push（1ユーザー単位）のみ。broadcast / multicast は意図的に実装しない。
+// 送信系は reply（ユーザーの操作への返信）のみ。push / broadcast / multicast は意図的に実装しない。
 // 送信関数は必ず sendPermission() を内部で再確認する（呼び出し側のチェック漏れ対策）。
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -45,20 +45,6 @@ export async function replyMessage(lineUserId, replyToken, messages) {
     body: JSON.stringify({ replyToken, messages }),
   });
   if (!res.ok) throw new LineApiError(res.status);
-  return { sent: true };
-}
-
-/** retryKey（UUID）を付けると、LINE側で同一リクエストの重複配信が防がれる */
-export async function pushMessage(lineUserId, messages, retryKey) {
-  const perm = await sendPermission(lineUserId);
-  if (!perm.ok) return { sent: false, reason: perm.reason };
-  const res = await fetch(`${API}/message/push`, {
-    method: 'POST',
-    headers: authHeaders(retryKey ? { 'x-line-retry-key': retryKey } : {}),
-    body: JSON.stringify({ to: lineUserId, messages }),
-  });
-  // 409 = 同じ retryKey のリクエストが既に受理済み → 送信済みとして扱う
-  if (!res.ok && res.status !== 409) throw new LineApiError(res.status);
   return { sent: true };
 }
 

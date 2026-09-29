@@ -1,14 +1,21 @@
 // ============================================================
-// LINE配信の文面・選択肢はすべてこのファイルで管理します。
+// LINE自動返信の文面・選択肢はすべてこのファイルで管理します。
 // 文面を変えるときはこのファイルだけ編集すればOKです。
 // 注意: 選択肢の value（内部値）はDBに保存される値なので、変更しないでください。
-//       ラベル（label）は20文字以内（LINEクイックリプライの制限）。
+//
+// 自動で送るのは「友だち追加後の質問 → Q1→Q2→Q3 → 完了メッセージ＋診断CTA」まで。
+// それ以降は美穂先生が LINE Official Account Manager から個別に手動返信します。
 // ============================================================
 
-/** 3問セグメント。配列の順番が出題順。 */
+/**
+ * 3問アンケート。配列の順番が出題順。
+ * - key: DBカラム名（Q3は「現在の悩み、またはこれから知りたいこと」。カラム名は interest を流用）
+ * - tag: 回答時にトーク画面へ残る表示「【tag】選択肢」（美穂先生がトーク履歴で回答を確認するため）
+ */
 export const QUESTIONS = [
   {
-    key: 'grade', // DBカラム名
+    key: 'grade',
+    tag: '学年',
     text: 'お子さんの学年を教えてください。',
     options: [
       { value: 'preschool', label: '年長以下' },
@@ -20,6 +27,7 @@ export const QUESTIONS = [
   },
   {
     key: 'exam_intent',
+    tag: '中学受験',
     text: '中学受験について、今のお考えに一番近いものを教えてください。',
     options: [
       { value: 'planned', label: '受験する予定' },
@@ -29,14 +37,17 @@ export const QUESTIONS = [
     ],
   },
   {
-    key: 'interest',
-    text: '今、一番知りたいことはどれですか？',
+    key: 'interest', // = 現在の悩み、またはこれから知りたいこと
+    tag: '気になること',
+    text: '今、一番近いものはどれですか？',
+    subText: '今困っていることでも、これから知りたいことでも大丈夫です。',
     options: [
-      { value: 'what_to_do_now', label: '今の年齢で何をやるべきか' },
-      { value: 'study_habits', label: '学習習慣のつけ方' },
-      { value: 'parenting_communication', label: '親の声かけ・関わり方' },
-      { value: 'juku_timing', label: '入塾時期・塾選び' },
-      { value: 'exam_decision', label: '中学受験するかどうかの判断' },
+      { value: 'what_to_prioritize', label: '今の年齢で何を優先すればいいか知りたい' },
+      { value: 'study_habits', label: '学習習慣をどう作ればいいか気になる' },
+      { value: 'parenting_communication', label: '親の声かけ・関わり方に迷うことがある' },
+      { value: 'child_strengths', label: '子どもの得意・不得意に合う伸ばし方を知りたい' },
+      { value: 'juku_timing', label: '入塾時期や塾選びが気になる' },
+      { value: 'future_preparation', label: '今は特に困っていないが、今後の準備を知りたい' },
     ],
   },
 ];
@@ -48,226 +59,135 @@ export const START_KEYWORDS = ['3問に回答する', '診断スタート'];
 export const TEST_REGISTER_PREFIX = 'テスト登録';
 export const TEST_UNREGISTER_TEXT = 'テスト解除';
 export const TEST_REGISTERED =
-  'テスト用アカウントとして登録しました。\n\n「3問に回答する」と送ると、3問セグメントのテストを始められます。\n解除するときは「テスト解除」と送ってください。';
+  'テスト用アカウントとして登録しました。\n\n「3問に回答する」と送ると、3問アンケートのテストを始められます。\n解除するときは「テスト解除」と送ってください。';
 export const TEST_UNREGISTERED = 'テスト用アカウントの登録を解除しました。';
+export const TEST_RESET_TEXT = 'テストリセット';
+export const TEST_RESET_DONE =
+  'テスト用に回答をリセットしました。\n「3問に回答する」と送ると、最初からテストできます。';
 
 export const SEGMENT_INTRO =
-  'ご登録ありがとうございます。\n\nお子さんに合った情報をお届けするため、かんたんな3つの質問にお答えください（ボタンを選ぶだけ・約10秒）。';
+  'ご登録ありがとうございます。\n\nお子さんの今の状況を教えてください。\nボタンを選ぶだけの3つの質問です（約10秒）。';
 
+/** 3問完了直後の自動返信（Q3への返信として送る） */
 export const SEGMENT_COMPLETE = `ありがとうございます。
 
-これから数日間、
-「中学受験が本格化する前に、親として知っておきたいこと」
-を少しずつお届けします。
+お子さんの年齢や中学受験へのお考えによって、
+今やるべきことはかなり変わります。
 
-先取り学習をたくさんすればいい、という話ではありません。
+いただいた内容は、美穂先生が直接確認します。
 
-今の年齢だからこそ大切なこと、
-逆にまだやらなくていいこと、
-子どもが伸びやすくなる親の関わり方などをお伝えしていきます。`;
+「一般論ではなく、わが家の場合は今何をすればいい？」
+を具体的に整理したい方には、
+60分の個別診断もご用意しています。
 
+もし具体的に気になっていることがあれば、
+このままLINEで一言送っていただいても大丈夫です。`;
+
+/** 3問完了後に回答し直したとき */
 export const SEGMENT_UPDATED = '回答を更新しました。ありがとうございます。';
 
-/** 1,000円診断CTA */
+/**
+ * 1,000円診断CTA。遷移先は環境変数 PARENT_DIAGNOSIS_URL。
+ * buttonLabel: 遷移先が申込ページに直結する場合は「1,000円診断を申し込む」に変更。
+ */
 export const DIAGNOSIS = {
   name: 'わが家の中学受験準備診断',
   priceLabel: '60分 1,000円',
-  buttonLabel: '診断の詳細・お申し込み',
+  lead: '60分で、',
+  points: [
+    '今やるべきこと',
+    'まだやらなくていいこと',
+    '入塾までに整えたいこと',
+    'お子さんに合った親の関わり方',
+    '今後6〜12か月の方向性',
+  ],
+  tail: 'を整理します。',
+  buttonLabel: '診断の内容を見る',
 };
-
-// ------------------------------------------------------------
-// 7日間の教育配信。day: 3問回答日を0日目として何日目に送るか。
-// cta: true のステップは診断CTA（申込済みユーザーには送らない）。
-// ------------------------------------------------------------
-export const EDUCATION_STEPS = [
-  {
-    day: 0,
-    key: 'edu:day0',
-    text: `【1日目】中学受験は、小4から突然始まるものではありません
-
-「中学受験は小4から塾に通って始めるもの」
-そう思われている方は多いのですが、実際には、
-
-・机に向かう習慣
-・わからない問題に向き合う姿勢
-・「考えるのが楽しい」という感覚
-
-といった土台は、低学年のうちに少しずつ育っています。
-
-小4からの3年間で伸びる子の多くは、この土台がすでにできている子です。
-
-今の時期は「先取り」ではなく「土台づくり」の時期。
-明日は、この時期に一番避けたいことをお伝えします。`,
-  },
-  {
-    day: 1,
-    key: 'edu:day1',
-    text: `【2日目】低学年で避けたいのは、勉強を「やらされるもの」にすること
-
-低学年のうちは、親が言えば机に向かってくれます。
-でもその結果、
-
-「勉強＝親に言われてやるもの」
-
-という感覚が根づいてしまうと、学年が上がって量が増えたときに一気に苦しくなります。
-
-大切なのは、何をやらせるかより「どう関わるか」。
-
-・終わったら結果より取り組んだ姿勢を認める
-・すぐに答えを教えず「どう考えた？」と聞く
-・毎日同じ時間に短く取り組む
-
-こうした関わり方の積み重ねが、自分から机に向かう子につながっていきます。`,
-  },
-  {
-    day: 2,
-    key: 'edu:day2',
-    text: `【3日目】今やること、まだやらなくていいこと
-
-低学年の保護者の方からよく「今から何を先取りすればいいですか？」と聞かれます。
-
-答えは「先取り競争をする必要はありません」。
-
-今やりたいこと：
-・毎日の短い学習習慣
-・計算や音読など基礎の反復
-・読書や会話で言葉を増やすこと
-・図形やパズルで考える経験
-
-まだやらなくていいこと：
-・受験用の難しい問題集
-・長時間の机上学習
-・学年を大きく超える先取り
-
-年齢に応じた優先順位があります。今の時期にしかできないことを大切にしてください。`,
-  },
-  {
-    day: 3,
-    key: 'edu:day3',
-    text: `【4日目】「子ども3人が東大」だけではありません
-
-改めて、少し自己紹介をさせてください。
-
-・自身の子ども3人を東京大学へ
-・学習塾の経営・指導に約30年
-・数百組の親子を見てきました
-・教育関連の著書あり、現在も学習塾を運営
-
-「3人とも東大」と聞くと特別な家庭の話に聞こえるかもしれません。
-ですが、お伝えしているのは我が家の成功談ではなく、30年間、数百組の親子と向き合う中で見えてきた「伸びる家庭に共通すること」です。
-
-どのご家庭でも取り入れられる形でお伝えしていきます。`,
-  },
-  {
-    day: 4,
-    key: 'edu:day4',
-    text: `【5日目】小4・小5になってから多いご相談
-
-塾に通い始めてから、こんなご相談をよくいただきます。
-
-・自分から勉強しない
-・宿題のたびに親子げんかになる
-・塾の勉強が回らない
-・何を優先すべきかわからない
-
-どれも珍しいことではなく、多くのご家庭が通る道です。
-
-ただ、振り返ると低学年のうちの「関わり方」や「習慣」で、負担をずいぶん軽くできたケースが少なくありません。
-
-今の時期の小さな積み重ねが、数年後の親子の余裕につながります。`,
-  },
-  {
-    day: 5,
-    key: 'edu:day5',
-    text: `【6日目】わが家は今のままで大丈夫？ セルフチェック
-
-当てはまるものがいくつあるか、数えてみてください。
-
-□ 親が言わないと勉強しない
-□ 正解・不正解を親がすぐ教えている
-□ 学習習慣が日によってバラバラ
-□ 中学受験に向けて今何をすべきかわからない
-□ 入塾までに何を準備するべきかわからない
-
-2つ以上当てはまっても心配はいりません。
-「今気づけた」ことが一番大切です。
-
-明日は、こうしたことを「わが家の場合」で整理できる方法をご案内します。`,
-  },
-  {
-    day: 6,
-    key: 'edu:day6_cta',
-    cta: true,
-    text: `【7日目】「わが家の場合」を整理しませんか
-
-ここまでお読みいただきありがとうございました。
-一般論はわかっても、「うちの子の場合はどうなのか」は、ご家庭ごとに違います。
-
-そこで、「わが家の中学受験準備診断」をご用意しました。
-
-60分で、
-・今やるべきこと
-・まだやらなくていいこと
-・入塾までに整えたいこと
-・お子さんに合った親の関わり方
-・今後6〜12か月の方向性
-を整理します。
-
-お悩み相談ではなく、「わが家の場合」の方針がわかる60分です。`,
-  },
-];
 
 // ------------------------------------------------------------
 // LINEメッセージオブジェクトの組み立て（通常は編集不要）
 // ------------------------------------------------------------
 
+/** トーク画面に残る回答表示。例: 【学年】小1 */
+export function answerDisplayText(question, option) {
+  return `【${question.tag}】${option.label}`;
+}
+
+/**
+ * 質問をFlexメッセージで出す。選択肢は折り返し表示できるボックス（Q3は選択肢が長いため）。
+ * タップ → postback（DB保存はこの data を正とする）＋ displayText（トーク画面に回答が残る）
+ */
 export function questionMessage(questionKey, { withIntro = false } = {}) {
   const q = QUESTIONS.find((x) => x.key === questionKey);
   const idx = QUESTIONS.indexOf(q);
+  const title = `Q${idx + 1}. ${q.text}`;
   const msg = {
-    type: 'text',
-    text: `Q${idx + 1}. ${q.text}`,
-    quickReply: {
-      items: q.options.map((o) => ({
-        type: 'action',
-        action: {
-          type: 'postback',
-          label: o.label,
-          displayText: o.label,
-          data: `action=segment&question=${q.key}&value=${o.value}`,
-        },
-      })),
+    type: 'flex',
+    altText: title,
+    contents: {
+      type: 'bubble',
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'md',
+        contents: [
+          { type: 'text', text: `Q${idx + 1} / ${QUESTIONS.length}`, size: 'xs', color: '#888888' },
+          { type: 'text', text: q.text, weight: 'bold', size: 'md', wrap: true },
+          ...(q.subText ? [{ type: 'text', text: q.subText, size: 'sm', color: '#666666', wrap: true }] : []),
+          ...q.options.map((o) => ({
+            type: 'box',
+            layout: 'vertical',
+            paddingAll: '12px',
+            cornerRadius: '8px',
+            borderWidth: '1px',
+            borderColor: '#D5CFC4',
+            backgroundColor: '#FAF7F2',
+            action: {
+              type: 'postback',
+              label: o.label.slice(0, 20),
+              data: `action=segment&question=${q.key}&value=${o.value}`,
+              displayText: answerDisplayText(q, o),
+            },
+            contents: [{ type: 'text', text: o.label, size: 'sm', wrap: true, color: '#333333' }],
+          })),
+        ],
+      },
     },
   };
   return withIntro ? [{ type: 'text', text: SEGMENT_INTRO }, msg] : [msg];
 }
 
-export function educationMessages(step, { ctaUrl } = {}) {
-  if (!step.cta) return [{ type: 'text', text: step.text }];
-  return [
-    { type: 'text', text: step.text },
-    {
-      type: 'flex',
-      altText: `${DIAGNOSIS.name}（${DIAGNOSIS.priceLabel}）`,
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box',
-          layout: 'vertical',
-          spacing: 'sm',
-          contents: [
-            { type: 'text', text: DIAGNOSIS.name, weight: 'bold', size: 'lg', wrap: true },
-            { type: 'text', text: DIAGNOSIS.priceLabel, size: 'md', color: '#555555' },
-          ],
-        },
-        footer: {
-          type: 'box',
-          layout: 'vertical',
-          contents: [
-            { type: 'button', style: 'primary', action: { type: 'uri', label: DIAGNOSIS.buttonLabel, uri: ctaUrl } },
-          ],
-        },
+/** 3問完了メッセージ＋診断CTA。ctaUrl が無い場合（申込URL未設定など）はテキストのみ。 */
+export function completionMessages({ ctaUrl } = {}) {
+  const messages = [{ type: 'text', text: SEGMENT_COMPLETE }];
+  if (!ctaUrl) return messages;
+  messages.push({
+    type: 'flex',
+    altText: `${DIAGNOSIS.name}（${DIAGNOSIS.priceLabel}）`,
+    contents: {
+      type: 'bubble',
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'sm',
+        contents: [
+          { type: 'text', text: DIAGNOSIS.name, weight: 'bold', size: 'lg', wrap: true },
+          { type: 'text', text: DIAGNOSIS.priceLabel, size: 'sm', color: '#666666' },
+          { type: 'separator', margin: 'md' },
+          { type: 'text', text: DIAGNOSIS.lead, size: 'sm', margin: 'md' },
+          ...DIAGNOSIS.points.map((p) => ({ type: 'text', text: `・${p}`, size: 'sm', wrap: true })),
+          { type: 'text', text: DIAGNOSIS.tail, size: 'sm' },
+        ],
+      },
+      footer: {
+        type: 'box',
+        layout: 'vertical',
+        contents: [
+          { type: 'button', style: 'primary', action: { type: 'uri', label: DIAGNOSIS.buttonLabel, uri: ctaUrl } },
+        ],
       },
     },
-  ];
+  });
+  return messages;
 }

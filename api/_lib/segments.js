@@ -10,10 +10,12 @@ const BOOL_FILTERS = {
   segmented: 'segmentation_completed_at',
   blocked: 'blocked_at',
 };
+const FOLLOWUP = new Set(['pending', 'completed', 'not_needed']);
 
 /**
  * @param {Record<string,string>} filters 例:
  *   { grade: 'grade_1,grade_2', exam_intent: 'planned,considering_high', diagnosis_applied: 'false' }
+ *   manual_followup_status: 'pending' 等（カンマ区切り可）
  *   blocked を指定しない場合はブロック中ユーザーを除外する。
  */
 export function buildSegmentQuery(filters = {}, { limit = 200 } = {}) {
@@ -30,6 +32,14 @@ export function buildSegmentQuery(filters = {}, { limit = 200 } = {}) {
     where.push(`${column} = any($${params.length})`);
   }
 
+  if (filters.manual_followup_status) {
+    const values = String(filters.manual_followup_status).split(',').map((v) => v.trim()).filter(Boolean);
+    const bad = values.filter((v) => !FOLLOWUP.has(v));
+    if (bad.length) throw new Error(`invalid manual_followup_status: ${bad.join(',')}`);
+    params.push(values);
+    where.push(`manual_followup_status = any($${params.length})`);
+  }
+
   for (const [name, column] of Object.entries(BOOL_FILTERS)) {
     const raw = filters[name] ?? (name === 'blocked' ? 'false' : undefined);
     if (raw == null || raw === '') continue;
@@ -41,11 +51,12 @@ export function buildSegmentQuery(filters = {}, { limit = 200 } = {}) {
   const safeLimit = Math.min(Math.max(Number(limit) || 200, 1), 1000);
   return {
     countSql: `select count(*)::int as count from parent_line_users ${cond}`,
-    listSql: `select id, display_name, grade, exam_intent, interest, education_step,
+    listSql: `select id, display_name, grade, exam_intent, interest,
                      followed_at, segmentation_completed_at, diagnosis_cta_clicked_at,
-                     diagnosis_applied_at, blocked_at, created_at
+                     diagnosis_applied_at, manual_followup_status, manual_followup_completed_at,
+                     blocked_at, created_at
                 from parent_line_users ${cond}
-               order by created_at desc limit ${safeLimit}`,
+               order by segmentation_completed_at desc nulls last, created_at desc limit ${safeLimit}`,
     params,
   };
 }

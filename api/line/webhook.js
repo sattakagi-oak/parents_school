@@ -2,12 +2,13 @@
 // 署名検証 → イベント処理。bodyはDBに保存しない。
 
 import { verifySignature, getDisplayName } from '../_lib/line.js';
-import { isValidLineUserId, matchesTestRegisterCode } from '../_lib/config.js';
-import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser } from '../_lib/users.js';
+import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from '../_lib/config.js';
+import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress } from '../_lib/users.js';
 import { parsePostback, askFirstQuestion, handleSegmentAnswer, firstUnanswered } from '../_lib/segment.js';
 import { replyUntracked } from '../_lib/delivery.js';
 import {
   START_KEYWORDS, TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
+  TEST_RESET_TEXT, TEST_RESET_DONE,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 
@@ -62,6 +63,7 @@ export async function handleEvent(event) {
 
 // 「テスト登録 <合言葉>」→ テスト送信対象に登録。合言葉が違う場合は何も返さない（存在を知らせない）。
 // 「テスト解除」→ 登録済みなら解除。メッセージ本文はログに出さない。
+// 「テストリセット」→ テスト用ユーザーの回答を未回答に戻す（テストを繰り返すため）。
 async function handleTestRegistration(userId, replyToken, text) {
   if (text.startsWith(TEST_REGISTER_PREFIX)) {
     const code = text.slice(TEST_REGISTER_PREFIX.length).trim();
@@ -78,6 +80,14 @@ async function handleTestRegistration(userId, replyToken, text) {
     await removeTestUser(userId);
     await recordEvent(userId, 'test_user_unregistered');
     return 'message:test_unregistered';
+  }
+  // 「テストリセット」→ テスト用ユーザー本人の回答状態を未回答に戻す（production では無効）
+  if (text === TEST_RESET_TEXT) {
+    if (sendMode() === 'production' || !(await isTestUser(userId))) return 'message:ignored';
+    await resetTestUserProgress(userId);
+    await recordEvent(userId, 'test_user_reset');
+    await replyUntracked(userId, replyToken, [{ type: 'text', text: TEST_RESET_DONE }], 'test:reset');
+    return 'message:test_reset';
   }
   return null;
 }

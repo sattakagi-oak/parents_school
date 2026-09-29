@@ -44,12 +44,15 @@ export async function setAnswer(lineUserId, column, value) {
   return rows[0];
 }
 
-/** 初回完了時のみ completed_at / education_started_at を記録。初回なら true。 */
+/**
+ * 3問完了の記録（初回のみ）。完了日時を入れ、美穂先生の個別対応待ち（pending）にする。
+ * 既に完了済みなら null（再回答では状態を変えない）。
+ */
 export async function completeSegmentation(lineUserId) {
   const { rows } = await getDb().query(
     `update parent_line_users
         set segmentation_completed_at = now(),
-            education_started_at = coalesce(education_started_at, now()),
+            manual_followup_status = coalesce(manual_followup_status, 'pending'),
             updated_at = now()
       where line_user_id = $1 and segmentation_completed_at is null
         and grade is not null and exam_intent is not null and interest is not null
@@ -59,13 +62,20 @@ export async function completeSegmentation(lineUserId) {
   return rows[0] || null;
 }
 
-/** 教育ステップを from → to に進める（他の処理が先に進めていたら何もしない） */
-export async function advanceEducationStep(id, from, to) {
-  await getDb().query(
-    `update parent_line_users set education_step = $3, updated_at = now()
-      where id = $1 and education_step = $2`,
-    [id, from, to],
+const FOLLOWUP_STATUSES = new Set(['pending', 'completed', 'not_needed']);
+
+/** 美穂先生の個別対応状況を更新（管理スクリプト用）。completed のとき完了日時も記録。 */
+export async function setManualFollowup(id, status) {
+  if (!FOLLOWUP_STATUSES.has(status)) throw new Error('invalid manual_followup_status');
+  const { rowCount } = await getDb().query(
+    `update parent_line_users
+        set manual_followup_status = $2,
+            manual_followup_completed_at = case when $2 = 'completed' then now() else null end,
+            updated_at = now()
+      where id = $1`,
+    [id, status],
   );
+  return rowCount > 0;
 }
 
 export async function recordEvent(lineUserId, eventType, detail = null) {
@@ -91,4 +101,17 @@ export async function isRegisteredTestUser(lineUserId) {
   const { rows } = await getDb().query(
     'select 1 from parent_line_test_users where line_user_id = $1', [lineUserId]);
   return rows.length > 0;
+}
+
+/** テスト用: 回答・完了・対応状況・CTAクリック・完了メッセージの送信記録を消して、未回答の状態に戻す */
+export async function resetTestUserProgress(lineUserId) {
+  await getDb().query(
+    `update parent_line_users
+        set grade = null, exam_intent = null, interest = null,
+            segmentation_completed_at = null, manual_followup_status = null, manual_followup_completed_at = null,
+            diagnosis_cta_clicked_at = null, updated_at = now()
+      where line_user_id = $1`,
+    [lineUserId],
+  );
+  await getDb().query('delete from parent_line_message_logs where line_user_id = $1', [lineUserId]);
 }
