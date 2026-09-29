@@ -12,6 +12,11 @@ export async function upsertUser(lineUserId) {
   return rows[0];
 }
 
+export async function getUser(lineUserId) {
+  const { rows } = await getDb().query('select * from parent_line_users where line_user_id = $1', [lineUserId]);
+  return rows[0] || null;
+}
+
 export async function markFollowed(lineUserId, displayName) {
   const { rows } = await getDb().query(
     `insert into parent_line_users (line_user_id, display_name, followed_at) values ($1, $2, now())

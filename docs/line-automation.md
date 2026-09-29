@@ -1,8 +1,12 @@
 # 親の学習塾 LINE自動化
 
-LINE友だち追加 → 3問アンケート → 短い自動返信＋1,000円診断CTA → **美穂先生が回答を確認し、LINE公式アカウントから個別に手動返信**。
+LINE友だち追加 → Q1 学年 → Q2 進路・教育方針（学年別に出し分け）→ Q3 これから伸ばしたいこと → 短い自動返信＋1,000円個別診断CTA
+→ **美穂先生が回答を確認し、LINE公式アカウントから個別に手動返信** → 必要な方を1,000円個別診断へ → 4か月講座へ。
 
-大量の自動教育メッセージは送らない。価値は「30年以上、数百組の親子を見てきた美穂先生本人が回答を見てくれること」。
+ターゲットは「問題があって困っている親」ではなく、**わが子をもっと伸ばしたい・可能性を広げたい**教育意識の高い親。
+中学受験は重要な選択肢の一つだが、中学受験家庭だけに限定しない。アンケート・メッセージは悩み相談や問題解決に寄せない。
+
+価値は「30年以上、数百組の親子を見てきた美穂先生本人が回答を見てくれること」。
 システムの役割は、美穂先生がその人に合わせて返信するための情報を集め、見やすくするところまで。
 
 LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Functions。既存LP（`index.html`）には一切手を入れていない。Cronは使わない。
@@ -12,11 +16,11 @@ LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Func
 | きっかけ | 自動返信（すべて reply。push は使わない） |
 |---|---|
 | 友だち追加（follow）／「3問に回答する」 | あいさつ＋Q1 |
-| Q1回答 | Q2 |
+| Q1回答 | 学年に応じたQ2 |
 | Q2回答 | Q3 |
-| Q3回答（3問そろった初回） | 完了メッセージ＋診断CTA（1回だけ） |
+| Q3回答（3問そろった初回） | 完了メッセージ＋個別診断CTA（1回だけ） |
 
-その後の自由入力・CTAクリック・時間経過では何も自動送信しない。AI自動返信、Q3ごとの営業メッセージ、数時間後・翌日の追客も実装しない。
+その後の自由入力・CTAクリック・時間経過では何も自動送信しない。翌日配信・3日間/7日間教育・CTA未クリック者への追客・自動クロージング・AI自動返信は実装しない。
 
 ## 構成
 
@@ -33,34 +37,60 @@ LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Func
 
 ## 3問アンケート
 
-| | 質問 | 選択肢（内部値） | トーク画面の表示 |
-|---|---|---|---|
-| Q1 `grade` | お子さんの学年を教えてください。 | 年長以下 `preschool` / 小1 `grade_1` / 小2 `grade_2` / 小3 `grade_3` / 小4以上 `grade_4_plus` | `【学年】小1` |
-| Q2 `exam_intent` | 中学受験について、今のお考えに一番近いものを教えてください。 | 受験する予定 `planned` / かなり前向きに検討中 `considering_high` / まだ迷っている `considering` / 今のところ予定なし `not_planned` | `【中学受験】かなり前向きに検討中` |
-| Q3 `interest`（＝現在の悩み、またはこれから知りたいこと） | 今、一番近いものはどれですか？（今困っていることでも、これから知りたいことでも大丈夫です。） | 今の年齢で何を優先すればいいか知りたい `what_to_prioritize` / 学習習慣をどう作ればいいか気になる `study_habits` / 親の声かけ・関わり方に迷うことがある `parenting_communication` / 子どもの得意・不得意に合う伸ばし方を知りたい `child_strengths` / 入塾時期や塾選びが気になる `juku_timing` / 今は特に困っていないが、今後の準備を知りたい `future_preparation` | `【気になること】今の年齢で何を優先すればいいか知りたい` |
+DBカラムは流用し、意味を変えている: `exam_intent` = **進路・教育方針（education_path_intent）**、`interest` = **子どもについて伸ばしたいこと（growth_interest）**。
 
-- 質問は Flex Message。各選択肢は折り返し表示されるボタン（Q3の長い選択肢も全文表示）。
-- タップ = postback action。`data=action=segment&question=<key>&value=<内部値>` を**DB保存の正**とし、`displayText`（`【学年】小1` 等）はトーク画面に回答を残すためだけに使う（パースしない）。
+### Q1 学年（`grade`）— 表示 `【学年】小1`
+
+お子さんの学年を教えてください。
+年長以下 `preschool` / 小1 `grade_1` / 小2 `grade_2` / 小3 `grade_3` / 小4以上 `grade_4_plus`
+
+### Q2 進路・教育方針（`exam_intent`）— 表示 `【進路】…`。Q1の学年で出し分け
+
+| 学年 | 質問 | 選択肢（内部値） |
+|---|---|---|
+| 年長以下 | これからのお子さんの学びについて、一番近いものを教えてください。 | 将来の選択肢をできるだけ広げたい `expand_future_options` / 中学受験も視野に入れている `junior_exam_considering` / まずは学ぶことを楽しめる土台をつくりたい `build_learning_foundation` / まだ具体的な進路は考えていない `not_decided_yet` |
+| 小1・小2 | これからの進路について、今のお考えに一番近いものを教えてください。 | 中学受験を考えている `junior_exam_planned` / 中学受験も含めて幅広く検討している `junior_exam_considering` / まだ決めていないが、将来の選択肢を広げたい `expand_future_options` / 公立中心で考えている `public_school_main` / まだ特に決めていない `not_decided_yet` |
+| 小3 | これからの進路について、今のお考えに一番近いものを教えてください。 | 中学受験をする予定 `junior_exam_planned` / 中学受験を前向きに検討している `junior_exam_considering` / 中学受験をするかまだ迷っている `junior_exam_undecided` / 公立中への進学を中心に考えている `public_school_main` / まだ決めていない `not_decided_yet` |
+| 小4以上 | 現在の進路について、一番近いものを教えてください。 | 中学受験に向けて準備している `junior_exam_in_progress` / 中学受験を検討している `junior_exam_considering` / 高校受験を見据えている `high_school_exam` / まだ進路は決めていない `not_decided_yet` / その他の進路を考えている `other` |
+
+- 同じ意味の選択肢は学年をまたいで同じ内部値（例: 中学受験の検討 = `junior_exam_considering`）。セグメント抽出で学年横断に絞り込める。
+- その学年の選択肢に無い値（古いボタン等）は保存せず、今の学年のQ2を出し直す。学年を変えて既存のQ2回答が合わなくなった場合もQ2を聞き直す。
+
+### Q3 これから伸ばしたいこと（`interest`）— 表示 `【伸ばしたいこと】…`。全学年共通
+
+これから、お子さんについて一番伸ばしていきたいことはどれですか？
+（今困っていることではなく、「これからこうなってほしい」というお気持ちに近いもので大丈夫です。）
+
+自分から考えて学ぶ力を伸ばしたい `independent_thinking` / 勉強を楽しめる習慣をつくりたい `learning_habits` / 得意なこと・好きなことをもっと伸ばしたい `develop_strengths` / 将来の選択肢を広げられる力をつけたい `expand_future_options` / 子どものタイプに合った関わり方を知りたい `parenting_fit` / 今の年齢で何を優先すればいいか知りたい `what_to_prioritize`
+
+### postback / displayText
+
+- 質問は Flex Message。各選択肢は折り返し表示されるボタン（長い選択肢も全文表示）。
+- タップ = postback action。`data=action=segment&question=<grade|exam_intent|interest>&value=<内部値>` を**DB保存の正**とし、
+  `displayText`（`【学年】小1` / `【進路】…` / `【伸ばしたいこと】…`）はトーク画面に回答を残すためだけに使う（パースしない）。
   → 美穂先生は LINE Official Account Manager のトーク履歴だけで回答が分かる。
 - 値は許可リストで検証。再回答は最新値で上書き（完了日時・対応状況・完了メッセージは変えない）。
 - 「3問に回答する」「診断スタート」のテキスト、または postback `action=segment&question=start` で最初から回答できる（既存友だち用）。
 
 ## 3問完了後
 
-DB: `grade` / `exam_intent` / `interest` / `segmentation_completed_at = now()` / `manual_followup_status = 'pending'`
+DB: `grade` / `exam_intent`（進路）/ `interest`（伸ばしたいこと）/ `segmentation_completed_at = now()` / `manual_followup_status = 'pending'`
 
-自動返信（Q3への reply）: 完了メッセージ（美穂先生が直接確認します／60分の個別診断／気になることがあれば一言どうぞ）＋診断CTA（Flex）。
+自動返信（Q3への reply 1回）: 完了メッセージ（年齢や伸ばしたいことによって大切にしたいことは一人ひとり違う／美穂先生が直接確認します／個別診断のご案内／気になることがあれば一言どうぞ）＋個別診断CTA（Flex）。
 
-### 診断CTA
+### 1,000円個別診断CTA
 
-- 名称「わが家の中学受験準備診断」／60分 1,000円／「60分で、・今やるべきこと …を整理します。」
-- ボタン「診断の内容を見る」（申込ページ直結なら `messages.js` の `DIAGNOSIS.buttonLabel` を「1,000円診断を申し込む」に）
+- 名称「わが子の伸ばし方 個別診断」／60分 1,000円（中学受験専用には見せない）
+- 「60分で、・今の年齢で大切にしたいこと・お子さんの強みや得意の伸ばし方・今はまだ急がなくていいこと・将来の選択肢を広げるための準備・お子さんに合った親の関わり方・今後6〜12か月の方向性 を一緒に整理します。」
+- ボタン「個別診断の内容を見る」（申込ページ直結なら `messages.js` の `DIAGNOSIS.buttonLabel` を「1,000円個別診断を申し込む」に）
 - ボタンのリンク先は `PUBLIC_BASE_URL/api/line/cta?t=<ユーザーごとのランダムトークン>`。クリック時に `diagnosis_cta_clicked_at`（初回のみ）を記録して `PARENT_DIAGNOSIS_URL` へ転送。URLにLINE userIdは載せない。
 - `PARENT_DIAGNOSIS_URL`（https）か `PUBLIC_BASE_URL` が未設定、または診断申込済みのユーザーには、CTAなしで完了メッセージのみ。
+- 申込が確認できたら `diagnosis_applied_at` を記録（`npm run admin -- mark-applied <id>` または管理API）。
 
 ## 美穂先生の個別対応
 
 `manual_followup_status`: `pending`（3問完了時） → `completed`（個別返信済み。`manual_followup_completed_at` も記録）/ `not_needed`。友だち追加だけでは null。
+返信文は美穂先生が回答に触れて本人が書く（Messaging APIから自動送信しない）。
 
 ### 対応待ち一覧
 
@@ -68,10 +98,11 @@ Neon Console → SQL Editor（または Tables のビュー `parent_line_pending
 
 ```sql
 select * from parent_line_pending_followups;
--- = segmentation_completed_at is not null and manual_followup_status = 'pending'（ブロック中を除く）を新しい順
+-- 列: display_name, grade, education_path_intent, growth_interest, segmentation_completed_at,
+--     diagnosis_cta_clicked_at, diagnosis_applied_at, manual_followup_status（新しい回答者が上）
 ```
 
-ローカルから（回答を日本語で表示）:
+ローカルから（回答を「【学年】小1」の形で日本語表示）:
 
 ```bash
 npm run admin -- pending
@@ -90,14 +121,16 @@ update parent_line_users set manual_followup_status = 'completed', manual_follow
 ```sql
 select id, display_name from parent_line_users
  where grade in ('grade_1','grade_2')
-   and exam_intent in ('planned','considering_high')
+   and exam_intent in ('junior_exam_planned','junior_exam_considering')   -- 進路
    and diagnosis_applied_at is null
    and blocked_at is null;
+
+select id, display_name from parent_line_users where interest = 'independent_thinking';  -- 伸ばしたいこと
 ```
 
 ```bash
-npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=planned,considering_high --diagnosis_applied=false
-npm run admin -- segment --interest=parenting_communication
+npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=junior_exam_planned,junior_exam_considering --diagnosis_applied=false
+npm run admin -- segment --interest=independent_thinking
 npm run admin -- mark-applied <id>
 npm run admin -- stats
 ```
@@ -120,7 +153,7 @@ npm run admin -- stats
 ## データ
 
 `parent_line_users`（1ユーザー1行、`line_user_id` unique）
-- 回答: `grade` / `exam_intent` / `interest`
+- 回答: `grade` / `exam_intent`（進路・教育方針）/ `interest`（伸ばしたいこと）
 - `segmentation_completed_at` / `manual_followup_status` / `manual_followup_completed_at`
 - `diagnosis_cta_clicked_at`（初回クリック）/ `diagnosis_applied_at` / `followed_at` / `blocked_at`
 - `cta_token`: CTAリンク用のランダムID
@@ -182,7 +215,7 @@ Settings → Deployment Protection の Vercel Authentication は OFF（ON だと
 1. Preview に `LINE_SEND_MODE=test`、`LINE_TEST_REGISTER_CODE=<合言葉>`、`PARENT_DIAGNOSIS_URL`、`PUBLIC_BASE_URL` を設定して Redeploy。
 2. 本人のLINEから `テスト登録 <合言葉>` →「テスト用アカウントとして登録しました」。解除は `テスト解除`。
    - `テストリセット`: テスト用ユーザー本人の回答・完了・対応状況・CTAクリックを消して未回答に戻す（何度でもテスト可。production では無効）。
-3. `3問に回答する` → Q1〜Q3 をタップ（トーク画面に `【学年】…` 等が残る）→ 完了メッセージ＋診断CTA。
+3. `3問に回答する` → Q1〜Q3 をタップ（学年に応じたQ2が出る。トーク画面に `【学年】…` 等が残る）→ 完了メッセージ＋個別診断CTA。
 4. CTAボタンを押す → 申込ページへ遷移、`diagnosis_cta_clicked_at` が入る。
 5. `select * from parent_line_pending_followups;` に表示されること。
 6. その後、何を送っても自動メッセージが来ないこと。
@@ -199,7 +232,7 @@ production ブランチへマイグレーション → main へマージ → Pro
 **「既存ユーザーにも配信してください」と明示的な指示が出るまで実施しない。**
 
 1. **リッチメニュー**（推奨・送信数ゼロ）: Official Account Manager でリッチメニューにボタンを追加し、アクション「テキスト」＝`3問に回答する`。タップした人だけにQ1が返信される。
-2. **一斉メッセージ（Official Account Manager から人間が手動）**: 「3つの質問に答えると、美穂先生がお子さんの状況を確認します」＋ボタン（テキスト `3問に回答する`）。
+2. **一斉メッセージ（Official Account Manager から人間が手動）**: 「3つの質問に答えると、美穂先生がお子さんのことを確認します」＋ボタン（テキスト `3問に回答する`）。
 
 ## テスト
 

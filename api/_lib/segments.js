@@ -1,9 +1,10 @@
 // セグメント抽出（管理API・管理スクリプト共通）。
 // 条件はすべて許可リストで検証し、SQLはパラメータ化して組み立てる。
 
-import { QUESTIONS } from './messages.js';
+import { QUESTIONS, allOptionValues } from './messages.js';
 
-const ALLOWED = Object.fromEntries(QUESTIONS.map((q) => [q.key, new Set(q.options.map((o) => o.value))]));
+// exam_intent = 進路・教育方針（全学年の選択肢の和集合）、interest = 伸ばしたいこと
+const ALLOWED = Object.fromEntries(QUESTIONS.map((q) => [q.key, allOptionValues(q.key)]));
 const BOOL_FILTERS = {
   diagnosis_applied: 'diagnosis_applied_at',
   cta_clicked: 'diagnosis_cta_clicked_at',
@@ -14,7 +15,7 @@ const FOLLOWUP = new Set(['pending', 'completed', 'not_needed']);
 
 /**
  * @param {Record<string,string>} filters 例:
- *   { grade: 'grade_1,grade_2', exam_intent: 'planned,considering_high', diagnosis_applied: 'false' }
+ *   { grade: 'grade_1,grade_2', exam_intent: 'junior_exam_planned,junior_exam_considering', diagnosis_applied: 'false' }
  *   manual_followup_status: 'pending' 等（カンマ区切り可）
  *   blocked を指定しない場合はブロック中ユーザーを除外する。
  */
@@ -51,7 +52,8 @@ export function buildSegmentQuery(filters = {}, { limit = 200 } = {}) {
   const safeLimit = Math.min(Math.max(Number(limit) || 200, 1), 1000);
   return {
     countSql: `select count(*)::int as count from parent_line_users ${cond}`,
-    listSql: `select id, display_name, grade, exam_intent, interest,
+    listSql: `select id, display_name, grade,
+                     exam_intent as education_path_intent, interest as growth_interest,
                      followed_at, segmentation_completed_at, diagnosis_cta_clicked_at,
                      diagnosis_applied_at, manual_followup_status, manual_followup_completed_at,
                      blocked_at, created_at

@@ -26,8 +26,8 @@ const testMode = (extra = {}) => baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USE
 async function completeSegmentation(userId) {
   await send(ev('follow', userId));
   await send(answer(userId, 'grade', 'grade_1'));
-  await send(answer(userId, 'exam_intent', 'considering_high'));
-  await send(answer(userId, 'interest', 'what_to_prioritize'));
+  await send(answer(userId, 'exam_intent', 'junior_exam_considering'));
+  await send(answer(userId, 'interest', 'independent_thinking'));
 }
 
 /** 質問Flexから選択肢ボックスのactionを取り出す */
@@ -74,7 +74,7 @@ test('unfollow: blocked_atを記録、再followで解除', async () => {
 
 // ---------- 3問アンケート ----------
 
-test('Q1→Q2→Q3: postbackで保存、displayTextでトーク画面に回答が残る', async () => {
+test('Q1→Q2(小1用)→Q3: postbackで保存、displayTextでトーク画面に回答が残る', async () => {
   testMode();
   await send(ev('follow', OWNER));
   let msgs = lastMessages();
@@ -90,20 +90,24 @@ test('Q1→Q2→Q3: postbackで保存、displayTextでトーク画面に回答�
   await send(answer(OWNER, 'grade', 'grade_1'));
   assert.equal((await user(db, OWNER)).grade, 'grade_1');
   msgs = lastMessages();
-  assert.match(msgs[0].altText, /^Q2\. 中学受験について/);
-  assert.equal(optionActions(msgs[0])[1].displayText, '【中学受験】かなり前向きに検討中');
+  assert.equal(msgs[0].altText, 'Q2. これからの進路について、今のお考えに一番近いものを教えてください。');
+  assert.equal(optionActions(msgs[0])[1].displayText, '【進路】中学受験も含めて幅広く検討している');
+  assert.equal(optionActions(msgs[0])[1].data, 'action=segment&question=exam_intent&value=junior_exam_considering');
 
-  await send(answer(OWNER, 'exam_intent', 'considering_high'));
-  assert.equal((await user(db, OWNER)).exam_intent, 'considering_high');
+  await send(answer(OWNER, 'exam_intent', 'junior_exam_considering'));
+  assert.equal((await user(db, OWNER)).exam_intent, 'junior_exam_considering');
   msgs = lastMessages();
-  assert.equal(msgs[0].altText, 'Q3. 今、一番近いものはどれですか？');
+  assert.equal(msgs[0].altText, 'Q3. これから、お子さんについて一番伸ばしていきたいことはどれですか？');
   const body = msgs[0].contents.body.contents;
-  assert.ok(body.some((c) => c.text === '今困っていることでも、これから知りたいことでも大丈夫です。'));
+  assert.ok(body.some((c) => c.text === '今困っていることではなく、「これからこうなってほしい」というお気持ちに近いもので大丈夫です。'));
   actions = optionActions(msgs[0]);
   assert.deepEqual(actions.map((a) => a.data.split('value=')[1]), [
-    'what_to_prioritize', 'study_habits', 'parenting_communication', 'child_strengths', 'juku_timing', 'future_preparation',
+    'independent_thinking', 'learning_habits', 'develop_strengths', 'expand_future_options', 'parenting_fit', 'what_to_prioritize',
   ]);
-  assert.equal(actions[0].displayText, '【気になること】今の年齢で何を優先すればいいか知りたい');
+  assert.equal(actions[0].displayText, '【伸ばしたいこと】自分から考えて学ぶ力を伸ばしたい');
+
+  await send(answer(OWNER, 'interest', 'independent_thinking'));
+  assert.equal((await user(db, OWNER)).interest, 'independent_thinking');
   for (const a of actions) assert.ok(a.label.length <= 20, 'postback labelは20文字以内');
 });
 
@@ -111,7 +115,7 @@ test('3問完了: pending・完了日時を記録し、Q3への返信で完了�
   testMode();
   await completeSegmentation(OWNER);
   const u = await user(db, OWNER);
-  assert.deepEqual([u.grade, u.exam_intent, u.interest], ['grade_1', 'considering_high', 'what_to_prioritize']);
+  assert.deepEqual([u.grade, u.exam_intent, u.interest], ['grade_1', 'junior_exam_considering', 'independent_thinking']);
   assert.ok(u.segmentation_completed_at);
   assert.equal(u.manual_followup_status, 'pending');
   assert.equal(u.manual_followup_completed_at, null);
@@ -119,11 +123,16 @@ test('3問完了: pending・完了日時を記録し、Q3への返信で完了�
   const last = calls.sends().at(-1);
   assert.match(last.url, /\/message\/reply$/, 'Q3への返信（reply）として送る');
   const [text, flex] = last.body.messages;
-  assert.match(text.text, /美穂先生が直接確認します/);
+  assert.match(text.text, /いただいた内容は、美穂先生が直接確認します/);
+  assert.match(text.text, /うちの子の場合、今どんなことを大切にするといい？/);
   assert.match(text.text, /このままLINEで一言送っていただいても大丈夫です/);
   const flexText = JSON.stringify(flex.contents);
-  for (const s of ['わが家の中学受験準備診断', '60分 1,000円', '今後6〜12か月の方向性', '診断の内容を見る']) {
+  for (const s of ['わが子の伸ばし方 個別診断', '60分 1,000円', 'お子さんの強みや得意の伸ばし方',
+    '今後6〜12か月の方向性', 'を一緒に整理します。', '個別診断の内容を見る']) {
     assert.ok(flexText.includes(s), s);
+  }
+  for (const ng of ['お悩み相談', '中学受験準備診断', '問題があります']) {
+    assert.ok(!JSON.stringify(last.body.messages).includes(ng), `NG表現: ${ng}`);
   }
   assert.equal(flex.contents.footer.contents[0].action.uri, `https://example.test/api/line/cta?t=${u.cta_token}`);
   assert.ok(!flexText.includes(OWNER), 'URLにuserIdを載せない');
@@ -161,8 +170,8 @@ test('診断申込済みユーザーには診断CTAを出さない', async () =>
   await send(ev('follow', OWNER));
   await db.query('update parent_line_users set diagnosis_applied_at = now() where line_user_id = $1', [OWNER]);
   await send(answer(OWNER, 'grade', 'grade_1'));
-  await send(answer(OWNER, 'exam_intent', 'planned'));
-  await send(answer(OWNER, 'interest', 'study_habits'));
+  await send(answer(OWNER, 'exam_intent', 'junior_exam_planned'));
+  await send(answer(OWNER, 'interest', 'learning_habits'));
   assert.equal(lastMessages().length, 1);
 });
 
@@ -179,7 +188,7 @@ test('不正なpostback値・旧選択肢の値は無視され保存されない
   await send(ev('follow', OWNER));
   await send(answer(OWNER, 'grade', 'grade_99'));
   await send(answer(OWNER, 'hacked_column', 'x'));
-  await send(answer(OWNER, 'interest', 'exam_decision'));
+  await send(answer(OWNER, 'interest', 'juku_timing'));
   await send(postback(OWNER, 'action=segment&question=grade&value=grade_1;drop table x'));
   const u = await user(db, OWNER);
   assert.equal(u.grade, null);
@@ -193,11 +202,11 @@ test('再回答: 最新値で上書き、完了日時・対応状況・完了メ
   await setManualFollowup(before.id, 'completed');
   await send(answer(OWNER, 'grade', 'grade_2'));
   assert.match(lastMessages()[0].altText, /^Q2\./, '途中の質問なら次を順に出す');
-  await send(answer(OWNER, 'interest', 'child_strengths'));
+  await send(answer(OWNER, 'interest', 'develop_strengths'));
   assert.match(lastMessages()[0].text, /更新しました/);
   const after = await user(db, OWNER);
   assert.equal(after.grade, 'grade_2');
-  assert.equal(after.interest, 'child_strengths');
+  assert.equal(after.interest, 'develop_strengths');
   assert.equal(after.segmentation_completed_at.getTime(), before.segmentation_completed_at.getTime());
   assert.equal(after.manual_followup_status, 'completed');
   assert.equal((await logs(db, OWNER)).length, 1, '完了メッセージは1回だけ');
@@ -278,8 +287,8 @@ test('対応待ち一覧ビュー: 3問完了・pendingのみ、新しい順。�
   assert.equal(rows.length, 2);
   assert.ok(rows[0].segmentation_completed_at >= rows[1].segmentation_completed_at);
   assert.deepEqual(Object.keys(rows[0]).sort(), [
-    'diagnosis_applied_at', 'diagnosis_cta_clicked_at', 'display_name', 'exam_intent', 'grade', 'id',
-    'interest', 'manual_followup_status', 'segmentation_completed_at',
+    'diagnosis_applied_at', 'diagnosis_cta_clicked_at', 'display_name', 'education_path_intent', 'grade',
+    'growth_interest', 'id', 'manual_followup_status', 'segmentation_completed_at',
   ]);
 
   const owner = await user(db, OWNER);
@@ -301,11 +310,11 @@ test('管理API: 認証なしは401', async () => {
 });
 
 test('管理API: セグメント抽出・対応待ち絞り込み・申込済み登録', async () => {
-  await completeSegmentation(OWNER); // grade_1 / considering_high
+  await completeSegmentation(OWNER); // grade_1 / junior_exam_considering
   await send(ev('follow', OTHER));
   await send(answer(OTHER, 'grade', 'grade_3'));
 
-  const q = '/api/admin/line/users?grade=grade_1,grade_2&exam_intent=planned,considering_high&diagnosis_applied=false';
+  const q = '/api/admin/line/users?grade=grade_1,grade_2&exam_intent=junior_exam_planned,junior_exam_considering&diagnosis_applied=false';
   let body = await (await adminUsers(adminReq(q))).json();
   assert.equal(body.count, 1);
   assert.equal(body.users[0].line_user_id, undefined, 'userIdは返さない');
@@ -313,7 +322,9 @@ test('管理API: セグメント抽出・対応待ち絞り込み・申込済み
 
   body = await (await adminUsers(adminReq('/api/admin/line/users?manual_followup_status=pending'))).json();
   assert.equal(body.count, 1);
-  body = await (await adminUsers(adminReq('/api/admin/line/users?interest=what_to_prioritize'))).json();
+  assert.equal(body.users[0].education_path_intent, 'junior_exam_considering');
+  assert.equal(body.users[0].growth_interest, 'independent_thinking');
+  body = await (await adminUsers(adminReq('/api/admin/line/users?interest=independent_thinking'))).json();
   assert.equal(body.count, 1);
 
   const res = await adminApplied(adminReq('/api/admin/line/diagnosis-applied', {
@@ -396,4 +407,61 @@ test('テストリセット: テスト用ユーザーだけ未回答に戻せる
   u = await user(db, OWNER);
   assert.equal(u.manual_followup_status, 'pending', 'productionでは無効');
   assert.equal(calls.sends().length, n);
+});
+
+// ---------- 学年別Q2 ----------
+
+test('Q2は学年ごとに出し分ける（質問文・選択肢・内部値）', async () => {
+  testMode();
+  const cases = {
+    preschool: ['これからのお子さんの学びについて、一番近いものを教えてください。',
+      ['expand_future_options', 'junior_exam_considering', 'build_learning_foundation', 'not_decided_yet']],
+    grade_1: ['これからの進路について、今のお考えに一番近いものを教えてください。',
+      ['junior_exam_planned', 'junior_exam_considering', 'expand_future_options', 'public_school_main', 'not_decided_yet']],
+    grade_2: ['これからの進路について、今のお考えに一番近いものを教えてください。',
+      ['junior_exam_planned', 'junior_exam_considering', 'expand_future_options', 'public_school_main', 'not_decided_yet']],
+    grade_3: ['これからの進路について、今のお考えに一番近いものを教えてください。',
+      ['junior_exam_planned', 'junior_exam_considering', 'junior_exam_undecided', 'public_school_main', 'not_decided_yet']],
+    grade_4_plus: ['現在の進路について、一番近いものを教えてください。',
+      ['junior_exam_in_progress', 'junior_exam_considering', 'high_school_exam', 'not_decided_yet', 'other']],
+  };
+  for (const [grade, [text, values]] of Object.entries(cases)) {
+    await send(postback(OWNER, 'action=segment&question=start'));
+    await db.query('update parent_line_users set grade = null, exam_intent = null where line_user_id = $1', [OWNER]);
+    await send(answer(OWNER, 'grade', grade));
+    const msg = lastMessages()[0];
+    assert.equal(msg.altText, `Q2. ${text}`, grade);
+    assert.deepEqual(optionActions(msg).map((a) => a.data.split('value=')[1]), values, grade);
+    for (const a of optionActions(msg)) assert.match(a.displayText, /^【進路】/);
+  }
+  assert.equal(optionActions(lastMessages()[0])[2].displayText, '【進路】高校受験を見据えている');
+});
+
+test('Q2: 学年に合わない値（古いボタン等）は保存せず、今の学年のQ2を出し直す。学年未回答ならQ1', async () => {
+  testMode();
+  await send(ev('follow', OWNER));
+  await send(answer(OWNER, 'exam_intent', 'junior_exam_planned'));
+  assert.equal((await user(db, OWNER)).exam_intent, null);
+  assert.match(lastMessages()[0].altText, /^Q1\./, '学年未回答ならQ1を出す');
+
+  await send(answer(OWNER, 'grade', 'preschool'));
+  await send(answer(OWNER, 'exam_intent', 'high_school_exam')); // 小4以上用の値
+  assert.equal((await user(db, OWNER)).exam_intent, null);
+  assert.equal(lastMessages()[0].altText, 'Q2. これからのお子さんの学びについて、一番近いものを教えてください。');
+});
+
+test('学年を変えて既存のQ2回答が合わなくなったら、Q2を聞き直す', async () => {
+  testMode();
+  await send(ev('follow', OWNER));
+  await send(answer(OWNER, 'grade', 'preschool'));
+  await send(answer(OWNER, 'exam_intent', 'build_learning_foundation'));
+  await send(answer(OWNER, 'grade', 'grade_4_plus'));
+  assert.equal((await user(db, OWNER)).exam_intent, null);
+  assert.equal(lastMessages()[0].altText, 'Q2. 現在の進路について、一番近いものを教えてください。');
+
+  // 新しい学年でも有効な値なら保持
+  await send(answer(OWNER, 'exam_intent', 'not_decided_yet'));
+  await send(answer(OWNER, 'grade', 'grade_3'));
+  assert.equal((await user(db, OWNER)).exam_intent, 'not_decided_yet');
+  assert.match(lastMessages()[0].altText, /^Q3\./);
 });

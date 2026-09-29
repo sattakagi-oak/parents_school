@@ -1,6 +1,7 @@
 // GET /api/admin/line/users — セグメント抽出（読み取り専用・送信はしない）
 // 認証: Authorization: Bearer <ADMIN_API_TOKEN>
-// 例: ?grade=grade_1,grade_2&exam_intent=planned,considering_high&diagnosis_applied=false
+// 例: ?grade=grade_1,grade_2&exam_intent=junior_exam_planned,junior_exam_considering&diagnosis_applied=false
+//     （exam_intent=進路・教育方針 / interest=伸ばしたいこと。レスポンスでは education_path_intent / growth_interest）
 // レスポンスに LINE userId は含めない（内部IDのみ）。
 
 import { checkBearer, json } from '../../_lib/auth.js';

@@ -1,12 +1,13 @@
 // 3問アンケートの状態遷移。
 // - DB保存は postback data（正規化された内部値）を正とする。displayText は表示用のみでパースしない。
+// - Q2（進路・教育方針）は Q1 の学年で選択肢を出し分ける。回答値はその学年の選択肢に含まれるものだけ受け付ける。
 // - 次に出す質問 = 未回答のうち最初の質問。
 // - 3問そろった初回 → segmentation_completed_at / manual_followup_status=pending を記録し、
 //   Q3への返信として「完了メッセージ＋診断CTA」を1回だけ送る。自動送信はここで終わり。
 // - 完了後の再回答 → 値を最新で上書き。途中の質問なら次の質問を順に出し、最後なら「更新しました」。
 
-import { QUESTIONS, SEGMENT_UPDATED, questionMessage, completionMessages } from './messages.js';
-import { setAnswer, completeSegmentation, recordEvent } from './users.js';
+import { QUESTIONS, SEGMENT_UPDATED, questionMessage, completionMessages, resolveQuestion } from './messages.js';
+import { getUser, setAnswer, completeSegmentation, recordEvent } from './users.js';
 import { replyOnce, replyUntracked } from './delivery.js';
 import { diagnosisUrl, publicBaseUrl } from './config.js';
 
@@ -18,8 +19,9 @@ export function parsePostback(data) {
   return { action: p.get('action'), question: p.get('question'), value: p.get('value') };
 }
 
-export function isValidAnswer(question, value) {
-  const q = QUESTIONS.find((x) => x.key === question);
+/** user の状態（学年）で解決した質問の選択肢に value が含まれるか */
+export function isValidAnswer(question, value, user) {
+  const q = resolveQuestion(question, user);
   return Boolean(q && q.options.some((o) => o.value === value));
 }
 
@@ -38,16 +40,36 @@ export async function askFirstQuestion(lineUserId, replyToken, { withIntro = tru
   return replyUntracked(lineUserId, replyToken, questionMessage(QUESTIONS[0].key, { withIntro }), 'segment:q1');
 }
 
+function askQuestion(lineUserId, replyToken, key, user) {
+  return replyUntracked(lineUserId, replyToken, questionMessage(key, { user }), `segment:${key}`);
+}
+
 /** @returns {Promise<string>} 処理結果（テスト・ログ用） */
 export async function handleSegmentAnswer(lineUserId, replyToken, question, value) {
-  if (!isValidAnswer(question, value)) return 'invalid_answer';
+  if (!QUESTIONS.some((q) => q.key === question)) return 'invalid_answer';
+  const current = await getUser(lineUserId);
 
-  const user = await setAnswer(lineUserId, question, value);
+  if (!isValidAnswer(question, value, current)) {
+    // 学年未回答のままQ2が押された / 別の学年用の古いQ2ボタン → 今の状態で聞くべき質問を出し直す
+    if (question === 'exam_intent') {
+      const redo = current?.grade ? 'exam_intent' : 'grade';
+      await askQuestion(lineUserId, replyToken, redo, current);
+      return `invalid_answer:asked:${redo}`;
+    }
+    return 'invalid_answer';
+  }
+
+  let user = await setAnswer(lineUserId, question, value);
   await recordEvent(lineUserId, 'segment_answer', { question, value });
+
+  // 学年を変えて、既存のQ2回答が新しい学年の選択肢に無い → Q2を聞き直す
+  if (question === 'grade' && user.exam_intent && !isValidAnswer('exam_intent', user.exam_intent, user)) {
+    user = await setAnswer(lineUserId, 'exam_intent', null);
+  }
 
   const next = firstUnanswered(user);
   if (next) {
-    await replyUntracked(lineUserId, replyToken, questionMessage(next), `segment:${next}`);
+    await askQuestion(lineUserId, replyToken, next, user);
     return `asked:${next}`;
   }
 
@@ -63,7 +85,7 @@ export async function handleSegmentAnswer(lineUserId, replyToken, question, valu
   const idx = QUESTIONS.findIndex((q) => q.key === question);
   const following = QUESTIONS[idx + 1];
   if (following) {
-    await replyUntracked(lineUserId, replyToken, questionMessage(following.key), `segment:${following.key}`);
+    await askQuestion(lineUserId, replyToken, following.key, user);
     return `reanswer_asked:${following.key}`;
   }
   await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: SEGMENT_UPDATED }], 'segment:updated');

@@ -4,15 +4,15 @@
 //   npm run admin -- followup-done <id>               個別対応済みにする
 //   npm run admin -- followup-not-needed <id>         対応不要にする
 //   npm run admin -- followup-pending <id>            対応待ちに戻す
-//   npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=planned,considering_high --diagnosis_applied=false
-//   npm run admin -- segment --interest=parenting_communication
+//   npm run admin -- segment --grade=grade_1,grade_2 --exam_intent=junior_exam_planned,junior_exam_considering --diagnosis_applied=false
+//   npm run admin -- segment --interest=independent_thinking     （exam_intent=進路・教育方針 / interest=伸ばしたいこと）
 //   npm run admin -- mark-applied <id> / unmark-applied <id>   診断申込済みの登録・取消
 //   npm run admin -- stats                            件数集計
 //   npm run admin -- audit                            送信監査（テストユーザー以外への送信が0件か）
 import { getDb } from '../api/_lib/db.js';
 import { buildSegmentQuery } from '../api/_lib/segments.js';
 import { setManualFollowup } from '../api/_lib/users.js';
-import { QUESTIONS } from '../api/_lib/messages.js';
+import { optionLabel } from '../api/_lib/messages.js';
 import { testUserIds } from '../api/_lib/config.js';
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -20,8 +20,7 @@ const flags = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) 
 const args = rest.filter((a) => !a.startsWith('--'));
 const db = getDb();
 
-const LABELS = Object.fromEntries(QUESTIONS.map((q) => [q.key, Object.fromEntries(q.options.map((o) => [o.value, o.label]))]));
-const label = (key, value) => (value ? LABELS[key][value] || value : '');
+const label = (key, value, user) => (value ? optionLabel(key, value, user) : '');
 const date = (d) => (d ? new Date(d).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }) : '');
 
 try {
@@ -33,8 +32,8 @@ try {
         '────────────────────────',
         `名前: ${r.display_name || '(不明)'}    id: ${r.id}`,
         `【学年】${label('grade', r.grade)}`,
-        `【中学受験】${label('exam_intent', r.exam_intent)}`,
-        `【気になること】${label('interest', r.interest)}`,
+        `【進路】${label('exam_intent', r.education_path_intent, r)}`,
+        `【伸ばしたいこと】${label('interest', r.growth_interest)}`,
         `回答日時: ${date(r.segmentation_completed_at)}`,
         `診断CTAクリック: ${date(r.diagnosis_cta_clicked_at) || 'なし'}    診断申込: ${date(r.diagnosis_applied_at) || 'なし'}`,
       ].join('\n'));
@@ -47,8 +46,8 @@ try {
     const { rows: [c] } = await db.query(q.countSql, q.params);
     const { rows } = await db.query(q.listSql, q.params);
     console.log(`count: ${c.count}`);
-    console.table(rows.map(({ id, display_name, grade, exam_intent, interest, manual_followup_status, diagnosis_applied_at }) =>
-      ({ id, display_name, grade, exam_intent, interest, followup: manual_followup_status, applied: Boolean(diagnosis_applied_at) })));
+    console.table(rows.map(({ id, display_name, grade, education_path_intent, growth_interest, manual_followup_status, diagnosis_applied_at }) =>
+      ({ id, display_name, grade, education_path_intent, growth_interest, followup: manual_followup_status, applied: Boolean(diagnosis_applied_at) })));
   } else if (cmd === 'mark-applied' || cmd === 'unmark-applied') {
     const value = cmd === 'mark-applied' ? 'coalesce(diagnosis_applied_at, now())' : 'null';
     const { rowCount } = await db.query(
