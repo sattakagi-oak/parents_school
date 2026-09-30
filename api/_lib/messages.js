@@ -16,6 +16,9 @@
  * 元画像: 子育て相談/images/プレゼント②.png → present-1（未就学〜小学校低学年まで）
  *         子育て相談/images/プレゼント①.png → present-2（小学校中学年以上）
  */
+/** 画像を差し替えたら更新する（URLを変えて、LINE側に残った古い画像のキャッシュを使わせないため） */
+export const SHEET_IMAGE_VERSION = '20260930';
+
 export const SHEETS = {
   present_1: {
     label: 'プレゼント②（未就学〜小学校低学年まで）',
@@ -226,8 +229,8 @@ export function sheetMessages(sheet, { baseUrl } = {}) {
   if (baseUrl) {
     messages.push({
       type: 'image',
-      originalContentUrl: `${baseUrl}${SHEETS[sheet].path}`,
-      previewImageUrl: `${baseUrl}${SHEETS[sheet].previewPath}`,
+      originalContentUrl: `${baseUrl}${SHEETS[sheet].path}?v=${SHEET_IMAGE_VERSION}`,
+      previewImageUrl: `${baseUrl}${SHEETS[sheet].previewPath}?v=${SHEET_IMAGE_VERSION}`,
     });
   }
   messages.push({ type: 'text', text: SHEET_GUIDE, quickReply: checkCountQuickReply() });

@@ -11,7 +11,8 @@ import { GET as adminUsers } from '../api/admin/line/users.js';
 import { POST as adminApplied } from '../api/admin/line/diagnosis-applied.js';
 import { sendMode, sendPermission } from '../api/_lib/config.js';
 import { setManualFollowup } from '../api/_lib/users.js';
-import { STAGES, SHEETS } from '../api/_lib/messages.js';
+import { STAGES, SHEETS, SHEET_IMAGE_VERSION } from '../api/_lib/messages.js';
+const V = `?v=${SHEET_IMAGE_VERSION}`;
 import * as line from '../api/_lib/line.js';
 
 let db;
@@ -124,8 +125,8 @@ test('present_1 / present_2 の出し分け（5区分すべて）: 画像＋案�
     const [image, guide] = lastMessages();
     assert.deepEqual(image, {
       type: 'image',
-      originalContentUrl: `https://example.test${SHEETS[sheet].path}`,
-      previewImageUrl: `https://example.test${SHEETS[sheet].previewPath}`,
+      originalContentUrl: `https://example.test${SHEETS[sheet].path}${V}`,
+      previewImageUrl: `https://example.test${SHEETS[sheet].previewPath}${V}`,
     });
     assert.match(guide.text, /こちらのチェックリストを見ながら、\n10項目をチェックしてみてください。/);
     const items = guide.quickReply.items.map((i) => i.action);
@@ -248,7 +249,7 @@ test('旧入力 ①/1/１ → present_1、②/2/２ → present_2（シート未
     assert.equal(u.parenting_check_sheet_source, 'legacy_text');
     assert.equal(u.education_stage, null);
     const [image, guide] = lastMessages();
-    assert.equal(image.originalContentUrl, `https://example.test${SHEETS[sheet].path}`);
+    assert.equal(image.originalContentUrl, `https://example.test${SHEETS[sheet].path}${V}`);
     assert.equal(guide.quickReply.items.length, 11);
   }
 });
@@ -467,7 +468,7 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   await send(ev('follow', OWNER));
   await send(stage(OWNER, 'preschool'));
   assert.equal(lastMessages()[0].originalContentUrl,
-    'https://parents-school-git-feature-x.vercel.app/images/parent-check/present-1.png');
+    `https://parents-school-git-feature-x.vercel.app/images/parent-check/present-1.png${V}`);
   await send(count(OWNER, 3));
   const u = await user(db, OWNER);
   assert.equal(lastMessages()[1].contents.footer.contents[0].action.uri,
@@ -477,10 +478,10 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   for (const pub of ['', 'https://wrong.example.com']) {
     testMode({ PUBLIC_BASE_URL: pub, VERCEL_ENV: 'production', VERCEL_BRANCH_URL: 'x.vercel.app', VERCEL_PROJECT_PRODUCTION_URL: 'parents-school.vercel.app' });
     await send(stage(OWNER, 'junior_high_plus'));
-    assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-2.png');
+    assert.equal(lastMessages()[0].originalContentUrl, `https://parents-school.vercel.app/images/parent-check/present-2.png${V}`);
   }
   // Vercel 以外では PUBLIC_BASE_URL（スキーム省略・末尾スラッシュも補正）
   testMode({ PUBLIC_BASE_URL: 'parents-school.vercel.app/' });
   await send(stage(OWNER, 'preschool'));
-  assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-1.png');
+  assert.equal(lastMessages()[0].originalContentUrl, `https://parents-school.vercel.app/images/parent-check/present-1.png${V}`);
 });
