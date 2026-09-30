@@ -122,8 +122,11 @@ test('present_1 / present_2 の出し分け（5区分すべて）: 画像＋案�
     assert.equal(u.parenting_check_sheet_source, 'stage_button');
 
     const [image, guide] = lastMessages();
-    const url = `https://example.test${SHEETS[sheet].path}`;
-    assert.deepEqual(image, { type: 'image', originalContentUrl: url, previewImageUrl: url });
+    assert.deepEqual(image, {
+      type: 'image',
+      originalContentUrl: `https://example.test${SHEETS[sheet].path}`,
+      previewImageUrl: `https://example.test${SHEETS[sheet].previewPath}`,
+    });
     assert.match(guide.text, /こちらのチェックリストを見ながら、\n10項目をチェックしてみてください。/);
     const items = guide.quickReply.items.map((i) => i.action);
     assert.equal(items.length, 11);
@@ -133,8 +136,13 @@ test('present_1 / present_2 の出し分け（5区分すべて）: 画像＋案�
   }
 });
 
-test('シート画像ファイルがリポジトリに存在する', async () => {
-  for (const s of Object.values(SHEETS)) await access(new URL(`..${s.path}`, import.meta.url));
+test('シート画像: ファイルが存在し、LINEの上限内（原寸10MB・プレビュー1MB）', async () => {
+  const { stat } = await import('node:fs/promises');
+  for (const s of Object.values(SHEETS)) {
+    await access(new URL(`..${s.path}`, import.meta.url));
+    assert.ok((await stat(new URL(`..${s.path}`, import.meta.url))).size < 10 * 1024 * 1024, s.path);
+    assert.ok((await stat(new URL(`..${s.previewPath}`, import.meta.url))).size < 1024 * 1024, s.previewPath);
+  }
   assert.deepEqual(STAGES.map((s) => s.sheet), ['present_1', 'present_1', 'present_2', 'present_2', 'present_2']);
 });
 

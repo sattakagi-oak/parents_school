@@ -10,10 +10,23 @@
 // ステップ配信・自動追客・AIによる個別コメントはありません。
 // ============================================================
 
-/** チェックリスト（プレゼント）。画像は静的ファイル（PUBLIC_BASE_URL + path）。DBには sheet の識別値のみ保存。 */
+/**
+ * チェックリスト（プレゼント）。画像は静的ファイル（公開URL + path）。DBには sheet の識別値のみ保存。
+ * path: 原寸（LINE上限10MB）/ previewPath: トーク画面のプレビュー（LINE上限1MB。原寸が1MBを超えるため縮小JPEGを別に用意）
+ * 元画像: 子育て相談/images/プレゼント②.png → present-1（未就学〜小学校低学年まで）
+ *         子育て相談/images/プレゼント①.png → present-2（小学校中学年以上）
+ */
 export const SHEETS = {
-  present_1: { label: 'プレゼント1（未就学〜小学校低学年まで）', path: '/images/parent-check/present-1.png' },
-  present_2: { label: 'プレゼント2（小学校中学年以降）', path: '/images/parent-check/present-2.png' },
+  present_1: {
+    label: 'プレゼント②（未就学〜小学校低学年まで）',
+    path: '/images/parent-check/present-1.png',
+    previewPath: '/images/parent-check/present-1-preview.jpg',
+  },
+  present_2: {
+    label: 'プレゼント①（小学校中学年以上）',
+    path: '/images/parent-check/present-2.png',
+    previewPath: '/images/parent-check/present-2-preview.jpg',
+  },
 };
 
 /** 年代区分（education_stage）。sheet: その年代に送るチェックリスト */
@@ -211,8 +224,11 @@ export function checkCountQuickReply() {
 export function sheetMessages(sheet, { baseUrl } = {}) {
   const messages = [];
   if (baseUrl) {
-    const url = `${baseUrl}${SHEETS[sheet].path}`;
-    messages.push({ type: 'image', originalContentUrl: url, previewImageUrl: url });
+    messages.push({
+      type: 'image',
+      originalContentUrl: `${baseUrl}${SHEETS[sheet].path}`,
+      previewImageUrl: `${baseUrl}${SHEETS[sheet].previewPath}`,
+    });
   }
   messages.push({ type: 'text', text: SHEET_GUIDE, quickReply: checkCountQuickReply() });
   return messages;
