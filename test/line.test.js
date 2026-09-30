@@ -465,8 +465,14 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   assert.equal(lastMessages()[1].contents.footer.contents[0].action.uri,
     `https://parents-school-git-feature-x.vercel.app/api/line/cta?t=${u.cta_token}`);
 
-  // production では PUBLIC_BASE_URL を使う
-  testMode({ PUBLIC_BASE_URL: 'https://parents-school.vercel.app/', VERCEL_ENV: 'production', VERCEL_BRANCH_URL: 'x.vercel.app' });
-  await send(stage(OWNER, 'junior_high_plus'));
-  assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-2.png');
+  // production では Vercel の本番ドメインを使う（PUBLIC_BASE_URL が未設定・誤っていても）
+  for (const pub of ['', 'https://wrong.example.com']) {
+    testMode({ PUBLIC_BASE_URL: pub, VERCEL_ENV: 'production', VERCEL_BRANCH_URL: 'x.vercel.app', VERCEL_PROJECT_PRODUCTION_URL: 'parents-school.vercel.app' });
+    await send(stage(OWNER, 'junior_high_plus'));
+    assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-2.png');
+  }
+  // Vercel 以外では PUBLIC_BASE_URL（スキーム省略・末尾スラッシュも補正）
+  testMode({ PUBLIC_BASE_URL: 'parents-school.vercel.app/' });
+  await send(stage(OWNER, 'preschool'));
+  assert.equal(lastMessages()[0].originalContentUrl, 'https://parents-school.vercel.app/images/parent-check/present-1.png');
 });

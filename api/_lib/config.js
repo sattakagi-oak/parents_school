@@ -70,14 +70,22 @@ export function diagnosisUrl() {
   return env('PARENT_DIAGNOSIS_URL');
 }
 
-/** CTAリダイレクトURLの組み立てに使う公開URL（例: https://example.vercel.app） */
+/**
+ * 画像URL・CTAリンクの組み立てに使う公開URL（例: https://example.vercel.app）。
+ * Vercel 上では手動設定ミスを避けるため、Vercel が自動設定するURLを優先する:
+ *   Preview    → そのブランチ自身のURL（VERCEL_BRANCH_URL）
+ *   Production → 本番ドメイン（VERCEL_PROJECT_PRODUCTION_URL）
+ * Vercel 以外（ローカル等）では PUBLIC_BASE_URL。スキーム省略時は https を補う。
+ */
 export function publicBaseUrl() {
-  // Vercel の Preview では、そのブランチ自身のURL（Vercelが自動設定する VERCEL_BRANCH_URL）を必ず使う。
-  // PUBLIC_BASE_URL が本番URLのままだと、画像・CTAリンクが新コードの無い本番側を指して 404 になるため。
-  if (env('VERCEL_ENV') === 'preview' && env('VERCEL_BRANCH_URL')) {
-    return `https://${env('VERCEL_BRANCH_URL')}`;
-  }
-  return env('PUBLIC_BASE_URL').replace(/\/+$/, '');
+  const vercelEnv = env('VERCEL_ENV');
+  let url = '';
+  if (vercelEnv === 'preview' && env('VERCEL_BRANCH_URL')) url = env('VERCEL_BRANCH_URL');
+  else if (vercelEnv === 'production' && env('VERCEL_PROJECT_PRODUCTION_URL')) url = env('VERCEL_PROJECT_PRODUCTION_URL');
+  else url = env('PUBLIC_BASE_URL');
+  if (!url) return '';
+  if (!/^https?:\/\//.test(url)) url = `https://${url}`;
+  return url.replace(/\/+$/, '');
 }
 
 export function secretEnv(name) {
