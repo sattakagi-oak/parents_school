@@ -240,3 +240,62 @@ npm test
 ```
 
 PGlite（メモリ上のPostgres）で実際のマイグレーションSQLを流し、LINE APIは偽物に差し替えて実送信ゼロで検証する。
+
+---
+
+## 無料講座（Zoom）の申込・リマインド
+
+講座: お子さんの「自走力」と「地頭」をきたえる 〜わが子3人東大進学の塾長があかす、家庭での関わり方〜
+日時（日本時間・定員/締切なし）: 10/20（火）10:00 / 21:00、10/21（水）10:00 / 21:00（各60分）。設定は `api/_lib/messages.js` の `WEBINAR`。
+
+```
+告知（LINE Official Account Manager から人が配信。ボタン＝テキスト「無料講座に申し込む」を送信）
+  → 相手「無料講座に申し込む」 → 案内（顔出しなし・ミュートOK）＋日時ボタン          [reply]
+  → 日時タップ → 申込保存 → 申込完了＋「日程を変更する」ボタン                       [reply]
+  → 前日20時台: Zoom付きリマインド / 当日朝8時台: Zoom付きリマインド                 [push]
+     （1時間前リマインドも実装済み。Vercel Pro で10分おきのCronを追加すると有効）
+```
+
+- 開始の文言: 「無料講座に申し込む」「無料講座に申込む」「申込」「申し込む」「申し込み」
+- 日程変更: 完了メッセージの「日程を変更する」→ 日時ボタン → 選び直しで上書き。キャンセル機能なし。
+- 前日20時を過ぎてからの申込: 完了メッセージに Zoom 情報を入れ、前日リマインドは送らない（当日朝は送る）。
+- 開始済みの回は選べない（ボタンから消える）。全回終了後は「受付終了」。
+- リマインドは種類ごと・回ごとに1回（`parent_webinar_registrations.*_sent_for`）。日程変更後は変更後の回で送る。ブロック中の人には送らない。
+- 送り損ねても意味が変わる時間帯には送らない（前日分を当日に送らない等）。
+
+### 安全装置
+
+- `WEBINAR_ENABLED=true` にするまで、申込受付・リマインドとも**テスト用ユーザーだけ**（他の人の「申込」には返信もDB登録もしない）。
+- さらに `LINE_SEND_MODE` の制御（test ならテスト用ユーザーのみ）がかかる。
+- push はこのリマインドだけで使用。broadcast / multicast はなし。告知の一斉配信は人が Official Account Manager から行う。
+
+### Cron（`vercel.json`）
+
+| 種類 | スケジュール（UTC） | 日本時間 |
+|---|---|---|
+| `day_before` | `0 11 * * *` | 毎日20時台 |
+| `morning` | `0 23 * * *` | 毎日8時台 |
+| `hour_before` | （未設定）`*/10 * * * *` | Vercel Pro のときだけ追加 |
+
+`GET /api/cron/webinar-reminders?kind=<種類>`、認証 `Authorization: Bearer <CRON_SECRET>`。`&now=<ISO日時>` で時刻を指定して動作確認できる。
+
+### 環境変数（Vercel Production）
+
+| 変数 | 値 |
+|---|---|
+| `CRON_SECRET` | 32文字以上のランダム文字列（`.env.local` に生成済みの値を使う） |
+| `WEBINAR_ZOOM_URL` / `WEBINAR_ZOOM_MEETING_ID` / `WEBINAR_ZOOM_PASSCODE` | Zoom 参加情報 |
+| `WEBINAR_ENABLED` | テスト中は未設定。本番の友だちに開放するときに `true` |
+
+### 申込状況の確認
+
+```sql
+select u.display_name, r.session_id, r.registered_at, r.session_changed_at,
+       r.day_before_sent_for, r.morning_sent_for
+  from parent_webinar_registrations r join parent_line_users u using (line_user_id)
+ order by r.session_id, r.registered_at;
+```
+
+```bash
+npm run admin -- webinar
+```

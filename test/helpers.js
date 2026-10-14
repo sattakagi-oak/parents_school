@@ -11,7 +11,7 @@ export const OTHER = 'U' + '1'.repeat(32);
 
 export function baseEnv(overrides = {}) {
   for (const k of Object.keys(process.env)) {
-    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_)/.test(k)) delete process.env[k];
+    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_|WEBINAR_)/.test(k)) delete process.env[k];
   }
   Object.assign(process.env, {
     LINE_CHANNEL_SECRET: SECRET,
@@ -28,7 +28,7 @@ export function baseEnv(overrides = {}) {
 
 export async function freshDb() {
   const db = new PGlite();
-  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql']) {
+  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql', '006_webinar_registrations.sql']) {
     await db.exec(await readFile(new URL(`../db/migrations/${f}`, import.meta.url), 'utf8'));
   }
   setDb(db);

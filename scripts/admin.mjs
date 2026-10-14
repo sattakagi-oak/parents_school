@@ -9,10 +9,11 @@
 //   npm run admin -- mark-applied <id> / unmark-applied <id>   診断申込済みの登録・取消
 //   npm run admin -- stats                            件数集計
 //   npm run admin -- audit                            送信監査（テストユーザー以外への送信が0件か）
+//   npm run admin -- webinar                          無料講座の申込状況（回ごと）
 import { getDb } from '../api/_lib/db.js';
 import { buildSegmentQuery } from '../api/_lib/segments.js';
 import { setManualFollowup } from '../api/_lib/users.js';
-import { stageLabel, SHEETS } from '../api/_lib/messages.js';
+import { stageLabel, SHEETS, WEBINAR } from '../api/_lib/messages.js';
 import { testUserIds } from '../api/_lib/config.js';
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -65,6 +66,19 @@ try {
              count(blocked_at)::int as blocked
         from parent_line_users`);
     console.table(rows);
+  } else if (cmd === 'webinar') {
+    const { rows } = await db.query(
+      `select u.display_name, r.session_id, r.registered_at, r.session_changed_at,
+              r.day_before_sent_for = r.session_id as day_before_sent, r.morning_sent_for = r.session_id as morning_sent
+         from parent_webinar_registrations r join parent_line_users u using (line_user_id)
+        where r.webinar_key = $1 order by r.session_id, r.registered_at`, [WEBINAR.key]);
+    for (const s of WEBINAR.sessions) {
+      const list = rows.filter((r) => r.session_id === s.id);
+      console.log(`■ ${s.label}  ${list.length}名`);
+      for (const r of list) {
+        console.log(`  - ${r.display_name || '(不明)'}  申込 ${date(r.registered_at)}${r.session_changed_at ? '（日程変更あり）' : ''}  前日リマインド:${r.day_before_sent ? '済' : '未'} 当日朝:${r.morning_sent ? '済' : '未'}`);
+      }
+    }
   } else if (cmd === 'audit') {
     // 実送信（message_sent）と許可外で止めた送信（send_blocked）を、宛先がテスト用ユーザーかどうかで集計
     const { rows } = await db.query(
@@ -78,7 +92,7 @@ try {
     const bad = rows.filter((r) => r.event_type === 'message_sent' && !r.to_test_user).reduce((a, r) => a + r.n, 0);
     console.log(`テストユーザー以外への実送信: ${bad}件`);
   } else {
-    console.log('commands: pending | followup-done <id> | followup-not-needed <id> | followup-pending <id> | segment | mark-applied <id> | unmark-applied <id> | stats | audit');
+    console.log('commands: pending | webinar | followup-done <id> | followup-not-needed <id> | followup-pending <id> | segment | mark-applied <id> | unmark-applied <id> | stats | audit');
   }
 } finally {
   await db.end();

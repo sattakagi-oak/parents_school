@@ -372,8 +372,8 @@ test('testモード: テスト対象外には follow返信・シート・個数�
   assert.equal(sent.rows[0].n, 0);
 });
 
-test('送信はreplyのみ（push/broadcast/multicastの関数は存在しない）', async () => {
-  assert.deepEqual(Object.keys(line).sort(), ['getDisplayName', 'replyMessage', 'verifySignature']);
+test('チェックリスト導線の送信はreplyのみ（broadcast/multicastの関数は存在しない。pushは無料講座リマインド専用）', async () => {
+  assert.deepEqual(Object.keys(line).sort(), ['getDisplayName', 'pushMessage', 'replyMessage', 'verifySignature']);
   testMode();
   await fullFlow(OWNER);
   await send(text(OWNER, 'テスト開始'));

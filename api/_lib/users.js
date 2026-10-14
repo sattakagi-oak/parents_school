@@ -143,7 +143,7 @@ export async function isRegisteredTestUser(lineUserId) {
   return rows.length > 0;
 }
 
-/** テスト用: 年代・シート・チェック数・対応状況・CTAクリック・1回限りの送信記録を消して、友だち追加直後の状態に戻す */
+/** テスト用: 年代・シート・チェック数・対応状況・CTAクリック・1回限りの送信記録・無料講座の申込を消して、友だち追加直後の状態に戻す */
 export async function resetTestUserProgress(lineUserId) {
   await getDb().query(
     `update parent_line_users
@@ -156,4 +156,5 @@ export async function resetTestUserProgress(lineUserId) {
     [lineUserId],
   );
   await getDb().query('delete from parent_line_message_logs where line_user_id = $1', [lineUserId]);
+  await getDb().query('delete from parent_webinar_registrations where line_user_id = $1', [lineUserId]);
 }

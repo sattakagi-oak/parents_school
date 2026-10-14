@@ -278,3 +278,153 @@ export function checkCompleteMessages({ ctaUrl, askStage = false } = {}) {
   if (askStage) messages.push(stageMessage({ supplement: true }));
   return messages;
 }
+
+// ============================================================
+// 無料講座（Zoom）の申込・リマインド
+// 告知は LINE Official Account Manager から人が配信し、そのボタンで相手から
+// 「無料講座に申し込む」と送られてきたら、以下の自動返信が始まる。
+// Zoom の URL・ID・パスコードはコードに書かず、環境変数（WEBINAR_ZOOM_*）から読む。
+// ============================================================
+
+export const WEBINAR = {
+  key: 'jisoryoku_jiatama_202610',
+  title: 'お子さんの「自走力」と「地頭」をきたえる',
+  subtitle: 'わが子3人東大進学の塾長があかす、家庭での関わり方',
+  /** start/end は日本時間。label はボタン・メッセージに出す表記 */
+  sessions: [
+    { id: '1020_am', label: '10/20（火）10:00〜11:00', start: '2026-10-20T10:00:00+09:00', end: '2026-10-20T11:00:00+09:00' },
+    { id: '1020_pm', label: '10/20（火）21:00〜22:00', start: '2026-10-20T21:00:00+09:00', end: '2026-10-20T22:00:00+09:00' },
+    { id: '1021_am', label: '10/21（水）10:00〜11:00', start: '2026-10-21T10:00:00+09:00', end: '2026-10-21T11:00:00+09:00' },
+    { id: '1021_pm', label: '10/21（水）21:00〜22:00', start: '2026-10-21T21:00:00+09:00', end: '2026-10-21T22:00:00+09:00' },
+  ],
+  /** このテキストが相手から送られたら申込開始（告知メッセージのボタンに設定する文言は1行目） */
+  startKeywords: ['無料講座に申し込む', '無料講座に申込む', '申込', '申し込む', '申し込み'],
+};
+
+const WEBINAR_HEADER = `【無料講座】
+${WEBINAR.title}
+〜${WEBINAR.subtitle}〜`;
+
+export const WEBINAR_CLOSED = 'ありがとうございます😊\nこちらの無料講座の受付は終了しました。またのご案内をお待ちください。';
+
+export function webinarSession(id) {
+  return WEBINAR.sessions.find((s) => s.id === id) || null;
+}
+
+/** Zoom 参加情報のテキスト。URL 未設定なら null */
+export function zoomText(zoom) {
+  if (!zoom?.url) return null;
+  return [
+    '▼参加用Zoom',
+    zoom.url,
+    zoom.meetingId ? `ミーティングID: ${zoom.meetingId}` : null,
+    zoom.passcode ? `パスコード: ${zoom.passcode}` : null,
+  ].filter(Boolean).join('\n');
+}
+
+/** 日時選択ボタン（Flex）。sessions は受付中の回だけを渡す */
+export function webinarSessionMessage(sessions, { changing = false } = {}) {
+  const title = changing ? '変更後のご希望日時を選んでください👇' : 'ご希望の日時を選んでください👇';
+  return {
+    type: 'flex',
+    altText: title,
+    contents: {
+      type: 'bubble',
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'md',
+        contents: [
+          { type: 'text', text: WEBINAR.title, weight: 'bold', size: 'md', wrap: true },
+          { type: 'text', text: title, size: 'sm', color: '#666666', wrap: true },
+          ...sessions.map((s) => ({
+            type: 'box',
+            layout: 'vertical',
+            paddingAll: '12px',
+            cornerRadius: '8px',
+            borderWidth: '1px',
+            borderColor: '#D5CFC4',
+            backgroundColor: '#FAF7F2',
+            action: {
+              type: 'postback',
+              label: s.label.slice(0, 20),
+              data: `action=webinar_session&value=${s.id}`,
+              displayText: `【無料講座 希望日時】${s.label}`,
+            },
+            contents: [{ type: 'text', text: s.label, size: 'md', weight: 'bold', color: '#333333' }],
+          })),
+        ],
+      },
+    },
+  };
+}
+
+/** 申込の入口: ご案内＋日時ボタン */
+export function webinarStartMessages(sessions) {
+  return [
+    {
+      type: 'text',
+      text: `${WEBINAR_HEADER}\n\nお申し込みありがとうございます😊\n\n顔出しなし・ミュートでのご参加もOKです。\nもちろん、ご質問やご感想をいただけるととても嬉しいです。`,
+    },
+    webinarSessionMessage(sessions),
+  ];
+}
+
+/**
+ * 申込完了（日程変更後も同じ）。
+ * zoom を渡した場合（前日リマインドの時刻を過ぎてからの申込）は Zoom 情報も入れる。
+ */
+export function webinarCompleteMessages(session, { changed = false, zoom = null, morningStillComing = true } = {}) {
+  const head = changed ? '日程を変更しました😊' : 'お申し込みが完了しました😊';
+  const zoomBlock = zoomText(zoom);
+  const tail = zoomBlock
+    ? `${zoomBlock}\n\nお時間になりましたら、上のリンクからご参加ください。${morningStillComing ? '\n当日の朝にもあらためてお送りします。' : ''}`
+    : '開催が近づきましたら、前日の20時ごろと当日の朝に、このLINEで参加用のZoomリンクをお送りします。';
+  return [
+    {
+      type: 'text',
+      text: `${head}\n\n${WEBINAR_HEADER}\n\n【日時】${session.label}\n【参加方法】Zoom（オンライン）\n\n顔出しなし・ミュートでのご参加もOKです。\nご質問やご感想もお気軽にどうぞ😊\n\n${tail}`,
+    },
+    {
+      type: 'flex',
+      altText: '日程を変更する',
+      contents: {
+        type: 'bubble',
+        size: 'kilo',
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            { type: 'text', text: 'ご都合が変わった場合は、こちらから日程を変更できます。', size: 'sm', wrap: true, color: '#555555' },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'button',
+              style: 'secondary',
+              action: { type: 'postback', label: '日程を変更する', data: 'action=webinar_change', displayText: '日程を変更する' },
+            },
+          ],
+        },
+      },
+    },
+  ];
+}
+
+/** リマインド。kind: day_before（前日20時台）/ morning（当日朝）/ hour_before（1時間前） */
+export function webinarReminderMessages(kind, session, zoom) {
+  const lead = {
+    day_before: `明日は無料講座の日です😊\n\n${WEBINAR_HEADER}\n\n【日時】${session.label}`,
+    morning: `本日、無料講座を開催します😊\n\n${WEBINAR_HEADER}\n\n【日時】本日 ${session.label.replace(/^.*）/, '')}`,
+    hour_before: `まもなく（1時間後）無料講座が始まります😊\n\n【日時】${session.label}`,
+  }[kind];
+  const after = {
+    day_before: '顔出しなし・ミュートでもOKです。お気軽にご参加ください。\n当日の朝にもあらためてお送りします。',
+    morning: '顔出しなし・ミュートでもOKです。お時間になりましたら、上のリンクからご参加ください。',
+    hour_before: 'お時間になりましたら、上のリンクからご参加ください。',
+  }[kind];
+  return [{ type: 'text', text: `${lead}\n\n${zoomText(zoom)}\n\n${after}` }];
+}

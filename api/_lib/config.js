@@ -88,6 +88,21 @@ export function publicBaseUrl() {
   return url.replace(/\/+$/, '');
 }
 
+/**
+ * 無料講座の受付を全員に開放するか。'true' 以外は、申込受付・リマインドともテスト用ユーザーだけ。
+ * （本番の友だちへの申込受付・リマインドは、ユーザーの許可後にこれを true にして有効化する）
+ */
+export function webinarOpen() {
+  return env('WEBINAR_ENABLED').toLowerCase() === 'true';
+}
+
+/** Zoom 参加情報（環境変数）。URL が無ければ null */
+export function zoomConfig() {
+  const url = env('WEBINAR_ZOOM_URL');
+  if (!/^https:\/\//.test(url)) return null;
+  return { url, meetingId: env('WEBINAR_ZOOM_MEETING_ID'), passcode: env('WEBINAR_ZOOM_PASSCODE') };
+}
+
 export function secretEnv(name) {
   return env(name);
 }

@@ -6,6 +6,7 @@ import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from
 import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress } from '../_lib/users.js';
 import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
+import { handleWebinarStart, handleWebinarSession, isWebinarStartText } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
   TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor,
@@ -41,6 +42,12 @@ export async function handleEvent(event) {
       if (p?.action === 'check_count') {
         return `postback:${await handleCheckCount(userId, replyToken, p.value)}`;
       }
+      if (p?.action === 'webinar_session') {
+        return `postback:${await handleWebinarSession(userId, replyToken, p.value)}`;
+      }
+      if (p?.action === 'webinar_change') {
+        return `postback:${(await handleWebinarStart(userId, replyToken, { changing: true })) || 'webinar_not_open'}`;
+      }
       return 'postback:ignored';
     }
     case 'message': {
@@ -48,6 +55,11 @@ export async function handleEvent(event) {
       if (!text) return 'message:ignored';
       const devResult = await handleDevCommand(userId, replyToken, text);
       if (devResult) return devResult;
+      // 無料講座の申込（告知メッセージのボタンから送られる文言）。WEBINAR_ENABLED までテスト用ユーザーのみ
+      if (isWebinarStartText(text)) {
+        const r = await handleWebinarStart(userId, replyToken);
+        if (r) return `message:${r}`;
+      }
       // 旧導線の「①/②/1/2」（シート未取得の人のみ）
       const legacy = legacySheetFor(text);
       if (legacy) {
