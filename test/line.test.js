@@ -25,6 +25,7 @@ beforeEach(async () => {
 
 const send = (...events) => webhook(signedRequest({ destination: 'Uxxx', events }));
 const testMode = (extra = {}) => baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER, ...extra });
+const THIRD_USER = 'U' + '9'.repeat(32);
 const text = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
 const stage = (userId, value, extra = '') => postback(userId, `action=stage&value=${value}${extra}`);
 const count = (userId, n) => postback(userId, `action=check_count&value=${n}`);
@@ -484,4 +485,43 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   testMode({ PUBLIC_BASE_URL: 'parents-school.vercel.app/' });
   await send(stage(OWNER, 'preschool'));
   assert.equal(lastMessages()[0].originalContentUrl, `https://parents-school.vercel.app/images/parent-check/present-1.png${V}`);
+});
+
+// ---------- 個別分析の「申し込みました」報告 ----------
+
+test('個別分析カード: ボタンの下に「お支払い完了後に申し込みましたと送って」の案内', async () => {
+  testMode();
+  await fullFlow(OWNER);
+  const footer = lastMessages()[1].contents.footer.contents;
+  assert.equal(footer[0].action.label, '強みと伸ばし方を整理する');
+  assert.equal(footer[1].text, 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊');
+});
+
+test('「申し込みました」報告: 申込済みとして記録し、自動返信はしない（表記ゆれも可）', async () => {
+  testMode();
+  await fullFlow(OWNER);
+  const n = calls.sends().length;
+  await send(text(OWNER, '申し込みました！よろしくお願いします'));
+  const u = await user(db, OWNER);
+  assert.ok(u.diagnosis_applied_at);
+  assert.equal(calls.sends().length, n, '返信は美穂先生が個別に行う');
+  const first = u.diagnosis_applied_at.getTime();
+  await send(text(OWNER, '申込みました。'));
+  assert.equal((await user(db, OWNER)).diagnosis_applied_at.getTime(), first, '最初の報告日時を保持');
+
+  for (const t of ['申込完了です', 'お支払いしました', '申し込み しました']) {
+    await db.query('update parent_line_users set diagnosis_applied_at = null where line_user_id = $1', [OWNER]);
+    await send(text(OWNER, t));
+    assert.ok((await user(db, OWNER)).diagnosis_applied_at, t);
+  }
+  // 関係ない文や無料講座の「申込」は対象外
+  await db.query('update parent_line_users set diagnosis_applied_at = null where line_user_id = $1', [OWNER]);
+  for (const t of ['申し込みたいです', '申込', 'もう申し込んだかな？']) await send(text(OWNER, t));
+  assert.equal((await user(db, OWNER)).diagnosis_applied_at, null);
+});
+
+test('「申し込みました」報告: DBにいない既存の友だちでも記録される', async () => {
+  await send(text(THIRD_USER, '申し込みました'));
+  assert.ok((await user(db, THIRD_USER)).diagnosis_applied_at);
+  assert.equal(calls.sends().length, 0);
 });

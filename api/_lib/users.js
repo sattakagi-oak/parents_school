@@ -102,6 +102,16 @@ export async function setCheckCount(lineUserId, count) {
   return rows[0] || null;
 }
 
+/** 個別分析の「申し込みました」報告: 申込済みとして記録（最初の報告日時を保持） */
+export async function markDiagnosisAppliedReported(lineUserId) {
+  await getDb().query(
+    `insert into parent_line_users (line_user_id, diagnosis_applied_at) values ($1, now())
+     on conflict (line_user_id) do update
+       set diagnosis_applied_at = coalesce(parent_line_users.diagnosis_applied_at, now()), updated_at = now()`,
+    [lineUserId],
+  );
+}
+
 const FOLLOWUP_STATUSES = new Set(['pending', 'completed', 'not_needed']);
 
 /** 美穂先生の個別対応状況を更新（管理スクリプト用）。completed のとき完了日時も記録。 */

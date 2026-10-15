@@ -133,7 +133,23 @@ export const ANALYSIS = {
   ],
   tail: 'を一緒に整理します。',
   buttonLabel: '強みと伸ばし方を整理する',
+  /** ボタンの下に出す案内（誰が申し込んだかを公式LINE上で把握するため） */
+  afterPayNote: 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊',
 };
+
+/**
+ * 相手からこの文言（の書き出し）が送られたら「個別分析に申込済み」として記録する（自動返信はしない）。
+ * 空白・句読点・！などは無視して比較。
+ */
+export const ANALYSIS_APPLIED_TEXTS = [
+  '申し込みました', '申込みました', '申込ました', '申し込みしました', '申込しました',
+  '申し込み完了', '申込完了', '申し込み終わりました', '支払いました', 'お支払いしました', 'お支払い完了',
+];
+
+export function isAnalysisAppliedText(text) {
+  const t = String(text || '').replace(/[\s　！!。．.、,♪〜～ー]/g, '');
+  return ANALYSIS_APPLIED_TEXTS.some((k) => t.startsWith(k));
+}
 
 // ------------------------------------------------------------
 // ラベル・判定（通常は編集不要）
@@ -262,6 +278,7 @@ export function analysisCard(ctaUrl) {
         layout: 'vertical',
         contents: [
           { type: 'button', style: 'primary', action: { type: 'uri', label: ANALYSIS.buttonLabel, uri: ctaUrl } },
+          { type: 'text', text: ANALYSIS.afterPayNote, size: 'sm', wrap: true, color: '#c8402e', weight: 'bold', margin: 'md' },
         ],
       },
     },

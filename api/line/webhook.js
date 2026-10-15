@@ -3,13 +3,13 @@
 
 import { verifySignature, getDisplayName } from '../_lib/line.js';
 import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from '../_lib/config.js';
-import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress } from '../_lib/users.js';
+import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress, markDiagnosisAppliedReported } from '../_lib/users.js';
 import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
 import { handleWebinarStart, handleWebinarSession, isWebinarStartText } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
-  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor,
+  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 
@@ -55,6 +55,12 @@ export async function handleEvent(event) {
       if (!text) return 'message:ignored';
       const devResult = await handleDevCommand(userId, replyToken, text);
       if (devResult) return devResult;
+      // 個別分析の「申し込みました」報告 → 申込済みとして記録するだけ（返信は美穂先生が個別に行う）
+      if (isAnalysisAppliedText(text)) {
+        await markDiagnosisAppliedReported(userId);
+        await recordEvent(userId, 'diagnosis_applied_reported');
+        return 'message:diagnosis_applied_reported';
+      }
       // 無料講座の申込（告知メッセージのボタンから送られる文言）。WEBINAR_ENABLED までテスト用ユーザーのみ
       if (isWebinarStartText(text)) {
         const r = await handleWebinarStart(userId, replyToken);
