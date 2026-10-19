@@ -57,7 +57,7 @@ test('申込: 案内（顔出しなし・ミュートOK）＋4つの日時ボタ
   assert.match(intro.text, /顔出しなし・ミュートでのご参加もOK/);
   assert.deepEqual(sessionIds(sessions), ['1020_am', '1020_pm', '1021_am', '1021_pm']);
   const actions = sessions.contents.body.contents.filter((c) => c.type === 'box').map((b) => b.action);
-  assert.equal(actions[0].displayText, '【無料講座 希望日時】10/20（火）10:00〜11:00');
+  assert.equal(actions[0].displayText, '【無料講座 希望日時】10/20（火）10:15〜');
   assert.equal(actions[3].displayText, '【無料講座 希望日時】10/21（水）21:00〜22:00');
 
   await send(pick(OWNER, '1020_pm'));
@@ -151,7 +151,7 @@ test('前日20時台: 翌日の回の申込者だけにZoom付きでpush。再�
   assert.ok(p[0].headers['x-line-retry-key']);
   const msg = p[0].body.messages[0].text;
   assert.match(msg, /^明日は無料講座の日です😊/);
-  assert.match(msg, /【日時】10\/20（火）10:00〜11:00/);
+  assert.match(msg, /【日時】10\/20（火）10:15〜/);
   assert.ok(msg.includes(ZOOM.WEBINAR_ZOOM_URL));
   assert.match(msg, /ミーティングID: 123 456 789\nパスコード: 000000/);
 
@@ -314,7 +314,7 @@ test('新規友だち: 期間中の新規追加だけ挨拶に告知を添える
   const msgs = lastReply();
   assert.equal(msgs.length, 3);
   assert.match(msgs[2].text, /^【明日開催・まだ間に合います】/);
-  assert.match(msgs[2].text, /10\/20（火）10:00〜11:00[\s\S]*10\/21（水）21:00〜22:00/);
+  assert.match(msgs[2].text, /10\/20（火）10:15〜[\s\S]*10\/21（水）21:00〜22:00/);
   assert.match(msgs[2].text, /「申し込む」と送るだけ/);
 
   await send(follow(OWNER, true));
@@ -328,7 +328,7 @@ test('新規友だち: 期間中の新規追加だけ挨拶に告知を添える
   await send(follow(OWNER, false));
   const day = lastReply()[2].text;
   assert.match(day, /^【本日開催・まだ間に合います】/);
-  assert.doesNotMatch(day, /10\/20（火）10:00/, '終わった回は出さない');
+  assert.doesNotMatch(day, /10\/20（火）10:15/, '終わった回は出さない');
   assert.match(day, /10\/20（火）21:00〜22:00/);
 
   await register(OWNER, '1020_pm');
