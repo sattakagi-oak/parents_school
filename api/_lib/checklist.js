@@ -12,8 +12,9 @@
 
 import {
   STAGES, CHECK_COUNT_MAX, CHECK_UPDATED, STAGE_SUPPLEMENT_THANKS,
-  stageByValue, greetingMessages, sheetMessages, checkCompleteMessages, stageMessage,
+  stageByValue, stageLabel, greetingMessages, sheetMessages, checkCompleteMessages, stageMessage,
 } from './messages.js';
+import { notifyAdmins } from './notify.js';
 import { getUser, setStageAndSheet, setStageOnly, setLegacySheet, setCheckCount, recordEvent } from './users.js';
 import { replyOnce, replyUntracked } from './delivery.js';
 import { diagnosisUrl, publicBaseUrl } from './config.js';
@@ -90,6 +91,8 @@ export async function handleCheckCount(lineUserId, replyToken, value) {
     await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CHECK_UPDATED }], 'check:updated');
     return 'count_updated';
   }
+  const stage = user.education_stage ? stageLabel(user.education_stage) : '年代未回答';
+  await notifyAdmins(lineUserId, 'check_count', `チェック数を回答しました：${count}個（${stage}）`);
   return `completed:${status}`;
 }
 

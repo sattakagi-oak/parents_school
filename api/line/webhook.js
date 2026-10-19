@@ -12,6 +12,7 @@ import {
   TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
+import { notifyAdmins, quote, describeMessage } from '../_lib/notify.js';
 
 const MAX_BODY_BYTES = 256 * 1024;
 
@@ -57,13 +58,17 @@ export async function handleEvent(event) {
     }
     case 'message': {
       const text = event.message?.type === 'text' ? event.message.text?.trim() : null;
-      if (!text) return 'message:ignored';
+      if (!text) {
+        await notifyAdmins(userId, 'message', `メッセージが届きました：${describeMessage(event.message)}`);
+        return 'message:ignored';
+      }
       const devResult = await handleDevCommand(userId, replyToken, text);
       if (devResult) return devResult;
       // 個別分析の「申し込みました」報告 → 申込済みとして記録するだけ（返信は美穂先生が個別に行う）
       if (isAnalysisAppliedText(text)) {
         await markDiagnosisAppliedReported(userId);
         await recordEvent(userId, 'diagnosis_applied_reported');
+        await notifyAdmins(userId, 'applied', '個別分析を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
         return 'message:diagnosis_applied_reported';
       }
       // 無料講座の申込（告知メッセージのボタンから送られる文言）。WEBINAR_ENABLED までテスト用ユーザーのみ
@@ -77,7 +82,8 @@ export async function handleEvent(event) {
         const r = await handleLegacySheet(userId, replyToken, legacy);
         if (r) return `message:${r}`;
       }
-      // それ以外のメッセージは美穂先生（LINE公式アカウントのチャット）が対応する。自動返信しない。
+      // それ以外のメッセージは美穂先生（LINE公式アカウントのチャット）が対応する。自動返信せず、通知だけ送る。
+      await notifyAdmins(userId, 'message', `メッセージが届きました：\n${quote(text)}`);
       return 'message:ignored';
     }
     default:

@@ -1,5 +1,5 @@
 // LINE Messaging API の最小クライアント。
-// 送信系は reply（ユーザーの操作への返信）と、無料講座の申込者へのリマインド用の push（1人ずつ）のみ。
+// 送信系は reply（ユーザーの操作への返信）と、push（1人ずつ）のみ。push は無料講座のリマインドと運営への通知だけに使う。
 // broadcast / multicast は意図的に実装しない。
 // 送信関数は必ず sendPermission() を内部で再確認する（呼び出し側のチェック漏れ対策）。
 
@@ -50,7 +50,7 @@ export async function replyMessage(lineUserId, replyToken, messages) {
 }
 
 /**
- * 1ユーザーへの push。無料講座のリマインド専用（api/_lib/webinar.js からのみ呼ぶ）。
+ * 1ユーザーへの push。無料講座のリマインド（webinar.js）と運営への通知（notify.js）専用。
  * retryKey（UUID）を付けると、LINE側で同じリクエストの重複配信が防がれる。
  */
 export async function pushMessage(lineUserId, messages, retryKey) {

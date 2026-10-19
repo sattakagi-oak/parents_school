@@ -22,6 +22,7 @@ import {
   webinarCompleteMessages, webinarReminderMessages, webinarNewFriendMessages, WEBINAR_NEW_FRIEND_WINDOW,
 } from './messages.js';
 import { log, errorSummary } from './log.js';
+import { notifyAdmins } from './notify.js';
 
 const HOUR = 3_600_000;
 
@@ -140,6 +141,10 @@ export async function handleWebinarSession(lineUserId, replyToken, sessionId, { 
     [lineUserId, WEBINAR.key, session.id, sentFor(t.day_before), sentFor(t.morning), sentFor(t.hour_before)],
   );
   await recordEvent(lineUserId, changed ? 'webinar_changed' : 'webinar_registered', { session: session.id, late: Boolean(late) });
+
+  await notifyAdmins(lineUserId, 'webinar', changed
+    ? `無料講座の日程を変更しました：${session.label}`
+    : `無料講座に申し込みました：${session.label}`);
 
   const messages = webinarCompleteMessages(session, {
     changed,

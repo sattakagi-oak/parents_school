@@ -28,7 +28,7 @@ export function baseEnv(overrides = {}) {
 
 export async function freshDb() {
   const db = new PGlite();
-  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql', '006_webinar_registrations.sql']) {
+  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql', '006_webinar_registrations.sql', '007_notify_targets.sql']) {
     await db.exec(await readFile(new URL(`../db/migrations/${f}`, import.meta.url), 'utf8'));
   }
   setDb(db);
