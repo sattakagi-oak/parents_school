@@ -335,7 +335,17 @@ test('新規友だち: 期間中の新規追加だけ挨拶に告知を添える
   await send(follow(OWNER, false));
   assert.equal(lastReply().length, 2, '申込済みは対象外');
 
-  at('2026-10-21T00:00:00+09:00');
-  await send(follow(OTHER, false));
-  assert.equal(replies().filter((c) => c.body.messages.length === 3).length, 2);
+});
+
+test('新規友だち: 10/21は「本日最終日」、21:00以降は挨拶のみ', async () => {
+  at('2026-10-21T12:00:00+09:00');
+  await send(follow(OWNER, false));
+  const last = lastReply()[2].text;
+  assert.match(last, /^【本日最終日・まだ間に合います】/);
+  assert.match(last, /10\/21（水）21:00〜22:00/);
+  assert.doesNotMatch(last, /10\/21（水）10:00/);
+
+  at('2026-10-21T21:00:00+09:00');
+  await send(follow(OWNER, false));
+  assert.equal(lastReply().length, 2);
 });

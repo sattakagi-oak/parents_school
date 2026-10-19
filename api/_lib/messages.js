@@ -322,7 +322,7 @@ export const WEBINAR = {
  * 期間中に新しく友だち追加した人（ブロック解除は除く）にだけ、挨拶と一緒に送る無料講座の告知。
  * 既存の友だちには公式アカウント管理画面から一斉配信済みのため、新規の人だけが対象。
  */
-export const WEBINAR_NEW_FRIEND_WINDOW = { from: '2026-10-19T14:01:00+09:00', until: '2026-10-21T00:00:00+09:00' };
+export const WEBINAR_NEW_FRIEND_WINDOW = { from: '2026-10-19T14:01:00+09:00', until: '2026-10-21T21:00:00+09:00' };
 
 function jstDate(d) {
   return new Date(d.getTime() + 9 * 3_600_000).toISOString().slice(0, 10);
