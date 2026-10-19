@@ -6,7 +6,7 @@ import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from
 import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress, markDiagnosisAppliedReported } from '../_lib/users.js';
 import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
-import { handleWebinarStart, handleWebinarSession, isWebinarStartText } from '../_lib/webinar.js';
+import { handleWebinarStart, handleWebinarSession, isWebinarStartText, newFriendWebinarMessages } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
   TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText,
@@ -26,7 +26,12 @@ export async function handleEvent(event) {
       await recordEvent(userId, 'follow');
       // チェック数まで回答済みの人の再追加（ブロック解除）では挨拶を送り直さない
       if (user.parenting_check_answered_at) return 'follow:already_answered';
-      await sendGreeting(userId, replyToken);
+      const extra = await newFriendWebinarMessages(userId, { isUnblocked: event.follow?.isUnblocked });
+      await sendGreeting(userId, replyToken, extra);
+      if (extra.length) {
+        await recordEvent(userId, 'webinar_new_friend_notice');
+        return 'follow:greeting+webinar';
+      }
       return 'follow:greeting';
     }
     case 'unfollow':

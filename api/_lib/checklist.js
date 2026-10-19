@@ -33,8 +33,8 @@ export function ctaUrlFor(user) {
   return `${base}/api/line/cta?t=${user.cta_token}`;
 }
 
-export async function sendGreeting(lineUserId, replyToken) {
-  return replyUntracked(lineUserId, replyToken, greetingMessages(), 'greeting');
+export async function sendGreeting(lineUserId, replyToken, extra = []) {
+  return replyUntracked(lineUserId, replyToken, greetingMessages(extra), extra.length ? 'greeting:webinar' : 'greeting');
 }
 
 function replySheet(lineUserId, replyToken, sheet) {

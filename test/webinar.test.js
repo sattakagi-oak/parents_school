@@ -303,3 +303,39 @@ test('テストリセットで講座の申込も消える', async () => {
   await send(text(OWNER, 'テストリセット'));
   assert.equal(await reg(OWNER), undefined);
 });
+
+// ---------- 新規友だちへの告知（挨拶に添える） ----------
+
+const follow = (userId, isUnblocked) => ev('follow', userId, { follow: { isUnblocked } });
+
+test('新規友だち: 期間中の新規追加だけ挨拶に告知を添える（ブロック解除・期間外・申込済みは挨拶のみ）', async () => {
+  at('2026-10-19T14:05:00+09:00');
+  await send(follow(OWNER, false));
+  const msgs = lastReply();
+  assert.equal(msgs.length, 3);
+  assert.match(msgs[2].text, /^【明日開催・まだ間に合います】/);
+  assert.match(msgs[2].text, /10\/20（火）10:00〜11:00[\s\S]*10\/21（水）21:00〜22:00/);
+  assert.match(msgs[2].text, /「申し込む」と送るだけ/);
+
+  await send(follow(OWNER, true));
+  assert.equal(lastReply().length, 2, 'ブロック解除は対象外');
+
+  at('2026-10-19T14:00:00+09:00');
+  await send(follow(OWNER, false));
+  assert.equal(lastReply().length, 2, '14:01より前は対象外');
+
+  at('2026-10-20T12:00:00+09:00');
+  await send(follow(OWNER, false));
+  const day = lastReply()[2].text;
+  assert.match(day, /^【本日開催・まだ間に合います】/);
+  assert.doesNotMatch(day, /10\/20（火）10:00/, '終わった回は出さない');
+  assert.match(day, /10\/20（火）21:00〜22:00/);
+
+  await register(OWNER, '1020_pm');
+  await send(follow(OWNER, false));
+  assert.equal(lastReply().length, 2, '申込済みは対象外');
+
+  at('2026-10-21T00:00:00+09:00');
+  await send(follow(OTHER, false));
+  assert.equal(replies().filter((c) => c.body.messages.length === 3).length, 2);
+});

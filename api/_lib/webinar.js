@@ -19,7 +19,7 @@ import { upsertUser, recordEvent } from './users.js';
 import { replyUntracked } from './delivery.js';
 import {
   WEBINAR, WEBINAR_CLOSED, webinarSession, webinarStartMessages, webinarSessionMessage,
-  webinarCompleteMessages, webinarReminderMessages,
+  webinarCompleteMessages, webinarReminderMessages, webinarNewFriendMessages, WEBINAR_NEW_FRIEND_WINDOW,
 } from './messages.js';
 import { log, errorSummary } from './log.js';
 
@@ -87,6 +87,20 @@ export async function handleWebinarStart(lineUserId, replyToken, { changing = fa
   const messages = changing ? [webinarSessionMessage(sessions, { changing: true })] : webinarStartMessages(sessions);
   await replyUntracked(lineUserId, replyToken, messages, changing ? 'webinar:change' : 'webinar:start');
   return changing ? 'webinar_change' : 'webinar_start';
+}
+
+/**
+ * 友だち追加時に挨拶へ添える無料講座の告知。期間中の新規追加（isUnblocked === false）で、
+ * 受付中・未申込のときだけ。対象外は空配列。
+ */
+export async function newFriendWebinarMessages(lineUserId, { isUnblocked, now = clock() } = {}) {
+  if (isUnblocked !== false) return [];
+  if (now < new Date(WEBINAR_NEW_FRIEND_WINDOW.from) || now >= new Date(WEBINAR_NEW_FRIEND_WINDOW.until)) return [];
+  if (!(await canUse(lineUserId))) return [];
+  const sessions = availableSessions(now);
+  if (!sessions.length) return [];
+  if ((await getRegistration(lineUserId))?.session_id) return [];
+  return webinarNewFriendMessages(sessions, now);
 }
 
 /** 日時ボタン */

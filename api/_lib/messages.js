@@ -220,8 +220,8 @@ export function stageMessage({ supplement = false } = {}) {
 }
 
 /** 挨拶＋年代ボタン */
-export function greetingMessages() {
-  return [{ type: 'text', text: GREETING }, stageMessage()];
+export function greetingMessages(extra = []) {
+  return [{ type: 'text', text: GREETING }, stageMessage(), ...extra];
 }
 
 /** 0〜10個のクイックリプライ */
@@ -317,6 +317,39 @@ export const WEBINAR = {
   /** このテキストが相手から送られたら申込開始（告知メッセージのボタンに設定する文言は1行目） */
   startKeywords: ['無料講座に申し込む', '無料講座に申込む', '申込', '申し込む', '申し込み'],
 };
+
+/**
+ * 期間中に新しく友だち追加した人（ブロック解除は除く）にだけ、挨拶と一緒に送る無料講座の告知。
+ * 既存の友だちには公式アカウント管理画面から一斉配信済みのため、新規の人だけが対象。
+ */
+export const WEBINAR_NEW_FRIEND_WINDOW = { from: '2026-10-19T14:01:00+09:00', until: '2026-10-21T00:00:00+09:00' };
+
+function jstDate(d) {
+  return new Date(d.getTime() + 9 * 3_600_000).toISOString().slice(0, 10);
+}
+
+/** sessions は受付中の回。now の日付で「明日開催/本日開催」を切り替える */
+export function webinarNewFriendMessages(sessions, now) {
+  const first = sessions[0].start.slice(0, 10);
+  const last = WEBINAR.sessions[WEBINAR.sessions.length - 1].start.slice(0, 10);
+  const today = jstDate(now);
+  const head = today < first ? '【明日開催・まだ間に合います】'
+    : today === last ? '【本日最終日・まだ間に合います】'
+      : '【本日開催・まだ間に合います】';
+  const text = `${head}
+「勉強しなさい」が逆効果になる子がいます。
+
+子どもには4つの個性タイプがあり、響く言葉はまったく違います。
+
+東大に進んだ3人の子育てで私が「絶対にやらなかったこと」を、LINE登録者限定の無料講座でお話しします。
+
+${sessions.map((s) => `📅 ${s.label}`).join('\n')}
+（各60分・Zoom）
+
+👉このトークに「申し込む」と送るだけ
+当日の申し込みもOKです🙆‍♀️`;
+  return [{ type: 'text', text }];
+}
 
 const WEBINAR_HEADER = `【無料講座】
 ${WEBINAR.title}
