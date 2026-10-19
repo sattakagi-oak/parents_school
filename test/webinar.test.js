@@ -152,6 +152,7 @@ test('前日20時台: 翌日の回の申込者だけにZoom付きでpush。再�
   const msg = p[0].body.messages[0].text;
   assert.match(msg, /^明日は無料講座の日です😊/);
   assert.match(msg, /【日時】10\/20（火）10:15〜/);
+  assert.match(msg, /【日時】10\/20（火）10:15〜\n※開始時刻を10:00から10:15に変更しました（15分遅れてのスタートです）/);
   assert.ok(msg.includes(ZOOM.WEBINAR_ZOOM_URL));
   assert.match(msg, /ミーティングID: 123 456 789\nパスコード: 000000/);
 

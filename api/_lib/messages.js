@@ -309,7 +309,8 @@ export const WEBINAR = {
   subtitle: 'わが子3人東大進学の塾長があかす、家庭での関わり方',
   /** start/end は日本時間。label はボタン・メッセージに出す表記 */
   sessions: [
-    { id: '1020_am', label: '10/20（火）10:15〜', start: '2026-10-20T10:15:00+09:00', end: '2026-10-20T11:15:00+09:00' },
+    { id: '1020_am', label: '10/20（火）10:15〜', start: '2026-10-20T10:15:00+09:00', end: '2026-10-20T11:15:00+09:00',
+      note: '※開始時刻を10:00から10:15に変更しました（15分遅れてのスタートです）。ご注意ください🙏' },
     { id: '1020_pm', label: '10/20（火）21:00〜22:00', start: '2026-10-20T21:00:00+09:00', end: '2026-10-20T22:00:00+09:00' },
     { id: '1021_am', label: '10/21（水）10:00〜11:00', start: '2026-10-21T10:00:00+09:00', end: '2026-10-21T11:00:00+09:00' },
     { id: '1021_pm', label: '10/21（水）21:00〜22:00', start: '2026-10-21T21:00:00+09:00', end: '2026-10-21T22:00:00+09:00' },
@@ -476,5 +477,6 @@ export function webinarReminderMessages(kind, session, zoom) {
     morning: '顔出しなし・ミュートでもOKです。お時間になりましたら、上のリンクからご参加ください。',
     hour_before: 'お時間になりましたら、上のリンクからご参加ください。',
   }[kind];
-  return [{ type: 'text', text: `${lead}\n\n${zoomText(zoom)}\n\n${after}` }];
+  const note = session.note ? `\n${session.note}` : '';
+  return [{ type: 'text', text: `${lead}${note}\n\n${zoomText(zoom)}\n\n${after}` }];
 }
