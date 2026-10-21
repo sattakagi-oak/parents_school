@@ -176,11 +176,18 @@ export function legacySheetFor(text) {
 // LINEメッセージオブジェクトの組み立て（通常は編集不要）
 // ------------------------------------------------------------
 
+// 相手が押すボタンは、すべて message アクション（相手から本物のメッセージが送られる）にする。
+// postback だと公式アカウントのチャットにルームができず、相手の操作が美穂先生から見えないため。
+// 送られた文言は parseButtonText() で読み取る。過去に送った postback ボタンも webhook で引き続き処理する。
+
 /**
- * 年代ボタン（Flex）。各ボタン = postback（DB保存はこの data を正とする）＋
- * displayText（トーク画面に「【学年】小学校低学年」と残り、美穂先生が履歴で確認できる）。
+ * 年代ボタン（Flex）。押すと「【学年】小学校低学年」が送られる。
  * supplement: 旧入力の人に任意で年代だけ聞く場合（シートは再送しない）
  */
+export const STAGE_TEXT_PREFIX = '【学年】';
+export const WEBINAR_SESSION_TEXT_PREFIX = '【無料講座 希望日時】';
+export const WEBINAR_CHANGE_TEXT = '日程を変更する';
+
 export function stageMessage({ supplement = false } = {}) {
   const title = supplement ? STAGE_SUPPLEMENT_TITLE : STAGE_TITLE;
   return {
@@ -202,12 +209,7 @@ export function stageMessage({ supplement = false } = {}) {
             borderWidth: '1px',
             borderColor: '#D5CFC4',
             backgroundColor: '#FAF7F2',
-            action: {
-              type: 'postback',
-              label: s.label,
-              data: `action=stage&value=${s.value}${supplement ? '&supplement=1' : ''}`,
-              displayText: `【学年】${s.label}`,
-            },
+            action: { type: 'message', label: s.label, text: `${STAGE_TEXT_PREFIX}${s.label}` },
             contents: [
               { type: 'text', text: s.label, size: 'md', weight: 'bold', color: '#333333', flex: 0 },
               ...(s.sub ? [{ type: 'text', text: `（${s.sub}）`, size: 'sm', color: '#777777', gravity: 'center' }] : []),
@@ -407,12 +409,7 @@ export function webinarSessionMessage(sessions, { changing = false } = {}) {
             borderWidth: '1px',
             borderColor: '#D5CFC4',
             backgroundColor: '#FAF7F2',
-            action: {
-              type: 'postback',
-              label: s.label.slice(0, 20),
-              data: `action=webinar_session&value=${s.id}`,
-              displayText: `【無料講座 希望日時】${s.label}`,
-            },
+            action: { type: 'message', label: s.label.slice(0, 20), text: `${WEBINAR_SESSION_TEXT_PREFIX}${s.label}` },
             contents: [{ type: 'text', text: s.label, size: 'md', weight: 'bold', color: '#333333' }],
           })),
         ],
@@ -467,7 +464,7 @@ export function webinarCompleteMessages(session, { changed = false, zoom = null,
             {
               type: 'button',
               style: 'secondary',
-              action: { type: 'postback', label: '日程を変更する', data: 'action=webinar_change', displayText: '日程を変更する' },
+              action: { type: 'message', label: WEBINAR_CHANGE_TEXT, text: WEBINAR_CHANGE_TEXT },
             },
           ],
         },
@@ -490,4 +487,25 @@ export function webinarReminderMessages(kind, session, zoom) {
   }[kind];
   const note = session.note ? `\n${session.note}` : '';
   return [{ type: 'text', text: `${lead}${note}\n\n${zoomText(zoom)}\n\n${after}` }];
+}
+
+/**
+ * ボタンから送られた文言を読み取る（前後の空白は無視）。該当なしは null。
+ *   { action: 'stage', value } / { action: 'webinar_session', value } / { action: 'webinar_change' }
+ * チェック数は parseCheckCountText()。
+ */
+export function parseButtonText(text) {
+  const t = String(text || '').trim();
+  if (t.startsWith(STAGE_TEXT_PREFIX)) {
+    const label = t.slice(STAGE_TEXT_PREFIX.length).trim();
+    const s = STAGES.find((x) => x.label === label || `${x.label}（${x.sub}）` === label);
+    return s ? { action: 'stage', value: s.value } : null;
+  }
+  if (t.startsWith(WEBINAR_SESSION_TEXT_PREFIX)) {
+    const label = t.slice(WEBINAR_SESSION_TEXT_PREFIX.length).trim();
+    const s = WEBINAR.sessions.find((x) => x.label === label);
+    return s ? { action: 'webinar_session', value: s.id } : null;
+  }
+  if (t === WEBINAR_CHANGE_TEXT) return { action: 'webinar_change' };
+  return null;
 }

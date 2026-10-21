@@ -9,7 +9,7 @@ import { replyUntracked } from '../_lib/delivery.js';
 import { handleWebinarStart, handleWebinarSession, isWebinarStartText, newFriendWebinarMessages } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
-  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText, parseCheckCountText,
+  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText, parseCheckCountText, parseButtonText,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 import { notifyAdmins, quote, describeMessage } from '../_lib/notify.js';
@@ -64,6 +64,12 @@ export async function handleEvent(event) {
       }
       const devResult = await handleDevCommand(userId, replyToken, text);
       if (devResult) return devResult;
+      // ボタンから送られた文言（学年・無料講座の日時・日程変更）
+      const button = parseButtonText(text);
+      if (button) {
+        const r = await handleButtonText(userId, replyToken, button);
+        if (r) return `message:${r}`;
+      }
       // チェック数（ボタンの「【チェック数】n個」、またはシート受取済みの人の手入力「n個」）
       const count = parseCheckCountText(text);
       if (count && (count.strict || (await getUser(userId))?.parenting_check_sheet)) {
@@ -94,6 +100,22 @@ export async function handleEvent(event) {
     default:
       return 'ignored';
   }
+}
+
+// ボタン（message アクション）の文言を処理。対象外なら null（通常メッセージとして扱い、通知する）
+async function handleButtonText(userId, replyToken, button) {
+  if (button.action === 'stage') {
+    const user = await upsertUser(userId);
+    // 旧入力（①/②）でシートを受け取り、学年が未登録の人 → 学年だけ登録（シートは再送しない）
+    const supplement = Boolean(user?.parenting_check_sheet_source === 'legacy_text' && !user.education_stage);
+    return handleStage(userId, replyToken, button.value, { supplement });
+  }
+  if (button.action === 'webinar_session') {
+    const r = await handleWebinarSession(userId, replyToken, button.value);
+    return r === 'webinar_not_open' ? null : r;
+  }
+  if (button.action === 'webinar_change') return handleWebinarStart(userId, replyToken, { changing: true });
+  return null;
 }
 
 // 開発用コマンド（production では全て無効 = 通常のメッセージとして扱い、何もしない）

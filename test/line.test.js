@@ -1,6 +1,6 @@
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import {
   baseEnv, freshDb, stubLine, signedRequest, ev, postback, user, logs,
   OWNER, OTHER, ADMIN_TOKEN,
@@ -77,11 +77,8 @@ test('follow: 新しい挨拶＋5つの学年ボタン（reply）。旧「個別
   for (const ng of ['個別相談希望', '30分', '1,000円']) assert.ok(!greeting.text.includes(ng), ng);
 
   const actions = stageActions(stages);
-  assert.deepEqual(actions.map((a) => a.data), [
-    'action=stage&value=preschool', 'action=stage&value=elementary_lower', 'action=stage&value=elementary_middle',
-    'action=stage&value=elementary_upper', 'action=stage&value=junior_high_plus',
-  ]);
-  assert.deepEqual(actions.map((a) => a.displayText), [
+  assert.ok(actions.every((a) => a.type === 'message'), '本物のメッセージとして送られる');
+  assert.deepEqual(actions.map((a) => a.text), [
     '【学年】幼稚園・保育園', '【学年】小学校低学年', '【学年】小学校中学年', '【学年】小学校高学年', '【学年】中学生以上',
   ]);
   const flexText = JSON.stringify(stages);
@@ -263,9 +260,9 @@ test('旧入力の人: 個数回答後のカードの後に、任意で学年ボ
   assert.equal(msgs.length, 3);
   assert.equal(msgs[2].altText, 'よろしければ、お子さんの学年も教えてください（任意）');
   const a = stageActions(msgs[2]);
-  assert.equal(a[3].data, 'action=stage&value=elementary_upper&supplement=1');
+  assert.equal(a[3].text, '【学年】小学校高学年');
 
-  await send(stage(OWNER, 'elementary_upper', '&supplement=1'));
+  await send(text(OWNER, a[3].text));
   const u = await user(db, OWNER);
   assert.equal(u.education_stage, 'elementary_upper');
   assert.equal(u.parenting_check_sheet, 'present_2');
@@ -547,4 +544,29 @@ test('チェック数のメッセージ: ボタンの「【チェック数】n�
 
   await send(postback(OWNER, 'action=check_count&value=5'));
   assert.equal((await user(db, OWNER)).parenting_check_count, 5, '旧ボタン（postback）も引き続き使える');
+});
+
+test('相手が押すボタンはすべて message アクション（postback を使わない＝必ずチャットにルームができる）', async () => {
+  const src = await readFile(new URL('../api/_lib/messages.js', import.meta.url), 'utf8');
+  assert.ok(!/type:\s*'postback'/.test(src), 'messages.js に postback ボタンを作らない');
+});
+
+test('学年ボタンのメッセージ: 「【学年】…」でシート送信、旧入力の人は学年だけ登録', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: `${OWNER},${OTHER}` });
+  const db = await freshDb();
+  const calls = stubLine();
+  const send = (...events) => webhook(signedRequest({ destination: 'Uxxx', events }));
+  const say = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
+  const lastReply = () => calls.sends().filter((c) => c.url.endsWith('/reply')).at(-1).body.messages;
+
+  await send(say(OWNER, '【学年】小学校中学年'));
+  const u = await user(db, OWNER);
+  assert.equal(u.education_stage, 'elementary_middle');
+  assert.equal(u.parenting_check_sheet, 'present_2');
+  assert.equal(lastReply()[0].type, 'image');
+
+  await send(say(OTHER, '①'));
+  await send(say(OTHER, '【学年】幼稚園・保育園'));
+  assert.equal((await user(db, OTHER)).education_stage, 'preschool');
+  assert.equal(lastReply()[0].text, 'ありがとうございます😊 学年を登録しました。');
 });

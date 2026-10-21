@@ -6,7 +6,7 @@ import {
 import { POST as webhook } from '../api/line/webhook.js';
 import { GET as cron } from '../api/cron/webinar-reminders.js';
 import { setClockForTest, runWebinarReminders, reminderTimes } from '../api/_lib/webinar.js';
-import { WEBINAR } from '../api/_lib/messages.js';
+import { WEBINAR, webinarSession, parseButtonText } from '../api/_lib/messages.js';
 
 const CRON_SECRET = 'c'.repeat(40);
 const ZOOM = {
@@ -22,8 +22,11 @@ let now;
 const at = (iso) => { now = new Date(iso); };
 const send = (...events) => webhook(signedRequest({ destination: 'Uxxx', events }));
 const text = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
-const pick = (userId, id) => postback(userId, `action=webinar_session&value=${id}`);
-const change = (userId) => postback(userId, 'action=webinar_change');
+// 日時・日程変更ボタンは message アクション（相手から本物のメッセージが送られる）
+const pick = (userId, id) => (webinarSession(id)
+  ? text(userId, `【無料講座 希望日時】${webinarSession(id).label}`)
+  : postback(userId, `action=webinar_session&value=${id}`));
+const change = (userId) => text(userId, '日程を変更する');
 const replies = () => calls.sends().filter((c) => c.url.endsWith('/reply'));
 const pushes = () => calls.sends().filter((c) => c.url.endsWith('/push'));
 const lastReply = () => replies().at(-1).body.messages;
@@ -31,7 +34,7 @@ const reg = async (userId) =>
   (await db.query('select * from parent_webinar_registrations where line_user_id = $1', [userId])).rows[0];
 const testMode = (extra = {}) =>
   baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER, CRON_SECRET, ...ZOOM, ...extra });
-const sessionIds = (msg) => msg.contents.body.contents.filter((c) => c.type === 'box').map((b) => b.action.data.split('value=')[1]);
+const sessionIds = (msg) => msg.contents.body.contents.filter((c) => c.type === 'box').map((b) => parseButtonText(b.action.text).value);
 
 beforeEach(async () => {
   testMode();
@@ -57,8 +60,9 @@ test('申込: 案内（顔出しなし・ミュートOK）＋4つの日時ボタ
   assert.match(intro.text, /顔出しなし・ミュートでのご参加もOK/);
   assert.deepEqual(sessionIds(sessions), ['1020_am', '1020_pm', '1021_am', '1021_pm']);
   const actions = sessions.contents.body.contents.filter((c) => c.type === 'box').map((b) => b.action);
-  assert.equal(actions[0].displayText, '【無料講座 希望日時】10/20（火）10:15〜');
-  assert.equal(actions[3].displayText, '【無料講座 希望日時】10/21（水）21:00〜22:00');
+  assert.ok(actions.every((a) => a.type === 'message'));
+  assert.equal(actions[0].text, '【無料講座 希望日時】10/20（火）10:15〜');
+  assert.equal(actions[3].text, '【無料講座 希望日時】10/21（水）21:00〜22:00');
 
   await send(pick(OWNER, '1020_pm'));
   const r = await reg(OWNER);
@@ -69,7 +73,7 @@ test('申込: 案内（顔出しなし・ミュートOK）＋4つの日時ボタ
   assert.match(done.text, /【日時】10\/20（火）21:00〜22:00/);
   assert.match(done.text, /前日の20時ごろと当日の朝に、このLINEで参加用のZoomリンクをお送りします/);
   assert.ok(!done.text.includes(ZOOM.WEBINAR_ZOOM_URL), '早めの申込ではZoomリンクはまだ送らない');
-  assert.equal(changeCard.contents.footer.contents[0].action.data, 'action=webinar_change');
+  assert.deepEqual(changeCard.contents.footer.contents[0].action, { type: 'message', label: '日程を変更する', text: '日程を変更する' });
   assert.equal(pushes().length, 0);
 });
 
@@ -349,4 +353,12 @@ test('新規友だち: 10/21は「本日最終日」、21:00以降は挨拶の�
   at('2026-10-21T21:00:00+09:00');
   await send(follow(OWNER, false));
   assert.equal(lastReply().length, 2);
+});
+
+test('旧ボタン（postback）の日時選択・日程変更も引き続き使える', async () => {
+  await send(text(OWNER, '無料講座に申し込む'));
+  await send(postback(OWNER, 'action=webinar_session&value=1021_am'));
+  assert.equal((await reg(OWNER)).session_id, '1021_am');
+  await send(postback(OWNER, 'action=webinar_change'));
+  assert.deepEqual(sessionIds(lastReply()[0]), ['1020_am', '1020_pm', '1021_am', '1021_pm']);
 });
