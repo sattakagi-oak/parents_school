@@ -133,8 +133,8 @@ test('present_1 / present_2 の出し分け（5区分すべて）: 画像＋案�
     const items = guide.quickReply.items.map((i) => i.action);
     assert.equal(items.length, 11);
     assert.deepEqual(items.map((a) => a.label), ['0個', '1個', '2個', '3個', '4個', '5個', '6個', '7個', '8個', '9個', '10個']);
-    assert.deepEqual(items.map((a) => a.data), Array.from({ length: 11 }, (_, n) => `action=check_count&value=${n}`));
-    assert.equal(items[6].displayText, '【チェック数】6個');
+    assert.ok(items.every((a) => a.type === 'message'), '本物のメッセージとして送られる（チャットにルームができる）');
+    assert.deepEqual(items.map((a) => a.text), Array.from({ length: 11 }, (_, n) => `【チェック数】${n}個`));
   }
 });
 
@@ -524,4 +524,27 @@ test('「申し込みました」報告: DBにいない既存の友だちでも�
   await send(text(THIRD_USER, '申し込みました'));
   assert.ok((await user(db, THIRD_USER)).diagnosis_applied_at);
   assert.equal(calls.sends().length, 0);
+});
+
+test('チェック数のメッセージ: ボタンの「【チェック数】n個」で記録・完了、手入力「n個」はシート受取済みの人だけ', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER });
+  const db = await freshDb();
+  const calls = stubLine();
+  const send = (...events) => webhook(signedRequest({ destination: 'Uxxx', events }));
+  const say = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
+  const lastReply = () => calls.sends().filter((c) => c.url.endsWith('/reply')).at(-1).body.messages;
+
+  await send(say(OWNER, '３個'));
+  assert.equal((await user(db, OWNER))?.parenting_check_count ?? null, null, 'シート未受取の手入力は無視');
+
+  await send(postback(OWNER, 'action=stage&value=elementary_lower'));
+  await send(say(OWNER, '【チェック数】7個'));
+  assert.equal((await user(db, OWNER)).parenting_check_count, 7);
+  assert.ok(lastReply().length >= 2, 'お礼＋個別分析カード');
+
+  await send(say(OWNER, '８個でした'));
+  assert.equal((await user(db, OWNER)).parenting_check_count, 8);
+
+  await send(postback(OWNER, 'action=check_count&value=5'));
+  assert.equal((await user(db, OWNER)).parenting_check_count, 5, '旧ボタン（postback）も引き続き使える');
 });

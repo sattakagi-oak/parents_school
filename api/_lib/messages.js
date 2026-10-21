@@ -224,19 +224,30 @@ export function greetingMessages(extra = []) {
   return [{ type: 'text', text: GREETING }, stageMessage(), ...extra];
 }
 
-/** 0〜10個のクイックリプライ */
+/**
+ * 0〜10個のクイックリプライ。押すと相手から本物のメッセージ「【チェック数】n個」が送られる
+ * （postback だと公式アカウントのチャットにルームができず、美穂先生が返信できないため）。
+ */
 export function checkCountQuickReply() {
   return {
     items: Array.from({ length: CHECK_COUNT_MAX + 1 }, (_, n) => ({
       type: 'action',
-      action: {
-        type: 'postback',
-        label: `${n}個`,
-        data: `action=check_count&value=${n}`,
-        displayText: `【チェック数】${n}個`,
-      },
+      action: { type: 'message', label: `${n}個`, text: `【チェック数】${n}個` },
     })),
   };
+}
+
+/**
+ * チェック数のメッセージを読み取る。ボタンの「【チェック数】n個」は strict、
+ * 手入力の「n個」（全角数字可）は loose として返す。該当なしは null。
+ */
+export function parseCheckCountText(text) {
+  const t = text.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).replace(/\s/g, '');
+  let m = t.match(/^【チェック数】(\d{1,2})個$/);
+  if (m && Number(m[1]) <= CHECK_COUNT_MAX) return { value: m[1], strict: true };
+  m = t.match(/^(\d{1,2})個(でした)?[。!！]?$/);
+  if (m && Number(m[1]) <= CHECK_COUNT_MAX) return { value: m[1], strict: false };
+  return null;
 }
 
 /** チェックリスト画像＋案内＋0〜10個ボタン。baseUrl が無ければ画像は付けない。 */

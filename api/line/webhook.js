@@ -3,13 +3,13 @@
 
 import { verifySignature, getDisplayName } from '../_lib/line.js';
 import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from '../_lib/config.js';
-import { markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress, markDiagnosisAppliedReported } from '../_lib/users.js';
+import { getUser, markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress, markDiagnosisAppliedReported } from '../_lib/users.js';
 import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
 import { handleWebinarStart, handleWebinarSession, isWebinarStartText, newFriendWebinarMessages } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
-  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText,
+  TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText, parseCheckCountText,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 import { notifyAdmins, quote, describeMessage } from '../_lib/notify.js';
@@ -64,6 +64,11 @@ export async function handleEvent(event) {
       }
       const devResult = await handleDevCommand(userId, replyToken, text);
       if (devResult) return devResult;
+      // チェック数（ボタンの「【チェック数】n個」、またはシート受取済みの人の手入力「n個」）
+      const count = parseCheckCountText(text);
+      if (count && (count.strict || (await getUser(userId))?.parenting_check_sheet)) {
+        return `message:${await handleCheckCount(userId, replyToken, count.value)}`;
+      }
       // 個別分析の「申し込みました」報告 → 申込済みとして記録するだけ（返信は美穂先生が個別に行う）
       if (isAnalysisAppliedText(text)) {
         await markDiagnosisAppliedReported(userId);
