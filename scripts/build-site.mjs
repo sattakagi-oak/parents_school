@@ -11,6 +11,7 @@
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,6 +19,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const SITE_URL = 'https://www.school-oak-m.jp/oya/';
 export const LINE_URL = 'https://lin.ee/Ph97ydn';
 const SITE_NAME = '親の学習塾｜スクールオーク';
+// CSS/JS を更新したら URL が変わるように（ブラウザに古いファイルを使わせない）
+const ver = (f) => createHash('sha1').update(readFileSync(join(ROOT, f))).digest('hex').slice(0, 8);
+const CSS_V = ver('assets/site.css');
+const JS_V = ver('assets/site.js');
 
 const NAV = [
   ['', 'top', 'トップ'],
@@ -70,7 +75,7 @@ ${robots}<link rel="canonical" href="${url}">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${root}images/PS_logo.png">
-<link rel="stylesheet" href="${root}assets/site.css">
+<link rel="stylesheet" href="${root}assets/site.css?v=${CSS_V}">
 ${jsonld}
 </head>
 <body>
@@ -90,7 +95,7 @@ ${html.trim()}
 <small>© School Oak. All rights reserved.</small>
 </div></footer>
 <div class="sticky-cta"><a class="btn btn-line" data-line="${meta.src}" href="${LINE_URL}">チェックリストを無料で受け取る</a></div>
-<script src="${root}assets/site.js"></script>
+<script src="${root}assets/site.js?v=${JS_V}"></script>
 </body>
 </html>
 `;
