@@ -93,3 +93,13 @@ LINE登録後は、既存の自動導線（チェック数 → 個別分析 30�
 - [x] LINE 友だち追加 URL：`https://lin.ee/Ph97ydn`
 - [ ] 配下のパス名（`/oya/` を想定）
 - [ ] コラムの書き手（みほ先生の口述・メモ → Claude が記事化 → みほ先生が確認、を想定）
+
+## 6. HP の作り（2026-10-26 時点・ブランチ `feature/hp`）
+
+- 中身は `site-src/pages/*.html`（固定ページ）と `site-src/column/*.html`（コラム）。共通のヘッダー・フッター・SEO タグは `scripts/build-site.mjs` が付ける。
+- 編集したら `npm run build:site` → 生成された `index.html` 群と `sitemap.xml` をコミット。
+- コラムを足す：`site-src/column/<slug>.html` を作り、1行目の設定に `path`・`title`・`description`・`date`・`category` を書く。`"draft": true` の間は検索に出ず、一覧にも出ない。
+- LINE ボタンは `{{line_button}}`（入口名はページ設定の `src`）。入口ごとの計測 URL は `assets/site.js` の `LINE_URLS` に足す。
+- 個別分析の「直接お支払い」は `/api/analysis/apply?src=…` → 環境変数 `PARENT_DIAGNOSIS_URL` へ転送（URL はリポジトリに書かない）。
+- 本講座 LP は `/program/`（noindex、個別分析を受けた方にだけ案内）。
+- 公開時：スクールオークのサイト（Netlify）の `_redirects` に `/oya/*  https://parents-school.vercel.app/:splat  200!` を追加し、school-oak-m.jp の robots.txt に `Sitemap: https://www.school-oak-m.jp/oya/sitemap.xml` を追記、Search Console に登録。
