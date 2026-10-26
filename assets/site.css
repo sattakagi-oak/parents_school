@@ -53,6 +53,12 @@ h3 { font-size: 20px; }
 .btn-outline { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
 .navy .btn-outline { background: transparent; color: #fff; border-color: #fff; }
 .btn-sm { padding: 9px 18px; font-size: 14px; box-shadow: 0 4px 0 var(--green-dark); }
+@media (max-width: 480px) {
+  .site-header .wrap { gap: 10px; padding: 0 14px; }
+  .brand img { height: 20px; }
+  .brand span { font-size: 14px; }
+  .btn-sm { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+}
 .btn-sm::before { display: none; }
 .cta-note { font-size: 13px; color: var(--sub); margin-top: 12px; }
 .navy .cta-note { color: #c4d4e8; }
