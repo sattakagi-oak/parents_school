@@ -1,7 +1,7 @@
 # 親の学習塾：HP・コラム・YouTube 集客計画
 
 ゴールは **LINE登録（「親の習慣」チェックリストのプレゼント）に一本化**。
-LINE登録後は、既存の自動導線（チェック数 → 個別分析 30分1,000円 → 美穂先生の手動フォロー）につながる。
+LINE登録後は、既存の自動導線（チェック数 → 個別診断 30分1,000円 → 美穂先生の手動フォロー）につながる。
 
 ## 0. 現状（2026-10-26 時点）
 
@@ -79,7 +79,7 @@ LINE登録後は、既存の自動導線（チェック数 → 個別分析 30�
 - **入口ごとの LINE 登録 URL**：LINE公式アカウントの「流入経路分析」で、HP・コラム・YouTube（概要欄）・インスタ・イベントごとに別 URL を作る。
 - サイト側：Search Console（検索での表示・クリック）＋簡易アクセス計測。
 - 3か月ごとに「どこから LINE 登録が来たか」を見て、伸びている入口に寄せる。
-- LINE 登録後の流れ（チェック数回答率 → 個別分析の申込率）は、既存の DB（`parent_line_users`）で見られる。
+- LINE 登録後の流れ（チェック数回答率 → 個別診断の申込率）は、既存の DB（`parent_line_users`）で見られる。
 
 ## 5. 決めること
 
@@ -100,6 +100,6 @@ LINE登録後は、既存の自動導線（チェック数 → 個別分析 30�
 - 編集したら `npm run build:site` → 生成された `index.html` 群と `sitemap.xml` をコミット。
 - コラムを足す：`site-src/column/<slug>.html` を作り、1行目の設定に `path`・`title`・`description`・`date`・`category` を書く。`"draft": true` の間は検索に出ず、一覧にも出ない。
 - LINE ボタンは `{{line_button}}`（入口名はページ設定の `src`）。入口ごとの計測 URL は `assets/site.js` の `LINE_URLS` に足す。
-- 個別分析の「直接お支払い」は `/api/analysis/apply?src=…` → 環境変数 `PARENT_DIAGNOSIS_URL` へ転送（URL はリポジトリに書かない）。
-- 本講座 LP は `/program/`（noindex、個別分析を受けた方にだけ案内）。
+- 個別診断の「直接お支払い」は `/api/analysis/apply?src=…` → 環境変数 `PARENT_DIAGNOSIS_URL` へ転送（URL はリポジトリに書かない）。
+- 本講座 LP は `/program/`（noindex、個別診断を受けた方にだけ案内）。
 - 公開時：スクールオークのサイト（Netlify）の `_redirects` に `/oya/*  https://parents-school.vercel.app/:splat  200!` を追加し、school-oak-m.jp の robots.txt に `Sitemap: https://www.school-oak-m.jp/oya/sitemap.xml` を追記、Search Console に登録。

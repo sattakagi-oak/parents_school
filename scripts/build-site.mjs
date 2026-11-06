@@ -27,7 +27,7 @@ const JS_V = ver('assets/site.js');
 const NAV = [
   ['', 'top', 'トップ'],
   ['about/', 'about', 'みほ先生について'],
-  ['analysis/', 'analysis', '個別分析'],
+  ['analysis/', 'analysis', '個別診断'],
   ['column/', 'column', 'コラム'],
   ['events/', 'events', 'イベント'],
 ];

@@ -35,7 +35,7 @@ try {
         `【シート】${SHEETS[r.parenting_check_sheet]?.label || ''}${r.parenting_check_sheet_source === 'legacy_text' ? '（旧①②入力）' : ''}`,
         `【チェック数】${r.parenting_check_count}個`,
         `回答日時: ${date(r.parenting_check_answered_at)}`,
-        `個別分析CTAクリック: ${date(r.diagnosis_cta_clicked_at) || 'なし'}    申込: ${date(r.diagnosis_applied_at) || 'なし'}`,
+        `個別診断CTAクリック: ${date(r.diagnosis_cta_clicked_at) || 'なし'}    申込: ${date(r.diagnosis_applied_at) || 'なし'}`,
       ].join('\n'));
     }
   } else if (['followup-done', 'followup-not-needed', 'followup-pending'].includes(cmd)) {
