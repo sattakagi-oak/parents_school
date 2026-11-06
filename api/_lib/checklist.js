@@ -4,7 +4,7 @@
 //   年代タップ（postback action=stage）→ 年代・シートを保存 → シート画像＋案内＋0〜10個ボタン
 //   旧入力「①/②/1/2」（シート未取得の人のみ）→ シートだけ保存 → 同じくシート画像＋案内＋0〜10個ボタン
 //   個数タップ（postback action=check_count）→ 個数・回答日時・pending を保存
-//       初回: お礼＋個別分析カード（旧入力の人には任意で年代ボタンも）
+//       初回: お礼＋プレゼント動画＋個別相談カード（旧入力の人には任意で年代ボタンも）
 //       選び直し: 「更新しました」のみ
 //   以降の自動送信なし（美穂先生が手動コメント）
 //
@@ -85,7 +85,7 @@ export async function handleCheckCount(lineUserId, replyToken, value) {
 
   const status = await replyOnce(
     lineUserId, replyToken,
-    checkCompleteMessages({ ctaUrl: ctaUrlFor(user), askStage: !user.education_stage }),
+    checkCompleteMessages({ ctaUrl: ctaUrlFor(user), askStage: !user.education_stage, baseUrl: publicBaseUrl() }),
     COMPLETION_CAMPAIGN);
   if (status === 'already_sent') {
     await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CHECK_UPDATED }], 'check:updated');

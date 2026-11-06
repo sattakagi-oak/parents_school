@@ -70,16 +70,18 @@ export async function handleEvent(event) {
         const r = await handleButtonText(userId, replyToken, button);
         if (r) return `message:${r}`;
       }
-      // チェック数（ボタンの「【チェック数】n個」、またはシート受取済みの人の手入力「n個」）
+      // チェック数（ボタン、またはシート受取済みの人の手入力。数字だけの入力は未回答の人のみ）
       const count = parseCheckCountText(text);
-      if (count && (count.strict || (await getUser(userId))?.parenting_check_sheet)) {
-        return `message:${await handleCheckCount(userId, replyToken, count.value)}`;
+      if (count) {
+        const user = count.strict ? null : await getUser(userId);
+        const accept = count.strict || (user?.parenting_check_sheet && (!count.bare || !user.parenting_check_answered_at));
+        if (accept) return `message:${await handleCheckCount(userId, replyToken, count.value)}`;
       }
       // 個別分析の「申し込みました」報告 → 申込済みとして記録するだけ（返信は美穂先生が個別に行う）
       if (isAnalysisAppliedText(text)) {
         await markDiagnosisAppliedReported(userId);
         await recordEvent(userId, 'diagnosis_applied_reported');
-        await notifyAdmins(userId, 'applied', '個別分析を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
+        await notifyAdmins(userId, 'applied', '個別相談を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
         return 'message:diagnosis_applied_reported';
       }
       // 無料講座の申込（告知メッセージのボタンから送られる文言）。WEBINAR_ENABLED までテスト用ユーザーのみ
