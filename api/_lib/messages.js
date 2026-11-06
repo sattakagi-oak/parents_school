@@ -5,7 +5,8 @@
 //
 // 自動で送るのは次の返信（reply）だけです:
 //   友だち追加 → 挨拶＋年代ボタン → [年代タップ] シート画像＋案内＋0〜10個ボタン
-//   → [個数タップ] お礼＋「わが子の強み・伸ばし方 個別分析」カード
+//   → [個数タップ] お礼 → プレゼント動画 → 個別診断の案内（文章のみ）
+//   → [「個別診断」などの返信] 「わが子の強み・伸ばし方 個別診断」カード
 // それ以降は美穂先生が LINE Official Account Manager から個別に手動コメントします。
 // ステップ配信・自動追客・AIによる個別コメントはありません。
 // ============================================================
@@ -93,20 +94,46 @@ export const GREETING = `はじめまして、みほ先生です♪
 export const STAGE_TITLE = 'お子さんの学年を選んでください';
 
 /** 年代タップ後、シート画像の次に送る案内（0〜10個ボタン付き） */
-export const SHEET_GUIDE = `ありがとうございます😊
+export const SHEET_GUIDE = `チェックリストに回答したら、
+チェックがついた個数をこのLINEに送ってください😊
 
-こちらのチェックリストを見ながら、
-10項目をチェックしてみてください。
+みほ先生が直接確認し、2日以内にメッセージをお送りします。
 
-終わったら、
-当てはまった個数を下から選んでください👇`;
+さらに、回答してくださった方には、
+
+🎥 特別動画「伸びる子」の親は、ここを見ている
+
+をプレゼントします✨
+
+ぜひ、チェックの個数を送ってくださいね🌱`;
 
 /** 個数タップ後のお礼（初回） */
-export const CHECK_THANKS = `ご回答ありがとうございます😊
+export const CHECK_THANKS = `チェックありがとうございます😊
 
-いただいた内容は、
-みほ先生が直接確認して、
-個別にコメントをお返しします。`;
+みほ先生が直接確認し、2日以内に個別にメッセージをお送りします。少しお待ちくださいね。`;
+
+/** お礼の続き（動画を送るときだけ付ける） */
+export const CHECK_GIFT_LINE = `お礼に、特別動画「伸びる子」の親は、ここを見ている をプレゼントします🎁
+約7分です。ぜひご覧ください👇`;
+
+/** 動画の次に送る、個別診断の案内（ここではカードを出さない） */
+export const CONSULT_OFFER = `動画を見て「一度みほ先生と直接話してみたい」と思った方には、個別診断（30分 1,000円）もあります。
+
+ご希望の方は、このLINEに「個別診断」と送ってください😊`;
+
+/** 「個別診断」などの返信に、カードの前に添える */
+export const CONSULT_REPLY = `ご連絡ありがとうございます😊
+個別診断のご案内です👇`;
+
+/**
+ * 個数を送ってくれた人へのプレゼント動画（静的ファイル）。LINE の上限は動画200MB・プレビュー画像1MB。
+ * 元動画: 子育て相談/プレゼント完成.mp4 を 720p に圧縮。差し替えたら version を更新する。
+ */
+export const GIFT_VIDEO = {
+  path: '/videos/gift-kosodate.mp4',
+  previewPath: '/videos/gift-kosodate-preview.jpg',
+  version: '20261106',
+};
 
 /** 個数を選び直したとき */
 export const CHECK_UPDATED = 'チェック数を更新しました。ありがとうございます😊';
@@ -117,10 +144,10 @@ export const STAGE_SUPPLEMENT_THANKS = 'ありがとうございます😊 学�
 
 /**
  * 1,000円商品カード。遷移先は環境変数 PARENT_DIAGNOSIS_URL（クリック計測URL経由）。
- * 「個別相談」「お悩み相談」を主名称にしない。受けた後に何が分かるかを示す。
+ * 受けた後に何が分かるかを示す。
  */
 export const ANALYSIS = {
-  name: 'わが子の強み・伸ばし方 個別分析',
+  name: 'わが子の強み・伸ばし方 個別診断',
   priceLabel: '30分 1,000円（延長あり）',
   lead: '今のお子さんについてお話を伺いながら、',
   points: [
@@ -132,7 +159,7 @@ export const ANALYSIS = {
     '今後6〜12か月の方向性',
   ],
   tail: 'を一緒に整理します。',
-  buttonLabel: '強みと伸ばし方を整理する',
+  buttonLabel: '個別診断を申し込む',
   /** ボタンの下に出す案内（誰が申し込んだかを公式LINE上で把握するため） */
   afterPayNote: 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊',
 };
@@ -240,15 +267,20 @@ export function checkCountQuickReply() {
 }
 
 /**
- * チェック数のメッセージを読み取る。ボタンの「【チェック数】n個」は strict、
- * 手入力の「n個」（全角数字可）は loose として返す。該当なしは null。
+ * チェック数のメッセージを読み取る。該当なしは null。
+ *   strict: ボタンの「【チェック数】n個」
+ *   loose:  手入力の「n個」「nこ」「n個でした」（全角数字可）
+ *   bare:   数字だけの「n」（他の番号の返事と区別できないので、未回答の人だけ個数として扱う）
  */
 export function parseCheckCountText(text) {
   const t = text.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).replace(/\s/g, '');
+  const valid = (n) => Number(n) <= CHECK_COUNT_MAX;
   let m = t.match(/^【チェック数】(\d{1,2})個$/);
-  if (m && Number(m[1]) <= CHECK_COUNT_MAX) return { value: m[1], strict: true };
-  m = t.match(/^(\d{1,2})個(でした)?[。!！]?$/);
-  if (m && Number(m[1]) <= CHECK_COUNT_MAX) return { value: m[1], strict: false };
+  if (m && valid(m[1])) return { value: m[1], strict: true };
+  m = t.match(/^(\d{1,2})(?:個|こ|コ|つ)(?:でした|です)?[。!！]?$/);
+  if (m && valid(m[1])) return { value: m[1], strict: false };
+  m = t.match(/^(\d{1,2})[。!！]?$/);
+  if (m && valid(m[1])) return { value: m[1], strict: false, bare: true };
   return null;
 }
 
@@ -266,7 +298,7 @@ export function sheetMessages(sheet, { baseUrl } = {}) {
   return messages;
 }
 
-/** 「わが子の強み・伸ばし方 個別分析」カード */
+/** 「わが子の強み・伸ばし方 個別診断」カード */
 export function analysisCard(ctaUrl) {
   return {
     type: 'flex',
@@ -299,12 +331,21 @@ export function analysisCard(ctaUrl) {
 }
 
 /**
- * 個数回答（初回）への返信: お礼＋個別分析カード（＋旧入力の人には任意で年代ボタン）。
- * ctaUrl が無い（申込URL未設定・申込済み）場合はカードなし。
+ * 個数回答（初回）への返信: お礼 → プレゼント動画 → 個別診断の案内（＋旧入力の人には任意で年代ボタン）。
+ * baseUrl が無ければ動画は付けない（お礼の文面からも動画の案内を外す）。replyの上限は5通。
  */
-export function checkCompleteMessages({ ctaUrl, askStage = false } = {}) {
-  const messages = [{ type: 'text', text: CHECK_THANKS }];
-  if (ctaUrl) messages.push(analysisCard(ctaUrl));
+export function giftVideoMessage(baseUrl) {
+  return {
+    type: 'video',
+    originalContentUrl: `${baseUrl}${GIFT_VIDEO.path}?v=${GIFT_VIDEO.version}`,
+    previewImageUrl: `${baseUrl}${GIFT_VIDEO.previewPath}?v=${GIFT_VIDEO.version}`,
+  };
+}
+
+export function checkCompleteMessages({ offerConsult = false, askStage = false, baseUrl } = {}) {
+  const messages = [{ type: 'text', text: baseUrl ? `${CHECK_THANKS}\n\n${CHECK_GIFT_LINE}` : CHECK_THANKS }];
+  if (baseUrl) messages.push(giftVideoMessage(baseUrl));
+  if (offerConsult) messages.push({ type: 'text', text: CONSULT_OFFER });
   if (askStage) messages.push(stageMessage({ supplement: true }));
   return messages;
 }
