@@ -157,9 +157,9 @@ test('不正な年代・個数は保存しない', async () => {
   assert.equal((await user(db, OWNER)).parenting_check_count, null);
 });
 
-// ---------- チェック数 → お礼＋プレゼント動画＋個別相談カード ----------
+// ---------- チェック数 → お礼＋プレゼント動画＋個別相談の案内 → 返信でカード ----------
 
-test('個数: 保存・pending・お礼→プレゼント動画→「わが子の強み・伸ばし方 個別相談」カードの順（同じreply内）', async () => {
+test('個数: 保存・pending・お礼→プレゼント動画→個別相談の案内の順（同じreply内）。「個別相談」の返信でカード', async () => {
   testMode();
   await fullFlow(OWNER, 'elementary_lower', 6);
   const u = await user(db, OWNER);
@@ -172,16 +172,21 @@ test('個数: 保存・pending・お礼→プレゼント動画→「わが子�
   const last = calls.sends().at(-1);
   assert.match(last.url, /\/message\/reply$/);
   assert.equal(last.body.messages.length, 3, '学年回答済みなので年代の追加質問はなし');
-  const [thanks, video, card] = last.body.messages;
+  const [thanks, video, offer] = last.body.messages;
   assert.match(thanks.text, /^チェックありがとうございます😊/);
   assert.match(thanks.text, /2日以内に個別にメッセージをお送りします/);
   assert.match(thanks.text, /特別動画「伸びる子」の親は、ここを見ている をプレゼントします🎁/);
   assert.equal(video.type, 'video');
   assert.equal(video.originalContentUrl, `https://example.test${GIFT_VIDEO.path}?v=${GIFT_VIDEO.version}`);
   assert.equal(video.previewImageUrl, `https://example.test${GIFT_VIDEO.previewPath}?v=${GIFT_VIDEO.version}`);
+  assert.match(offer.text, /個別相談（30分 1,000円）もあります/);
+  assert.match(offer.text, /「個別相談」と送ってください/);
+
+  await send(text(OWNER, '個別相談'));
+  const [, card] = lastMessages();
   assert.equal(card.type, 'flex');
   const cardText = JSON.stringify(card.contents);
-  for (const s of ['動画を見て「一度みほ先生と直接話してみたい」と思った方へ', 'わが子の強み・伸ばし方 個別相談', '30分 1,000円（延長あり）', '今のお子さんについてお話を伺いながら、',
+  for (const s of ['わが子の強み・伸ばし方 個別相談', '30分 1,000円（延長あり）', '今のお子さんについてお話を伺いながら、',
     '今どんな力が伸びているか', 'お子さんの強み・得意', '次に何を伸ばすとよいか', '今やること／まだ急がなくていいこと',
     'お子さんに合った親の関わり方', '今後6〜12か月の方向性', 'を一緒に整理します。']) {
     assert.ok(cardText.includes(s), s);
@@ -189,7 +194,7 @@ test('個数: 保存・pending・お礼→プレゼント動画→「わが子�
   const button = card.contents.footer.contents[0].action;
   assert.equal(button.label, '個別相談を申し込む');
   assert.equal(button.uri, `https://example.test/api/line/cta?t=${u.cta_token}`);
-  const all = JSON.stringify(last.body.messages);
+  const all = JSON.stringify([...last.body.messages, ...lastMessages()]);
   for (const ng of ['個別分析', 'お悩み相談', OWNER]) assert.ok(!all.includes(ng), `含まない: ${ng}`);
 });
 
@@ -216,10 +221,10 @@ test('シート未取得で個数ボタンが押されたら保存せず年代�
   assert.equal(lastMessages()[0].altText, 'お子さんの学年を選んでください');
 });
 
-test('申込URL未設定・申込済みの人にはカードを出さない（お礼と動画のみ）', async () => {
+test('申込URL未設定・申込済みの人には個別相談を案内しない（お礼と動画のみ）', async () => {
   testMode({ PARENT_DIAGNOSIS_URL: '' });
   await fullFlow(OWNER);
-  assert.equal(lastMessages().length, 1);
+  assert.deepEqual(lastMessages().map((m) => m.type), ['text', 'video'], '案内もカードも出さない');
 
   testMode();
   await send(ev('follow', OTHER));
@@ -227,7 +232,7 @@ test('申込URL未設定・申込済みの人にはカードを出さない（�
   baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OTHER });
   await send(stage(OTHER, 'preschool'));
   await send(count(OTHER, 2));
-  assert.equal(lastMessages().length, 1);
+  assert.deepEqual(lastMessages().map((m) => m.type), ['text', 'video'], '案内もカードも出さない');
 });
 
 test('個数回答後は自由入力にも自動返信しない（美穂先生の手動コメントを邪魔しない）', async () => {
@@ -321,7 +326,7 @@ test('「テストリセット」: テスト用ユーザーを友だち追加直
   await send(text(OWNER, 'テスト開始'));
   await send(stage(OWNER, 'preschool'));
   await send(count(OWNER, 1));
-  assert.equal(lastMessages()[2].contents.body.contents[1].text, 'わが子の強み・伸ばし方 個別相談', 'リセット後はカードをもう一度確認できる');
+  assert.match(lastMessages()[2].text, /個別相談/, 'リセット後は案内をもう一度確認できる');
 });
 
 const CODE = 'test-register-code-1234567890';
@@ -481,7 +486,8 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   await send(count(OWNER, 3));
   const u = await user(db, OWNER);
   assert.match(lastMessages()[1].originalContentUrl, /^https:\/\/parents-school-git-feature-x\.vercel\.app\/videos\//);
-  assert.equal(lastMessages()[2].contents.footer.contents[0].action.uri,
+  await send(text(OWNER, '個別相談'));
+  assert.equal(lastMessages()[1].contents.footer.contents[0].action.uri,
     `https://parents-school-git-feature-x.vercel.app/api/line/cta?t=${u.cta_token}`);
 
   // production では Vercel の本番ドメインを使う（PUBLIC_BASE_URL が未設定・誤っていても）
@@ -501,7 +507,8 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
 test('個別相談カード: ボタンの下に「お支払い完了後に申し込みましたと送って」の案内', async () => {
   testMode();
   await fullFlow(OWNER);
-  const footer = lastMessages()[2].contents.footer.contents;
+  await send(text(OWNER, '個別相談'));
+  const footer = lastMessages()[1].contents.footer.contents;
   assert.equal(footer[0].action.label, '個別相談を申し込む');
   assert.equal(footer[1].text, 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊');
 });

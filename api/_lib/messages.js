@@ -5,7 +5,8 @@
 //
 // 自動で送るのは次の返信（reply）だけです:
 //   友だち追加 → 挨拶＋年代ボタン → [年代タップ] シート画像＋案内＋0〜10個ボタン
-//   → [個数タップ] お礼＋プレゼント動画＋「わが子の強み・伸ばし方 個別相談」カード
+//   → [個数タップ] お礼 → プレゼント動画 → 個別相談の案内（文章のみ）
+//   → [「個別相談」などの返信] 「わが子の強み・伸ばし方 個別相談」カード
 // それ以降は美穂先生が LINE Official Account Manager から個別に手動コメントします。
 // ステップ配信・自動追客・AIによる個別コメントはありません。
 // ============================================================
@@ -115,6 +116,15 @@ export const CHECK_THANKS = `チェックありがとうございます😊
 export const CHECK_GIFT_LINE = `お礼に、特別動画「伸びる子」の親は、ここを見ている をプレゼントします🎁
 約7分です。ぜひご覧ください👇`;
 
+/** 動画の次に送る、個別相談の案内（ここではカードを出さない） */
+export const CONSULT_OFFER = `動画を見て「一度みほ先生と直接話してみたい」と思った方には、個別相談（30分 1,000円）もあります。
+
+ご希望の方は、このLINEに「個別相談」と送ってください😊`;
+
+/** 「個別相談」などの返信に、カードの前に添える */
+export const CONSULT_REPLY = `ご連絡ありがとうございます😊
+個別相談のご案内です👇`;
+
 /**
  * 個数を送ってくれた人へのプレゼント動画（静的ファイル）。LINE の上限は動画200MB・プレビュー画像1MB。
  * 元動画: 子育て相談/プレゼント完成.mp4 を 720p に圧縮。差し替えたら version を更新する。
@@ -138,7 +148,6 @@ export const STAGE_SUPPLEMENT_THANKS = 'ありがとうございます😊 学�
  */
 export const ANALYSIS = {
   name: 'わが子の強み・伸ばし方 個別相談',
-  intro: '動画を見て「一度みほ先生と直接話してみたい」と思った方へ',
   priceLabel: '30分 1,000円（延長あり）',
   lead: '今のお子さんについてお話を伺いながら、',
   points: [
@@ -301,7 +310,6 @@ export function analysisCard(ctaUrl) {
         layout: 'vertical',
         spacing: 'sm',
         contents: [
-          { type: 'text', text: ANALYSIS.intro, size: 'sm', weight: 'bold', color: '#c8402e', wrap: true },
           { type: 'text', text: ANALYSIS.name, weight: 'bold', size: 'lg', wrap: true },
           { type: 'text', text: ANALYSIS.priceLabel, size: 'sm', color: '#666666' },
           { type: 'separator', margin: 'md' },
@@ -323,7 +331,7 @@ export function analysisCard(ctaUrl) {
 }
 
 /**
- * 個数回答（初回）への返信: お礼 → プレゼント動画 → 個別相談カード（＋旧入力の人には任意で年代ボタン）。
+ * 個数回答（初回）への返信: お礼 → プレゼント動画 → 個別相談の案内（＋旧入力の人には任意で年代ボタン）。
  * baseUrl が無ければ動画は付けない（お礼の文面からも動画の案内を外す）。replyの上限は5通。
  */
 export function giftVideoMessage(baseUrl) {
@@ -334,10 +342,10 @@ export function giftVideoMessage(baseUrl) {
   };
 }
 
-export function checkCompleteMessages({ ctaUrl, askStage = false, baseUrl } = {}) {
+export function checkCompleteMessages({ offerConsult = false, askStage = false, baseUrl } = {}) {
   const messages = [{ type: 'text', text: baseUrl ? `${CHECK_THANKS}\n\n${CHECK_GIFT_LINE}` : CHECK_THANKS }];
   if (baseUrl) messages.push(giftVideoMessage(baseUrl));
-  if (ctaUrl) messages.push(analysisCard(ctaUrl));
+  if (offerConsult) messages.push({ type: 'text', text: CONSULT_OFFER });
   if (askStage) messages.push(stageMessage({ supplement: true }));
   return messages;
 }

@@ -6,13 +6,14 @@ import { isValidLineUserId, matchesTestRegisterCode, isTestUser, sendMode } from
 import { getUser, markFollowed, markBlocked, upsertUser, recordEvent, addTestUser, removeTestUser, isRegisteredTestUser, resetTestUserProgress, markDiagnosisAppliedReported } from '../_lib/users.js';
 import { parsePostback, sendGreeting, handleStage, handleLegacySheet, handleCheckCount } from '../_lib/checklist.js';
 import { replyUntracked } from '../_lib/delivery.js';
-import { handleWebinarStart, handleWebinarSession, isWebinarStartText, newFriendWebinarMessages } from '../_lib/webinar.js';
+import { handleWebinarStart, handleWebinarSession, isWebinarStartText, newFriendWebinarMessages, availableSessions } from '../_lib/webinar.js';
 import {
   TEST_REGISTER_PREFIX, TEST_UNREGISTER_TEXT, TEST_REGISTERED, TEST_UNREGISTERED,
   TEST_RESET_TEXT, TEST_RESET_DONE, TEST_START_TEXT, legacySheetFor, isAnalysisAppliedText, parseCheckCountText, parseButtonText,
 } from '../_lib/messages.js';
 import { log, errorSummary } from '../_lib/log.js';
 import { notifyAdmins, quote, describeMessage } from '../_lib/notify.js';
+import { handleConsultText } from '../_lib/consult.js';
 
 const MAX_BODY_BYTES = 256 * 1024;
 
@@ -83,6 +84,11 @@ export async function handleEvent(event) {
         await recordEvent(userId, 'diagnosis_applied_reported');
         await notifyAdmins(userId, 'applied', '個別相談を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
         return 'message:diagnosis_applied_reported';
+      }
+      // 「個別相談」「お願いします」などの返信 → 案内カード。受付中の無料講座があるときの「申し込む」は無料講座を優先
+      if (!(isWebinarStartText(text) && availableSessions().length)) {
+        const r = await handleConsultText(userId, replyToken, text);
+        if (r) return `message:${r}`;
       }
       // 無料講座の申込（告知メッセージのボタンから送られる文言）。WEBINAR_ENABLED までテスト用ユーザーのみ
       if (isWebinarStartText(text)) {
