@@ -127,12 +127,12 @@ export const CONSULT_REPLY = `ご連絡ありがとうございます😊
 
 /**
  * 個数を送ってくれた人へのプレゼント動画（静的ファイル）。LINE の上限は動画200MB・プレビュー画像1MB。
- * 元動画: 子育て相談/プレゼント完成.mp4 を 720p に圧縮。差し替えたら version を更新する。
+ * 元動画: 子育て相談/プレゼントBGMなし.mp4 を 720p に圧縮。差し替えたら version を更新する。
  */
 export const GIFT_VIDEO = {
   path: '/videos/gift-kosodate.mp4',
   previewPath: '/videos/gift-kosodate-preview.jpg',
-  version: '20261106',
+  version: '20261107',
 };
 
 /** 個数を選び直したとき */
