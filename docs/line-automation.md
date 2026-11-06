@@ -113,7 +113,8 @@ LINE Messaging API + Neon（標準PostgreSQL、`pg` ドライバ）+ Vercel Func
 - `PARENT_DIAGNOSIS_URL`（https）か `PUBLIC_BASE_URL` が未設定、または申込済みの人にはカードを出さない（お礼のみ）。
 - お礼・動画・案内は1人1回（`parent_line_message_logs` の `check:complete`）。
 - ボタンの下に「お支払いが完了したら、このLINEで『申し込みました』とお送りください😊」と表示。
-- 相手から「申し込みました」（申込みました／申込完了／お支払いしました 等の書き出し）が届いたら `diagnosis_applied_at` を記録する（自動返信なし。美穂先生が個別に返信）。
+- 相手から「申し込みました」（申込みました／申込完了／お支払いしました 等の書き出し）が届いたら `diagnosis_applied_at` を記録する（自動返信なし）。
+- 個別診断はZoomで行う。報告を受けたら美穂先生がLINEで直接日程を調整し、Zoomのリンクを送る。
 
 ### 無料コメントと有料個別分析の役割分担（運用）
 
