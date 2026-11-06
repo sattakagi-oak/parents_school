@@ -1,6 +1,6 @@
-// 個別相談の案内。個数回答のお礼では文章で「個別相談もあります」と伝えるだけにし、
+// 個別診断の案内。個数回答のお礼では文章で「個別診断もあります」と伝えるだけにし、
 // 相手から希望の言葉が返ってきたらカード（申込ボタン）を自動で返す。
-//   explicit:   「個別相談」「相談したい」など。いつでも反応する（何度でも）
+//   explicit:   「個別診断」「診断したい」「相談したい」など。いつでも反応する（何度でも）
 //   contextual: 「お願いします」「希望します」など。普段の会話でも使う言葉なので、
 //               案内を送ってから CONTEXT_DAYS 日以内で、その後カードをまだ送っていない人にだけ反応する
 // 判定は短いメッセージだけ。長文は個別の相談内容とみなし、美穂先生への通知に任せる。
@@ -18,7 +18,7 @@ const CONTEXT_DAYS = 14;
 const MAX_LENGTH = 40;
 
 const NEGATIVE = /いりません|いらない|不要|結構|けっこう|大丈夫|やめ|しません|しない|遠慮|キャンセル|また今度|今はいい|今回は/;
-const EXPLICIT = /個別相談|個別分析|個別診断|個別面談|こべつそうだん|相談|そうだん|面談/;
+const EXPLICIT = /個別診断|こべつしんだん|診断|しんだん|個別相談|個別分析|個別面談|こべつそうだん|相談|そうだん|面談/;
 const CONTEXTUAL_EXACT = new Set([
   'お願いします', 'お願いいたします', 'おねがいします', 'お願い', 'お願いしたいです', 'お願いしたいのですが',
   'ぜひお願いします', 'ぜひ', 'はいお願いします', 'はい',
@@ -54,7 +54,7 @@ async function offerIsOpen(lineUserId) {
   return rows.length > 0;
 }
 
-/** 個別相談の希望ならカードを返す。対象外は null（通常のメッセージとして扱う） */
+/** 個別診断の希望ならカードを返す。対象外は null（通常のメッセージとして扱う） */
 export async function handleConsultText(lineUserId, replyToken, text) {
   const kind = classifyConsultText(text);
   if (!kind) return null;
@@ -64,6 +64,6 @@ export async function handleConsultText(lineUserId, replyToken, text) {
   if (!ctaUrl) return null; // 申込済み・申込URL未設定
   await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CONSULT_REPLY }, analysisCard(ctaUrl)], 'consult:card');
   await recordEvent(lineUserId, CARD_EVENT, { kind });
-  await notifyAdmins(lineUserId, 'consult', `個別相談の案内カードを自動で送りました：\n${quote(text)}`);
+  await notifyAdmins(lineUserId, 'consult', `個別診断の案内カードを自動で送りました：\n${quote(text)}`);
   return `consult_card:${kind}`;
 }

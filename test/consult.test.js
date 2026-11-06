@@ -10,7 +10,7 @@ let calls;
 const send = (...events) => webhook(signedRequest({ destination: 'Uxxx', events }));
 const text = (userId, t) => ev('message', userId, { message: { type: 'text', id: '1', text: t } });
 const replies = () => calls.sends().filter((c) => c.url.endsWith('/reply'));
-const hasCard = (r) => r.body.messages.some((m) => m.type === 'flex' && JSON.stringify(m).includes('個別相談を申し込む'));
+const hasCard = (r) => r.body.messages.some((m) => m.type === 'flex' && JSON.stringify(m).includes('個別診断を申し込む'));
 const cardCount = () => replies().filter(hasCard).length;
 async function answered(userId) {
   await send(postback(userId, 'action=stage&value=preschool'));
@@ -26,25 +26,25 @@ beforeEach(async () => {
 afterEach(() => setClockForTest(null));
 
 test('判定: 相談の言葉はexplicit、あいまいな言葉はcontextual、断り・長文・無関係はnull', () => {
-  for (const t of ['個別相談', '個別相談お願いします', '個別相談を希望します！', '相談', '相談したいです', 'そうだん', '個別分析希望', '個別診断', '面談お願いします', '個別 相談']) {
+  for (const t of ['個別診断', '個別診断お願いします', '診断したいです', 'しんだん', '個別相談', '個別相談お願いします', '個別相談を希望します！', '相談', '相談したいです', 'そうだん', '個別分析希望', '個別診断', '面談お願いします', '個別 相談']) {
     assert.equal(classifyConsultText(t), 'explicit', t);
   }
   for (const t of ['お願いします', 'お願いします！', 'お願いします😊', 'おねがいします', 'お願いいたします', 'ぜひお願いします', 'はい', '希望します', '希望です', '詳しく教えてください', '受けたいです', '話してみたいです', '申し込みたいです', '興味があります', '申し込む']) {
     assert.equal(classifyConsultText(t), 'contextual', t);
   }
-  for (const t of ['個別相談は大丈夫です', '相談はいりません', '今回は結構です', 'よろしくお願いします', 'ありがとうございます', '5', 'こんにちは',
+  for (const t of ['個別診断は大丈夫です', '個別相談は大丈夫です', '相談はいりません', '今回は結構です', 'よろしくお願いします', 'ありがとうございます', '5', 'こんにちは',
     '子どもの宿題について相談です。毎日声をかけても全然始めなくて、どうすればいいのか本当に困っています。']) {
     assert.equal(classifyConsultText(t), null, t);
   }
 });
 
-test('「個別相談」: 案内の前でも、何度でもカードを返す。チェック未回答の人にも返す', async () => {
+test('「個別診断」: 案内の前でも、何度でもカードを返す。チェック未回答の人にも返す', async () => {
   await send(text(OWNER, '相談したいです'));
   assert.equal(cardCount(), 1);
-  await send(text(OWNER, '個別相談'));
+  await send(text(OWNER, '個別診断'));
   assert.equal(cardCount(), 2);
   const [reply, card] = replies().at(-1).body.messages;
-  assert.match(reply.text, /個別相談のご案内です/);
+  assert.match(reply.text, /個別診断のご案内です/);
   assert.equal(card.type, 'flex');
 });
 

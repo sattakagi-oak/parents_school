@@ -82,10 +82,10 @@ export async function handleEvent(event) {
       if (isAnalysisAppliedText(text)) {
         await markDiagnosisAppliedReported(userId);
         await recordEvent(userId, 'diagnosis_applied_reported');
-        await notifyAdmins(userId, 'applied', '個別相談を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
+        await notifyAdmins(userId, 'applied', '個別診断を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
         return 'message:diagnosis_applied_reported';
       }
-      // 「個別相談」「お願いします」などの返信 → 案内カード。受付中の無料講座があるときの「申し込む」は無料講座を優先
+      // 「個別診断」「お願いします」などの返信 → 案内カード。受付中の無料講座があるときの「申し込む」は無料講座を優先
       if (!(isWebinarStartText(text) && availableSessions().length)) {
         const r = await handleConsultText(userId, replyToken, text);
         if (r) return `message:${r}`;

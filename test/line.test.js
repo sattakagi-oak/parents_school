@@ -60,7 +60,7 @@ test('巨大なbodyは413', async () => {
 
 // ---------- 友だち追加 → 挨拶 ----------
 
-test('follow: 新しい挨拶＋5つの学年ボタン（reply）。旧「個別相談希望 30分」案内は含まない', async () => {
+test('follow: 新しい挨拶＋5つの学年ボタン（reply）。旧「個別診断希望 30分」案内は含まない', async () => {
   testMode();
   await send(ev('follow', OWNER));
   const u = await user(db, OWNER);
@@ -74,7 +74,7 @@ test('follow: 新しい挨拶＋5つの学年ボタン（reply）。旧「個別
   assert.match(greeting.text, /^はじめまして、みほ先生です♪/);
   assert.match(greeting.text, /＼わが子をみずから伸びる子にする／\n「親の習慣」チェックリスト/);
   assert.match(greeting.text, /みほ先生が直接確認します😊$/);
-  for (const ng of ['個別相談希望', '30分', '1,000円']) assert.ok(!greeting.text.includes(ng), ng);
+  for (const ng of ['個別診断希望', '30分', '1,000円']) assert.ok(!greeting.text.includes(ng), ng);
 
   const actions = stageActions(stages);
   assert.ok(actions.every((a) => a.type === 'message'), '本物のメッセージとして送られる');
@@ -157,9 +157,9 @@ test('不正な年代・個数は保存しない', async () => {
   assert.equal((await user(db, OWNER)).parenting_check_count, null);
 });
 
-// ---------- チェック数 → お礼＋プレゼント動画＋個別相談の案内 → 返信でカード ----------
+// ---------- チェック数 → お礼＋プレゼント動画＋個別診断の案内 → 返信でカード ----------
 
-test('個数: 保存・pending・お礼→プレゼント動画→個別相談の案内の順（同じreply内）。「個別相談」の返信でカード', async () => {
+test('個数: 保存・pending・お礼→プレゼント動画→個別診断の案内の順（同じreply内）。「個別診断」の返信でカード', async () => {
   testMode();
   await fullFlow(OWNER, 'elementary_lower', 6);
   const u = await user(db, OWNER);
@@ -179,20 +179,20 @@ test('個数: 保存・pending・お礼→プレゼント動画→個別相談�
   assert.equal(video.type, 'video');
   assert.equal(video.originalContentUrl, `https://example.test${GIFT_VIDEO.path}?v=${GIFT_VIDEO.version}`);
   assert.equal(video.previewImageUrl, `https://example.test${GIFT_VIDEO.previewPath}?v=${GIFT_VIDEO.version}`);
-  assert.match(offer.text, /個別相談（30分 1,000円）もあります/);
-  assert.match(offer.text, /「個別相談」と送ってください/);
+  assert.match(offer.text, /個別診断（30分 1,000円）もあります/);
+  assert.match(offer.text, /「個別診断」と送ってください/);
 
-  await send(text(OWNER, '個別相談'));
+  await send(text(OWNER, '個別診断'));
   const [, card] = lastMessages();
   assert.equal(card.type, 'flex');
   const cardText = JSON.stringify(card.contents);
-  for (const s of ['わが子の強み・伸ばし方 個別相談', '30分 1,000円（延長あり）', '今のお子さんについてお話を伺いながら、',
+  for (const s of ['わが子の強み・伸ばし方 個別診断', '30分 1,000円（延長あり）', '今のお子さんについてお話を伺いながら、',
     '今どんな力が伸びているか', 'お子さんの強み・得意', '次に何を伸ばすとよいか', '今やること／まだ急がなくていいこと',
     'お子さんに合った親の関わり方', '今後6〜12か月の方向性', 'を一緒に整理します。']) {
     assert.ok(cardText.includes(s), s);
   }
   const button = card.contents.footer.contents[0].action;
-  assert.equal(button.label, '個別相談を申し込む');
+  assert.equal(button.label, '個別診断を申し込む');
   assert.equal(button.uri, `https://example.test/api/line/cta?t=${u.cta_token}`);
   const all = JSON.stringify([...last.body.messages, ...lastMessages()]);
   for (const ng of ['個別分析', 'お悩み相談', OWNER]) assert.ok(!all.includes(ng), `含まない: ${ng}`);
@@ -221,7 +221,7 @@ test('シート未取得で個数ボタンが押されたら保存せず年代�
   assert.equal(lastMessages()[0].altText, 'お子さんの学年を選んでください');
 });
 
-test('申込URL未設定・申込済みの人には個別相談を案内しない（お礼と動画のみ）', async () => {
+test('申込URL未設定・申込済みの人には個別診断を案内しない（お礼と動画のみ）', async () => {
   testMode({ PARENT_DIAGNOSIS_URL: '' });
   await fullFlow(OWNER);
   assert.deepEqual(lastMessages().map((m) => m.type), ['text', 'video'], '案内もカードも出さない');
@@ -326,7 +326,7 @@ test('「テストリセット」: テスト用ユーザーを友だち追加直
   await send(text(OWNER, 'テスト開始'));
   await send(stage(OWNER, 'preschool'));
   await send(count(OWNER, 1));
-  assert.match(lastMessages()[2].text, /個別相談/, 'リセット後は案内をもう一度確認できる');
+  assert.match(lastMessages()[2].text, /個別診断/, 'リセット後は案内をもう一度確認できる');
 });
 
 const CODE = 'test-register-code-1234567890';
@@ -486,7 +486,7 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
   await send(count(OWNER, 3));
   const u = await user(db, OWNER);
   assert.match(lastMessages()[1].originalContentUrl, /^https:\/\/parents-school-git-feature-x\.vercel\.app\/videos\//);
-  await send(text(OWNER, '個別相談'));
+  await send(text(OWNER, '個別診断'));
   assert.equal(lastMessages()[1].contents.footer.contents[0].action.uri,
     `https://parents-school-git-feature-x.vercel.app/api/line/cta?t=${u.cta_token}`);
 
@@ -504,12 +504,12 @@ test('Previewでは画像・CTAリンクにブランチ自身のURLを使う（P
 
 // ---------- 個別分析の「申し込みました」報告 ----------
 
-test('個別相談カード: ボタンの下に「お支払い完了後に申し込みましたと送って」の案内', async () => {
+test('個別診断カード: ボタンの下に「お支払い完了後に申し込みましたと送って」の案内', async () => {
   testMode();
   await fullFlow(OWNER);
-  await send(text(OWNER, '個別相談'));
+  await send(text(OWNER, '個別診断'));
   const footer = lastMessages()[1].contents.footer.contents;
-  assert.equal(footer[0].action.label, '個別相談を申し込む');
+  assert.equal(footer[0].action.label, '個別診断を申し込む');
   assert.equal(footer[1].text, 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊');
 });
 
