@@ -85,7 +85,7 @@ export async function setLegacySheet(lineUserId, sheet) {
 }
 
 /**
- * チェック数の保存（選び直しは最新値で上書き）。初回は回答日時を入れて美穂先生の対応待ち（pending）にする。
+ * チェック数の保存（初回のみ。2回目以降は checklist.js の handleCountAgain で記録だけする）。初回は回答日時を入れて美穂先生の対応待ち（pending）にする。
  * シート未取得のユーザーは更新しない（null を返す）。
  */
 export async function setCheckCount(lineUserId, count) {

@@ -24,7 +24,8 @@ afterEach(() => setClockForTest(null));
 test('通知: チェック数（初回のみ）・申込報告・無料講座申込・自由メッセージを通知先へ push', async () => {
   await send(postback(OWNER, 'action=stage&value=elementary_lower'));
   await send(postback(OWNER, 'action=check_count&value=7'));
-  await send(postback(OWNER, 'action=check_count&value=8')); // 選び直しは通知しない
+  await send(postback(OWNER, 'action=stage&value=junior_high_plus'));
+  await send(postback(OWNER, 'action=check_count&value=8')); // 2回目の回答（きょうだいの分など）
   await send(text(OWNER, '申し込みました'));
   await send(text(OWNER, '無料講座に申し込む'));
   await send(postback(OWNER, 'action=webinar_session&value=1020_pm'));
@@ -32,12 +33,13 @@ test('通知: チェック数（初回のみ）・申込報告・無料講座申
   await send(ev('message', OWNER, { message: { type: 'sticker', id: '2' } }));
 
   const n = notices();
-  assert.equal(n.length, 5);
+  assert.equal(n.length, 6);
   assert.match(n[0], /^🔔 テスト保護者さん\nチェック数を回答しました：7個（/);
-  assert.match(n[1], /「申し込みました」と報告/);
-  assert.match(n[2], /無料講座に申し込みました：10\/20（火）21:00〜22:00/);
-  assert.match(n[3], /メッセージが届きました：\n「質問です。うちの子は…」/);
-  assert.match(n[4], /（スタンプ）/);
+  assert.match(n[1], /2回目の回答がありました：中学生以上 8個（前回：小学校低学年（小1〜2） 7個）/);
+  assert.match(n[2], /「申し込みました」と報告/);
+  assert.match(n[3], /無料講座に申し込みました：10\/20（火）21:00〜22:00/);
+  assert.match(n[4], /メッセージが届きました：\n「質問です。うちの子は…」/);
+  assert.match(n[5], /（スタンプ）/);
   // 通知は push、本人への返信は reply のまま
   assert.ok(calls.sends().filter((c) => c.url.endsWith('/push')).every((c) => c.body.to === ADMIN));
 });

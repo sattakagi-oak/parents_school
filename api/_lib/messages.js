@@ -135,8 +135,6 @@ export const GIFT_VIDEO = {
   version: '20261107',
 };
 
-/** 個数を選び直したとき */
-export const CHECK_UPDATED = 'チェック数を更新しました。ありがとうございます😊';
 
 /** 旧入力（①/②）から入った人に、任意で年代を聞く */
 export const STAGE_SUPPLEMENT_TITLE = 'よろしければ、お子さんの学年も教えてください（任意）';
