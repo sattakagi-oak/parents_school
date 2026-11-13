@@ -94,7 +94,7 @@ test('送信: 必須項目がないと送れない → 送ると1回だけ届き
   assert.doesNotMatch(await (await viewReport(new Request(`https://example.test/api/report?t=${t}`))).text(), /下書き/);
 });
 
-test('面談日時: 保存すると登録され、翌朝に1回・2日後にもう1回だけ記入リマインド（送付済みは対象外）', async () => {
+test('面談日時: 保存すると登録され、面談当日10時に1回・2日後にもう1回だけ記入リマインド（送付済みは対象外）', async () => {
   const { stubLine } = await import('./helpers.js');
   const { runReportReminders } = await import('../api/_lib/report-reminders.js');
   baseEnv({ LINE_SEND_MODE: 'production', LINE_SEND_ENABLED: 'true' });
@@ -107,14 +107,17 @@ test('面談日時: 保存すると登録され、翌朝に1回・2日後にも�
   assert.equal(r.interview_at.toISOString(), '2026-11-20T01:00:00.000Z');
   const pushes = () => calls.sends().filter((c) => c.url.endsWith('/push') && c.body.to === ADMIN).map((c) => c.body.messages[0].text);
 
-  await runReportReminders({ now: new Date('2026-11-20T23:00:00Z') }); // 11/21 8:00 JST 前日面談 → 1回目
-  await runReportReminders({ now: new Date('2026-11-21T23:00:00Z') }); // 11/22 まだ
+  await runReportReminders({ now: new Date('2026-11-19T01:00:00Z') }); // 11/19 10:00 前日 → まだ
+  assert.equal(pushes().length, 0);
+  await runReportReminders({ now: new Date('2026-11-20T01:00:00Z') }); // 11/20 10:00 当日 → 1回目
   assert.equal(pushes().length, 1);
-  await runReportReminders({ now: new Date('2026-11-22T23:00:00Z') }); // 11/23 2回目
+  await runReportReminders({ now: new Date('2026-11-21T01:00:00Z') }); // 11/21 まだ
+  assert.equal(pushes().length, 1);
+  await runReportReminders({ now: new Date('2026-11-22T01:00:00Z') }); // 11/22 2回目
   assert.equal(pushes().length, 2);
-  await runReportReminders({ now: new Date('2026-11-24T23:00:00Z') }); // もう送らない
+  await runReportReminders({ now: new Date('2026-11-24T01:00:00Z') }); // もう送らない
   const n = pushes();
   assert.equal(n.length, 2);
-  assert.match(n[0], /レポートの記入をお願いします[\s\S]*\/admin\/report\/\?user=/);
+  assert.match(n[0], /本日10:00から個別診断です[\s\S]*\/admin\/report\/\?user=/);
   assert.match(n[1], /まだ未送付/);
 });
