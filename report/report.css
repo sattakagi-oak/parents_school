@@ -101,3 +101,8 @@
 .cta-box .send { display: inline-block; margin-top: 14px; background: #06c755; color: #fff; font-weight: 900; font-size: 17px; padding: 12px 22px; border-radius: 999px; }
 .cta-box .send b { background: #fff; color: #06c755; padding: 0 6px; border-radius: 6px; margin: 0 2px; }
 .cta-box .price { margin-top: 10px; font-size: 12px; color: #b8c7da; }
+
+.type-one { background: var(--ivory); border-radius: 14px; padding: 14px 16px; }
+.type-one b { display: block; font-size: 24px; color: var(--navy); }
+.type-one p { margin: 4px 0 0; font-size: 14px; color: var(--sub); }
+.type-desc b { color: var(--navy); }

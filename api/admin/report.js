@@ -49,7 +49,7 @@ export async function GET(request) {
       grade_label: u.education_stage ? stageLabel(u.education_stage) : '',
       child_name: survey.child_name || '',
       worry: survey.worry || '',
-      check: { count: u.parenting_check_count ?? '' },
+      check_count: u.parenting_check_count ?? '',
     };
     return json({
       auto, survey,

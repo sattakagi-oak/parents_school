@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { baseEnv, freshDb, ADMIN_TOKEN, OWNER } from './helpers.js';
 import { GET as adminGet, POST as adminPost } from '../api/admin/report.js';
 import { GET as viewReport } from '../api/report.js';
-import { renderReport, SAMPLE_REPORT, rankTypes } from '../api/_lib/report.js';
+import { renderReport, SAMPLE_REPORT } from '../api/_lib/report.js';
 
 let db;
 const req = (url, { token = ADMIN_TOKEN, body } = {}) => new Request(`https://example.test${url}`, {
@@ -33,7 +33,7 @@ test('候補一覧 → 自動入力（表示名・学年・チェック数・事
   const pre = await (await adminGet(req(`/api/admin/report?action=prefill&user=${id}`))).json();
   assert.equal(pre.auto.family_name, 'テスト花子');
   assert.equal(pre.auto.grade_label, '小学校中学年（小3〜4）');
-  assert.equal(pre.auto.check.count, 7);
+  assert.equal(pre.auto.check_count, 7);
   assert.equal(pre.auto.worry, '宿題を始めない');
   assert.equal(pre.auto.child_name, 'ゆうくん');
 });
@@ -53,10 +53,8 @@ test('下書き保存 → token付きURLで表示（エスケープ・下書き�
   assert.ok(!esc.includes('<script>x'));
 });
 
-test('見本: LINE用は途中で切り、続きは鍵付き＋「個別診断」と送る案内', () => {
-  const teaser = renderReport(SAMPLE_REPORT, { mode: 'teaser', sample: true });
-  assert.match(teaser, /この続きは、個別診断を受けた方だけに/);
-  assert.match(teaser, /個別診断<\/b>と送るだけ/);
-  assert.ok(!teaser.includes('今日は何時から始める？'), '3つのことの中身は見せない');
-  assert.equal(rankTypes(SAMPLE_REPORT.types)[0].name, '自由型');
+test('レポート: 親の関わり方の5項目（お悩み・タイプ・見立て・3つの関わり方・ひとこと）', () => {
+  const html = renderReport(SAMPLE_REPORT);
+  for (const k of ['今回のお悩み', '自由型', 'このタイプに届きやすい関わり方', 'いまの関わり方の見立て', '「管理しすぎ」', '今日からできる3つの関わり方', '今日は何時から始める？', 'みほ先生から']) assert.ok(html.includes(k), k);
+  for (const k of ['今伸びている力', '6〜12か月', 'まだ急がなくていいこと']) assert.ok(!html.includes(k), `出さない: ${k}`);
 });
