@@ -160,6 +160,8 @@ export const ANALYSIS = {
   buttonLabel: '個別診断を申し込む',
   /** ボタンの下に出す案内（誰が申し込んだかを公式LINE上で把握するため） */
   afterPayNote: 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊',
+  /** その下に出す、申込後の流れ（個別診断はZoom。美穂先生が日程を調整してリンクを送る） */
+  afterPayNext: '確認後、候補日程を送らせていただきます。',
 };
 
 /**
@@ -322,6 +324,7 @@ export function analysisCard(ctaUrl) {
         contents: [
           { type: 'button', style: 'primary', action: { type: 'uri', label: ANALYSIS.buttonLabel, uri: ctaUrl } },
           { type: 'text', text: ANALYSIS.afterPayNote, size: 'sm', wrap: true, color: '#c8402e', weight: 'bold', margin: 'md' },
+          { type: 'text', text: ANALYSIS.afterPayNext, size: 'sm', wrap: true, color: '#555555', margin: 'sm' },
         ],
       },
     },

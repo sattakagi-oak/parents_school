@@ -516,6 +516,7 @@ test('個別診断カード: ボタンの下に「お支払い完了後に申し
   const footer = lastMessages()[1].contents.footer.contents;
   assert.equal(footer[0].action.label, '個別診断を申し込む');
   assert.equal(footer[1].text, 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊');
+  assert.equal(footer[2].text, '確認後、候補日程を送らせていただきます。');
 });
 
 test('「申し込みました」報告: 申込済みとして記録し、自動返信はしない（表記ゆれも可）', async () => {
