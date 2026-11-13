@@ -14,6 +14,7 @@ import {
 import { log, errorSummary } from '../_lib/log.js';
 import { notifyAdmins, quote, describeMessage } from '../_lib/notify.js';
 import { handleConsultText } from '../_lib/consult.js';
+import { reportFormUrl } from '../_lib/report-link.js';
 
 const MAX_BODY_BYTES = 256 * 1024;
 
@@ -82,7 +83,8 @@ export async function handleEvent(event) {
       if (isAnalysisAppliedText(text)) {
         await markDiagnosisAppliedReported(userId);
         await recordEvent(userId, 'diagnosis_applied_reported');
-        await notifyAdmins(userId, 'applied', '個別診断を「申し込みました」と報告がありました。お支払いを確認して返信してください。');
+        const formUrl = reportFormUrl((await getUser(userId))?.id);
+        await notifyAdmins(userId, 'applied', `個別診断を「申し込みました」と報告がありました。お支払いを確認し、候補日程を送ってください。${formUrl ? `\n\n▶ 面談後のレポート記入はこちら（この方専用・30日有効）\n${formUrl}` : ''}`);
         return 'message:diagnosis_applied_reported';
       }
       // 「個別診断」「お願いします」などの返信 → 案内カード。受付中の無料講座があるときの「申し込む」は無料講座を優先

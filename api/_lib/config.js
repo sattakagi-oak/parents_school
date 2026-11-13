@@ -106,3 +106,19 @@ export function zoomConfig() {
 export function secretEnv(name) {
   return env(name);
 }
+
+/**
+ * 新しい導線（見本画像・新しい個別診断カード）を始めた日時。環境変数 NEW_FLOW_FROM（ISO 8601）。
+ * これ以降に初めてチェック数を送った人だけが対象。未設定なら誰も対象にしない（＝今までどおり）。
+ */
+export function newFlowFrom() {
+  const t = Date.parse(env('NEW_FLOW_FROM'));
+  return Number.isFinite(t) ? new Date(t) : null;
+}
+
+/** その人が新しい導線の対象か（チェック数の初回回答が NEW_FLOW_FROM 以降） */
+export function isNewFlowUser(user) {
+  const from = newFlowFrom();
+  const at = user?.parenting_check_answered_at ? new Date(user.parenting_check_answered_at) : null;
+  return Boolean(from && at && at >= from);
+}

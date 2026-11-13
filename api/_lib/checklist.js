@@ -18,7 +18,7 @@ import { notifyAdmins } from './notify.js';
 import { getUser, setStageAndSheet, setStageOnly, setLegacySheet, setCheckCount, recordEvent } from './users.js';
 import { replyOnce, replyUntracked } from './delivery.js';
 import { getDb } from './db.js';
-import { diagnosisUrl, publicBaseUrl } from './config.js';
+import { diagnosisUrl, publicBaseUrl, isNewFlowUser } from './config.js';
 
 export const COMPLETION_CAMPAIGN = 'check:complete';
 
@@ -92,7 +92,7 @@ export async function handleCheckCount(lineUserId, replyToken, value) {
   const offerConsult = Boolean(ctaUrlFor(user));
   const status = await replyOnce(
     lineUserId, replyToken,
-    checkCompleteMessages({ offerConsult, askStage: !user.education_stage, baseUrl: publicBaseUrl() }),
+    checkCompleteMessages({ offerConsult, askStage: !user.education_stage, baseUrl: publicBaseUrl(), showSample: isNewFlowUser(user) }),
     COMPLETION_CAMPAIGN);
   if (offerConsult && status === 'sent') await recordEvent(lineUserId, 'consult_offer');
   const stage = user.education_stage ? stageLabel(user.education_stage) : '年代未回答';

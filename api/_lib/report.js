@@ -1,5 +1,5 @@
 // 個別診断レポートの組み立て。子どもを分析するのではなく「親がどう関わるか」を伝える。
-// みほ先生の記入は5項目だけ（お悩み・タイプ・関わりの見立て・3つの関わり方・ひとこと）。
+// みほ先生の記入は5項目だけ（お悩み・タイプと強み1行・関わりの見立て・3つの関わり方・ひとこと）。
 //   full:   本人に送る完全版
 // 入力はすべてエスケープする（相手の言葉を引用するため）。
 
@@ -40,7 +40,7 @@ export const ACTION_PRESETS = [
 const list = (a) => (Array.isArray(a) ? a : []).filter((x) => x && Object.values(x).some((v) => String(v || '').trim()));
 
 /**
- * @param {object} d 入力 { family_name, child_name, grade_label, date, report_no, worry, type, tendency, check_count, view, actions:[{title,ng,ok}], message }
+ * @param {object} d 入力 { family_name, child_name, grade_label, date, report_no, worry, type, strength, tendency, check_count, view, actions:[{title,ng,ok}], message }
  * @param {{sample?: boolean, base?: string}} opts
  */
 export function renderReport(d, { sample = false, base = '' } = {}) {
@@ -65,7 +65,7 @@ export function renderReport(d, { sample = false, base = '' } = {}) {
 <div class="worry">「${nl(d.worry)}」<small>（事前アンケートと面談でお聞きした内容より）</small></div></section>
 
 <section><h2 class="sec-title mincho"><span class="n">2</span>お子さんのタイプ</h2>
-${t ? `<div class="type-one"><b class="mincho">${esc(t.name)}</b><p>${esc(t.desc)}</p></div>
+${t ? `<div class="type-one"><b class="mincho">${esc(t.name)}</b><p>${esc(t.desc)}</p>${d.strength ? `<p class="strength"><span>強み</span>${esc(d.strength)}</p>` : ''}</div>
 <div class="type-desc"><b>このタイプに届きやすい関わり方：</b>${esc(t.tip)}</div>` : ''}</section>
 
 <section><h2 class="sec-title mincho"><span class="n">3</span>いまの関わり方の見立て</h2>
@@ -97,7 +97,7 @@ ${actions.map((a, i) => `<div class="act"><span class="num">${i + 1}</span><h3>$
 export const SAMPLE_REPORT = {
   family_name: 'サンプル 花子', child_name: 'ゆうくん', grade_label: '小学3年生', date: '2026年11月20日', report_no: 12,
   worry: '宿題を始めるまでに1時間かかります。声をかけると怒って、余計に始めなくなります。',
-  type: 'jiyu', tendency: '管理しすぎ', check_count: 7,
+  type: 'jiyu', strength: '好きなことには、2時間でも集中できる', tendency: '管理しすぎ', check_count: 7,
   view: '「始める時間」を毎日お母さんが決めていることで、ゆうくんは「やらされている」と感じ、始める前から気持ちが離れています。声かけを減らし、決める場面をゆうくんに渡すことが近道です。',
   actions: [
     { title: '始める時間を、ゆうくんに決めてもらう', ng: '宿題やったの？', ok: '今日は何時から始める？' },

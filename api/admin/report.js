@@ -2,12 +2,17 @@
 //   GET  ?action=candidates        入力候補の一覧（個別診断に申込済み・チェック回答済みの人）。LINE userId は返さない
 //   GET  ?action=prefill&user=<id>  その人の自動入力（表示名・学年・チェック数・事前アンケート・下書き）
 //   POST {user, report_id?, data}   下書き保存。プレビューURL（token付き）を返す
-// LINEへの送信はまだ実装しない（本番公開の許可後に追加する）。
+//   POST {action:'send', user, report_id}  保存済みの下書きを本人のLINEに送る（1回だけ。送信後は編集不可）
+// 認証は管理パスワード、または通知で届く「その人専用の署名付きURL」（その1人の記入・送信だけできる）。
 
 import { checkBearer, json } from '../_lib/auth.js';
 import { getDb } from '../_lib/db.js';
 import { stageLabel } from '../_lib/messages.js';
 import { publicBaseUrl } from '../_lib/config.js';
+import { verifyFormKey } from '../_lib/report-link.js';
+import { pushMessage } from '../_lib/line.js';
+import { recordEvent } from '../_lib/users.js';
+import { log, errorSummary } from '../_lib/log.js';
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -19,12 +24,43 @@ async function userById(id) {
 
 const previewUrl = (token) => `${publicBaseUrl() || ''}/api/report?t=${token}`;
 
+/** 'full'（管理パスワード）／'user'（その人専用URL）／null */
+function access(request, userId) {
+  if (checkBearer(request, 'ADMIN_API_TOKEN')) return 'full';
+  const h = request.headers;
+  const keyUser = h.get('x-report-user');
+  if (keyUser && keyUser === userId && verifyFormKey(keyUser, h.get('x-report-exp'), h.get('x-report-key'))) return 'user';
+  return null;
+}
+
+/** 本人に送るメッセージ（カードを押すとレポートが開く） */
+export function reportMessages(url, data) {
+  const name = data?.family_name ? `${data.family_name}さん` : '';
+  return [
+    { type: 'text', text: `${name}、先日は個別診断をありがとうございました😊\nお約束の診断レポートをお送りします。` },
+    {
+      type: 'flex', altText: '個別診断レポートが届きました',
+      contents: { type: 'bubble',
+        body: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+          { type: 'text', text: '個別診断レポート', weight: 'bold', size: 'lg', color: '#0b254a' },
+          { type: 'text', text: 'わが子の強み・伸ばし方', size: 'sm', color: '#b48a25', weight: 'bold' },
+          { type: 'text', text: 'お子さんのタイプと、今日からできる3つの関わり方をまとめました。', size: 'sm', wrap: true, margin: 'md', color: '#56657a' },
+        ] },
+        footer: { type: 'box', layout: 'vertical', contents: [
+          { type: 'button', style: 'primary', color: '#0b254a', action: { type: 'uri', label: 'レポートを見る', uri: url } },
+        ] } },
+    },
+  ];
+}
+
 export async function GET(request) {
-  if (!checkBearer(request, 'ADMIN_API_TOKEN')) return json({ error: 'unauthorized' }, 401);
   const p = new URL(request.url).searchParams;
+  const level = access(request, p.get('user'));
+  if (!level) return json({ error: 'unauthorized' }, 401);
   const db = getDb();
 
   if (p.get('action') === 'candidates') {
+    if (level !== 'full') return json({ error: 'unauthorized' }, 401);
     const { rows } = await db.query(
       `select u.id, u.display_name, u.education_stage, u.parenting_check_count,
               u.diagnosis_applied_at, u.parenting_check_answered_at,
@@ -60,11 +96,12 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  if (!checkBearer(request, 'ADMIN_API_TOKEN')) return json({ error: 'unauthorized' }, 401);
   let body;
   try { body = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  if (!access(request, body.user)) return json({ error: 'unauthorized' }, 401);
   const u = await userById(body.user);
   if (!u) return json({ error: 'not_found' }, 404);
+  if (body.action === 'send') return sendReport(u, body.report_id);
   const data = body.data && typeof body.data === 'object' ? body.data : {};
   if (JSON.stringify(data).length > 20000) return json({ error: 'too_large' }, 413);
   const db = getDb();
@@ -81,4 +118,30 @@ export async function POST(request) {
       [u.line_user_id, data]));
   }
   return json({ id: row.id, report_no: row.report_no, status: row.status, preview_url: previewUrl(row.token) });
+}
+
+async function sendReport(u, reportId) {
+  if (!UUID.test(reportId || '')) return json({ error: 'bad_request' }, 400);
+  const db = getDb();
+  const { rows: [r] } = await db.query(
+    'select id, token, data, status from parent_diagnosis_reports where id = $1 and line_user_id = $2', [reportId, u.line_user_id]);
+  if (!r) return json({ error: 'not_found' }, 404);
+  if (r.status === 'sent') return json({ error: 'already_sent' }, 409);
+  const d = r.data || {};
+  if (!d.worry || !d.type || !(d.actions || []).some((a) => a?.title)) return json({ error: 'incomplete' }, 422);
+  if (u.blocked_at) return json({ error: 'blocked' }, 409);
+  // 二重送信を防ぐため、先に送信済みにしてから送る（失敗したら下書きに戻す）
+  const { rowCount } = await db.query(
+    "update parent_diagnosis_reports set status = 'sent', sent_at = now(), updated_at = now() where id = $1 and status = 'draft'", [r.id]);
+  if (!rowCount) return json({ error: 'already_sent' }, 409);
+  try {
+    const res = await pushMessage(u.line_user_id, reportMessages(previewUrl(r.token), d), r.id);
+    if (!res.sent) throw Object.assign(new Error(res.reason), { reason: res.reason });
+  } catch (err) {
+    await db.query("update parent_diagnosis_reports set status = 'draft', sent_at = null where id = $1", [r.id]);
+    log.error('レポート送信失敗', { error: errorSummary(err) });
+    return json({ error: err.reason || 'send_failed' }, 502);
+  }
+  await recordEvent(u.line_user_id, 'diagnosis_report_sent', { report_id: r.id });
+  return json({ status: 'sent', report_url: previewUrl(r.token) });
 }

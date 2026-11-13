@@ -55,6 +55,41 @@ test('下書き保存 → token付きURLで表示（エスケープ・下書き�
 
 test('レポート: 親の関わり方の5項目（お悩み・タイプ・見立て・3つの関わり方・ひとこと）', () => {
   const html = renderReport(SAMPLE_REPORT);
-  for (const k of ['今回のお悩み', '自由型', 'このタイプに届きやすい関わり方', 'いまの関わり方の見立て', '「管理しすぎ」', '今日からできる3つの関わり方', '今日は何時から始める？', 'みほ先生から']) assert.ok(html.includes(k), k);
+  for (const k of ['今回のお悩み', '自由型', '好きなことには、2時間でも集中できる', 'このタイプに届きやすい関わり方', 'いまの関わり方の見立て', '「管理しすぎ」', '今日からできる3つの関わり方', '今日は何時から始める？', 'みほ先生から']) assert.ok(html.includes(k), k);
   for (const k of ['今伸びている力', '6〜12か月', 'まだ急がなくていいこと']) assert.ok(!html.includes(k), `出さない: ${k}`);
+});
+
+test('専用URL: その1人だけ開ける（一覧・他の人・期限切れ・改ざんは不可）', async () => {
+  const { reportFormUrl } = await import('../api/_lib/report-link.js');
+  const { users: [u] } = await (await adminGet(req('/api/admin/report?action=candidates'))).json();
+  const url = new URL(reportFormUrl(u.id));
+  const h = { 'x-report-user': u.id, 'x-report-exp': url.searchParams.get('exp'), 'x-report-key': url.searchParams.get('k') };
+  const get = (q, headers) => adminGet(new Request(`https://example.test/api/admin/report?${q}`, { headers }));
+  assert.equal((await get(`action=prefill&user=${u.id}`, h)).status, 200);
+  assert.equal((await get('action=candidates', h)).status, 401, '一覧は見られない');
+  assert.equal((await get('action=prefill&user=00000000-0000-0000-0000-000000000000', h)).status, 401, '他の人は見られない');
+  assert.equal((await get(`action=prefill&user=${u.id}`, { ...h, 'x-report-key': 'f'.repeat(64) })).status, 401);
+  const old = new URL(reportFormUrl(u.id, { now: Date.now() - 31 * 86400000 }));
+  assert.equal((await get(`action=prefill&user=${u.id}`, { ...h, 'x-report-exp': old.searchParams.get('exp'), 'x-report-key': old.searchParams.get('k') })).status, 401, '期限切れ');
+});
+
+test('送信: 必須項目がないと送れない → 送ると1回だけ届き、送付済みは編集・再送できない', async () => {
+  const { stubLine } = await import('./helpers.js');
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER });
+  const calls = stubLine();
+  const { users: [u] } = await (await adminGet(req('/api/admin/report?action=candidates'))).json();
+  const empty = await (await adminPost(req('/api/admin/report', { body: { user: u.id, data: { family_name: 'x' } } }))).json();
+  assert.equal((await adminPost(req('/api/admin/report', { body: { action: 'send', user: u.id, report_id: empty.id } }))).status, 422);
+
+  const saved = await (await adminPost(req('/api/admin/report', { body: { user: u.id, report_id: empty.id, data: SAMPLE_REPORT } }))).json();
+  const res = await adminPost(req('/api/admin/report', { body: { action: 'send', user: u.id, report_id: saved.id } }));
+  assert.equal(res.status, 200);
+  const push = calls.sends().filter((c) => c.url.endsWith('/push'));
+  assert.equal(push.length, 1);
+  assert.equal(push[0].body.to, OWNER);
+  assert.match(JSON.stringify(push[0].body.messages), /レポートを見る/);
+  assert.equal((await adminPost(req('/api/admin/report', { body: { action: 'send', user: u.id, report_id: saved.id } }))).status, 409);
+  assert.equal((await adminPost(req('/api/admin/report', { body: { user: u.id, report_id: saved.id, data: SAMPLE_REPORT } }))).status, 409);
+  const t = new URL(saved.preview_url, 'https://example.test').searchParams.get('t');
+  assert.doesNotMatch(await (await viewReport(new Request(`https://example.test/api/report?t=${t}`))).text(), /下書き/);
 });

@@ -106,3 +106,6 @@
 .type-one b { display: block; font-size: 24px; color: var(--navy); }
 .type-one p { margin: 4px 0 0; font-size: 14px; color: var(--sub); }
 .type-desc b { color: var(--navy); }
+
+.type-one .strength { margin-top: 10px; color: var(--ink); font-weight: 700; font-size: 15px; }
+.type-one .strength span { display: inline-block; margin-right: 8px; font-size: 11px; font-weight: 800; color: #fff; background: var(--gold); border-radius: 999px; padding: 1px 10px; vertical-align: 2px; }
