@@ -93,3 +93,28 @@ test('送信: 必須項目がないと送れない → 送ると1回だけ届き
   const t = new URL(saved.preview_url, 'https://example.test').searchParams.get('t');
   assert.doesNotMatch(await (await viewReport(new Request(`https://example.test/api/report?t=${t}`))).text(), /下書き/);
 });
+
+test('面談日時: 保存すると登録され、翌朝に1回・2日後にもう1回だけ記入リマインド（送付済みは対象外）', async () => {
+  const { stubLine } = await import('./helpers.js');
+  const { runReportReminders } = await import('../api/_lib/report-reminders.js');
+  baseEnv({ LINE_SEND_MODE: 'production', LINE_SEND_ENABLED: 'true' });
+  const calls = stubLine();
+  const ADMIN = 'U' + 'a'.repeat(32);
+  await db.query('insert into parent_line_notify_targets (line_user_id) values ($1)', [ADMIN]);
+  const { users: [u] } = await (await adminGet(req('/api/admin/report?action=candidates'))).json();
+  await adminPost(req('/api/admin/report', { body: { user: u.id, data: { interview_at: '2026-11-20T10:00' } } }));
+  const { rows: [r] } = await db.query('select interview_at from parent_diagnosis_reports');
+  assert.equal(r.interview_at.toISOString(), '2026-11-20T01:00:00.000Z');
+  const pushes = () => calls.sends().filter((c) => c.url.endsWith('/push') && c.body.to === ADMIN).map((c) => c.body.messages[0].text);
+
+  await runReportReminders({ now: new Date('2026-11-20T23:00:00Z') }); // 11/21 8:00 JST 前日面談 → 1回目
+  await runReportReminders({ now: new Date('2026-11-21T23:00:00Z') }); // 11/22 まだ
+  assert.equal(pushes().length, 1);
+  await runReportReminders({ now: new Date('2026-11-22T23:00:00Z') }); // 11/23 2回目
+  assert.equal(pushes().length, 2);
+  await runReportReminders({ now: new Date('2026-11-24T23:00:00Z') }); // もう送らない
+  const n = pushes();
+  assert.equal(n.length, 2);
+  assert.match(n[0], /レポートの記入をお願いします[\s\S]*\/admin\/report\/\?user=/);
+  assert.match(n[1], /まだ未送付/);
+});

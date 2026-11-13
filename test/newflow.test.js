@@ -15,8 +15,8 @@ beforeEach(async () => {
   calls = stubLine();
 });
 
-test('NEW_FLOW_FROM 未設定: 今までどおり（見本なし・旧カード）', async () => {
-  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER });
+test('NEW_FLOW_FROM=off: 今までどおり（見本なし・旧カード）', async () => {
+  baseEnv({ LINE_SEND_MODE: 'test', LINE_TEST_USER_IDS: OWNER, NEW_FLOW_FROM: 'off' });
   await answer(OWNER);
   assert.deepEqual(last().map((m) => m.type), ['text', 'video', 'text']);
   await send(text(OWNER, '個別診断'));

@@ -11,13 +11,14 @@ export const OTHER = 'U' + '1'.repeat(32);
 
 export function baseEnv(overrides = {}) {
   for (const k of Object.keys(process.env)) {
-    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_|WEBINAR_)/.test(k)) delete process.env[k];
+    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_|WEBINAR_|NEW_FLOW_FROM)/.test(k)) delete process.env[k];
   }
   Object.assign(process.env, {
     LINE_CHANNEL_SECRET: SECRET,
     LINE_CHANNEL_ACCESS_TOKEN: 'dummy-token',
     LINE_SEND_ENABLED: 'false',
     LINE_SEND_MODE: 'disabled',
+    NEW_FLOW_FROM: 'off', // 既存のテストは今までの導線で確かめる（新しい導線は newflow.test.js）
 
     ADMIN_API_TOKEN: ADMIN_TOKEN,
     PUBLIC_BASE_URL: 'https://example.test',

@@ -14,3 +14,8 @@ create table if not exists parent_diagnosis_reports (
 );
 create index if not exists parent_diagnosis_reports_user_idx on parent_diagnosis_reports (line_user_id, created_at desc);
 alter table parent_diagnosis_reports enable row level security;
+
+-- 面談日時と、翌朝の記入リマインド（美穂先生あて）
+alter table parent_diagnosis_reports add column if not exists interview_at timestamptz;
+alter table parent_diagnosis_reports add column if not exists reminder_count integer not null default 0;
+alter table parent_diagnosis_reports add column if not exists last_reminded_at timestamptz;

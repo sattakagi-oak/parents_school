@@ -107,12 +107,17 @@ export function secretEnv(name) {
   return env(name);
 }
 
+/** 新しい導線を本番で始めた日時（環境変数 NEW_FLOW_FROM があればそちらを優先） */
+const NEW_FLOW_STARTED_AT = '2026-11-13T15:05:00+09:00';
+
 /**
- * 新しい導線（見本画像・新しい個別診断カード）を始めた日時。環境変数 NEW_FLOW_FROM（ISO 8601）。
- * これ以降に初めてチェック数を送った人だけが対象。未設定なら誰も対象にしない（＝今までどおり）。
+ * 新しい導線（見本画像・新しい個別診断カード）を始めた日時。
+ * これ以降に初めてチェック数を送った人だけが対象。それより前に回答済みの人は今までどおり。
+ * テストでは NEW_FLOW_FROM で上書きする（'off' で無効）。
  */
 export function newFlowFrom() {
-  const t = Date.parse(env('NEW_FLOW_FROM'));
+  const v = process.env.NEW_FLOW_FROM !== undefined ? env('NEW_FLOW_FROM') : NEW_FLOW_STARTED_AT;
+  const t = Date.parse(v);
   return Number.isFinite(t) ? new Date(t) : null;
 }
 

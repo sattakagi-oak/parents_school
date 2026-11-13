@@ -16,6 +16,14 @@ import { log, errorSummary } from '../_lib/log.js';
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
+/** 入力画面の面談日時（"2026-11-20T10:00"、日本時間）→ Date。なければ null */
+function interviewAt(data) {
+  const m = String(data?.interview_at || '').match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/);
+  if (!m) return null;
+  const d = new Date(`${m[1]}T${m[2]}:00+09:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 async function userById(id) {
   if (!UUID.test(id || '')) return null;
   const { rows } = await getDb().query('select * from parent_line_users where id = $1', [id]);
@@ -108,14 +116,15 @@ export async function POST(request) {
   let row;
   if (UUID.test(body.report_id || '')) {
     ({ rows: [row] } = await db.query(
-      `update parent_diagnosis_reports set data = $3, updated_at = now()
+      `update parent_diagnosis_reports set data = $3, interview_at = $4,
+              reminder_count = case when interview_at is distinct from $4 then 0 else reminder_count end, updated_at = now()
         where id = $1 and line_user_id = $2 and status = 'draft' returning id, report_no, token, status`,
-      [body.report_id, u.line_user_id, data]));
+      [body.report_id, u.line_user_id, data, interviewAt(data)]));
     if (!row) return json({ error: 'not_editable' }, 409);
   } else {
     ({ rows: [row] } = await db.query(
-      'insert into parent_diagnosis_reports (line_user_id, data) values ($1, $2) returning id, report_no, token, status',
-      [u.line_user_id, data]));
+      'insert into parent_diagnosis_reports (line_user_id, data, interview_at) values ($1, $2, $3) returning id, report_no, token, status',
+      [u.line_user_id, data, interviewAt(data)]));
   }
   return json({ id: row.id, report_no: row.report_no, status: row.status, preview_url: previewUrl(row.token) });
 }
