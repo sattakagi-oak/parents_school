@@ -127,16 +127,14 @@ export const CONSULT_REPLY = `ご連絡ありがとうございます😊
 
 /**
  * 個数を送ってくれた人へのプレゼント動画（静的ファイル）。LINE の上限は動画200MB・プレビュー画像1MB。
- * 元動画: 子育て相談/プレゼント完成.mp4 を 720p に圧縮。差し替えたら version を更新する。
+ * 元動画: 子育て相談/プレゼントBGMなし.mp4 を 720p に圧縮。差し替えたら version を更新する。
  */
 export const GIFT_VIDEO = {
   path: '/videos/gift-kosodate.mp4',
   previewPath: '/videos/gift-kosodate-preview.jpg',
-  version: '20261106',
+  version: '20261107',
 };
 
-/** 個数を選び直したとき */
-export const CHECK_UPDATED = 'チェック数を更新しました。ありがとうございます😊';
 
 /** 旧入力（①/②）から入った人に、任意で年代を聞く */
 export const STAGE_SUPPLEMENT_TITLE = 'よろしければ、お子さんの学年も教えてください（任意）';
@@ -162,7 +160,32 @@ export const ANALYSIS = {
   buttonLabel: '個別診断を申し込む',
   /** ボタンの下に出す案内（誰が申し込んだかを公式LINE上で把握するため） */
   afterPayNote: 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊',
+  /** その下に出す、申込後の流れ（個別診断はZoom。美穂先生が日程を調整してリンクを送る） */
+  afterPayNext: '確認後、候補日程を送らせていただきます。',
 };
+
+/** 新しい導線の人に出すカード（レポートの中身に合わせた書き方）。名前・価格・ボタン・注記は ANALYSIS と同じ */
+const ANALYSIS_BASE = ANALYSIS;
+export const ANALYSIS_V2 = {
+  ...ANALYSIS,
+  lead: '今のお悩みをじっくりお聞きしながら、',
+  points: ['お子さんのタイプと強み', 'いまの関わり方の見立て', '今日からできる3つの関わり方（声かけ例つき）'],
+  tail: 'を一緒に整理します。面談のあとは、内容をまとめたレポートもお届けします。',
+};
+
+/** 個数を送ってくれた新しい導線の人に、動画のあとで見せる個別診断レポートの見本 */
+export const REPORT_SAMPLE = {
+  path: '/images/report/sample-teaser.png',
+  previewPath: '/images/report/sample-teaser-preview.jpg',
+  version: '20261113',
+};
+/** 新しい導線の個別診断の案内（見本画像の直後に送る） */
+export const CONSULT_OFFER_V2 = `☝️個別診断を受けると、こんなレポートが届きます（見本）
+
+みほ先生と30分、今のお悩みをじっくりお話しできます（30分 1,000円）。
+面談のあとは、わが家に合った「3つの関わり方」を声かけ例つきでまとめたレポートもお届けします。
+
+ご希望の方は、このLINEに「個別診断」と送ってください😊`;
 
 /**
  * 相手からこの文言（の書き出し）が送られたら「個別分析に申込済み」として記録する（自動返信はしない）。
@@ -299,7 +322,8 @@ export function sheetMessages(sheet, { baseUrl } = {}) {
 }
 
 /** 「わが子の強み・伸ばし方 個別診断」カード */
-export function analysisCard(ctaUrl) {
+export function analysisCard(ctaUrl, { v2 = false } = {}) {
+  const ANALYSIS = v2 ? ANALYSIS_V2 : ANALYSIS_BASE;
   return {
     type: 'flex',
     altText: `${ANALYSIS.name}（${ANALYSIS.priceLabel}）`,
@@ -324,6 +348,7 @@ export function analysisCard(ctaUrl) {
         contents: [
           { type: 'button', style: 'primary', action: { type: 'uri', label: ANALYSIS.buttonLabel, uri: ctaUrl } },
           { type: 'text', text: ANALYSIS.afterPayNote, size: 'sm', wrap: true, color: '#c8402e', weight: 'bold', margin: 'md' },
+          { type: 'text', text: ANALYSIS.afterPayNext, size: 'sm', wrap: true, color: '#555555', margin: 'sm' },
         ],
       },
     },
@@ -342,10 +367,19 @@ export function giftVideoMessage(baseUrl) {
   };
 }
 
-export function checkCompleteMessages({ offerConsult = false, askStage = false, baseUrl } = {}) {
+export function checkCompleteMessages({ offerConsult = false, askStage = false, baseUrl, showSample = false } = {}) {
   const messages = [{ type: 'text', text: baseUrl ? `${CHECK_THANKS}\n\n${CHECK_GIFT_LINE}` : CHECK_THANKS }];
   if (baseUrl) messages.push(giftVideoMessage(baseUrl));
-  if (offerConsult) messages.push({ type: 'text', text: CONSULT_OFFER });
+  const sample = offerConsult && showSample && baseUrl;
+  if (sample) {
+    // 新しい導線: お礼 → 動画 → 見本画像 → 案内（＋旧入力の人の学年ボタン）で最大5通
+    messages.push({
+      type: 'image',
+      originalContentUrl: `${baseUrl}${REPORT_SAMPLE.path}?v=${REPORT_SAMPLE.version}`,
+      previewImageUrl: `${baseUrl}${REPORT_SAMPLE.previewPath}?v=${REPORT_SAMPLE.version}`,
+    });
+  }
+  if (offerConsult) messages.push({ type: 'text', text: sample ? CONSULT_OFFER_V2 : CONSULT_OFFER });
   if (askStage) messages.push(stageMessage({ supplement: true }));
   return messages;
 }

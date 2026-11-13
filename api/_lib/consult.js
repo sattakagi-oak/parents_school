@@ -10,6 +10,7 @@ import { upsertUser, recordEvent } from './users.js';
 import { replyUntracked } from './delivery.js';
 import { analysisCard, CONSULT_REPLY } from './messages.js';
 import { ctaUrlFor } from './checklist.js';
+import { isNewFlowUser } from './config.js';
 import { notifyAdmins, quote } from './notify.js';
 
 export const CONSULT_OFFER_EVENT = 'consult_offer';
@@ -60,9 +61,12 @@ export async function handleConsultText(lineUserId, replyToken, text) {
   if (!kind) return null;
   if (kind === 'contextual' && !(await offerIsOpen(lineUserId))) return null;
   // システム導入前からの友だちはDBにまだいないことがある
-  const ctaUrl = ctaUrlFor(await upsertUser(lineUserId));
+  const user = await upsertUser(lineUserId);
+  const ctaUrl = ctaUrlFor(user);
   if (!ctaUrl) return null; // 申込済み・申込URL未設定
-  await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CONSULT_REPLY }, analysisCard(ctaUrl)], 'consult:card');
+  // 新しい導線の人には、レポートの中身に合わせたカード（それ以外の人は今までどおり）
+  const card = analysisCard(ctaUrl, { v2: isNewFlowUser(user) });
+  await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CONSULT_REPLY }, card], 'consult:card');
   await recordEvent(lineUserId, CARD_EVENT, { kind });
   await notifyAdmins(lineUserId, 'consult', `個別診断の案内カードを自動で送りました：\n${quote(text)}`);
   return `consult_card:${kind}`;

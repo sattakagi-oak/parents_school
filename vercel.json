@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/webinar-reminders?kind=day_before", "schedule": "0 11 * * *" },
-    { "path": "/api/cron/webinar-reminders?kind=morning", "schedule": "0 23 * * *" }
+    { "path": "/api/cron/webinar-reminders?kind=morning", "schedule": "0 23 * * *" },
+    { "path": "/api/cron/report-reminders", "schedule": "0 1 * * *" }
   ]
 }

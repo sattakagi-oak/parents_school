@@ -9,7 +9,8 @@
     "test": "node --test test/*.test.js",
     "admin": "node --env-file=.env.local scripts/admin.mjs",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
-    "build:site": "node scripts/build-site.mjs"
+    "build:site": "node scripts/build-site.mjs",
+    "dev:local": "node --env-file=.env.local scripts/dev-server.mjs"
   },
   "dependencies": {
     "@vercel/functions": "^3.9.9",

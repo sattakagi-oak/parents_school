@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>個別診断レポート 入力｜親の学習塾</title>
+<style>
+  :root { --navy:#0b254a; --gold:#b48a25; --gold2:#dfbd67; --ink:#17243a; --sub:#56657a; --line:#d9e2ec; --bg:#f3f5f8; --ok:#0e8b70; --ng:#a84646; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.7 -apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif; }
+  header { background:var(--navy); color:#fff; padding:14px 18px; position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:12px; }
+  header h1 { font-size:16px; margin:0; }
+  header .st { margin-left:auto; font-size:12px; color:#c4d4e8; }
+  main { max-width:760px; margin:0 auto; padding:16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; }
+  .card h2 { font-size:15px; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .card h2 .n { width:24px; height:24px; border-radius:50%; background:var(--navy); color:#fff; font-size:12px; display:inline-flex; align-items:center; justify-content:center; }
+  label { display:block; font-size:12px; font-weight:700; color:var(--sub); margin:10px 0 4px; }
+  .auto { font-size:11px; color:var(--ok); font-weight:700; margin-left:6px; }
+  input[type=text], input[type=password], input[type=number], textarea, select { width:100%; font:inherit; border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:#fff; }
+  textarea { min-height:70px; resize:vertical; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .row4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .sub { font-size:12px; color:var(--sub); }
+  .group { border:1px dashed var(--line); border-radius:12px; padding:10px 12px; margin-top:10px; }
+  .group b { font-size:13px; }
+  .btn { font:inherit; font-weight:800; border:0; border-radius:999px; padding:11px 20px; cursor:pointer; }
+  .btn.primary { background:var(--navy); color:#fff; }
+  .btn.ghost { background:#fff; color:var(--navy); border:2px solid var(--navy); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .bar { position:sticky; bottom:0; background:rgba(243,245,248,.96); border-top:1px solid var(--line); padding:12px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  .msg { font-size:13px; }
+  .msg.ok { color:var(--ok); } .msg.ng { color:var(--ng); }
+  .pick { font-size:12px; margin-top:6px; }
+  .pick select { width:auto; font-size:12px; padding:4px 8px; }
+  .survey { background:#fffaf0; border:1px solid #f1e2bd; border-radius:10px; padding:10px 12px; font-size:13px; white-space:pre-wrap; }
+  .hidden { display:none !important; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .chips button { font:inherit; font-size:14px; font-weight:700; border:2px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:7px 14px; cursor:pointer; }
+  .chips button.on { border-color:var(--navy); background:var(--navy); color:#fff; }
+</style>
+</head>
+<body>
+<header><h1>個別診断レポート 入力</h1><span class="st" id="who"></span></header>
+<main>
+
+  <div class="card" id="login">
+    <h2>ログイン</h2>
+    <label for="token">管理パスワード</label>
+    <input type="password" id="token" autocomplete="current-password">
+    <p class="sub">この端末では30日間ログインしたままになります。</p>
+    <button class="btn primary" id="loginBtn">ログイン</button> <span class="msg" id="loginMsg"></span>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="card">
+      <h2>面談した方を選ぶ</h2>
+      <select id="user"></select>
+      <p class="sub">個別診断に「申し込みました」と報告した方が上に出ます。名前・学年・チェック数・事前アンケートは自動で入ります（あとから直せます）。</p>
+      <div id="surveyBox" class="hidden"><label>事前アンケートの回答</label><div class="survey" id="survey"></div></div>
+    </div>
+
+    <form id="form">
+      <div class="card"><h2>面談日時</h2>
+        <input type="datetime-local" name="interview_at" style="width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 11px">
+        <p class="sub">日程が決まったら入れて「下書き保存」してください。面談の当日10時に、記入のお知らせがLINEに届きます（未送付なら2日後の10時にもう一度）。</p>
+      </div>
+      <div class="card"><h2>基本情報 <span class="auto">ほぼ自動で入ります</span></h2>
+        <div class="row">
+          <div><label>お名前（LINE表示名）</label><input type="text" name="family_name"></div>
+          <div><label>診断日</label><input type="text" name="date"></div>
+          <div><label>お子さんの呼び名</label><input type="text" name="child_name" placeholder="ゆうくん"></div>
+          <div><label>学年</label><input type="text" name="grade_label"></div>
+        </div>
+      </div>
+
+      <div class="card"><h2><span class="n">1</span>今回のお悩み <span class="auto" id="worryAuto"></span></h2>
+        <textarea name="worry" placeholder="相手の言葉のまま（事前アンケートがあれば自動で入ります）"></textarea>
+      </div>
+
+      <div class="card"><h2><span class="n">2</span>お子さんのタイプ</h2>
+        <div class="chips" data-name="type"></div>
+        <p class="sub">選ぶと、タイプの説明と「届きやすい関わり方」がレポートに自動で入ります。</p>
+        <label>お子さんの強み（1行・空欄なら出しません）</label>
+        <input type="text" name="strength" placeholder="例：好きなことには、2時間でも集中できる">
+      </div>
+
+      <div class="card"><h2><span class="n">3</span>いまの関わり方の見立て</h2>
+        <label>多かった傾向（チェックリスト <span id="countAuto">-</span>個）</label>
+        <div class="chips" data-name="tendency"></div>
+        <input type="hidden" name="check_count">
+        <label>ひとこと見立て（2〜3文）</label>
+        <textarea name="view" placeholder="例：始める時間を毎日お母さんが決めていることで、「やらされている」と感じています。決める場面を渡すことが近道です。"></textarea>
+      </div>
+
+      <div class="card"><h2><span class="n">4</span>今日からできる3つの関わり方</h2>
+        <p class="sub">文例を選ぶと入ります。お子さんの名前や場面に合わせて直してください。</p>
+        <div id="actions"></div>
+      </div>
+
+      <div class="card"><h2><span class="n">5</span>みほ先生から（2〜3行）</h2>
+        <textarea name="message"></textarea>
+      </div>
+      <input type="hidden" name="type"><input type="hidden" name="tendency">
+    </form>
+  </div>
+</main>
+
+<div class="bar hidden" id="bar">
+  <button class="btn ghost" id="saveBtn">下書き保存</button>
+  <button class="btn ghost" id="previewBtn" disabled>プレビューを開く</button>
+  <button class="btn primary" id="sendBtn" disabled>LINEで送る</button>
+  <span class="msg" id="msg"></span>
+</div>
+
+<script>
+(function () {
+  var API = '/api/admin/report';
+  var KEY = 'oya_admin_token';
+  // 一度ログインしたら、この端末では30日間そのまま使える
+  var token = '';
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.until > Date.now()) token = saved.token; } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('form');
+  var state = { user: null, reportId: null, previewUrl: null };
+  // 通知で届く「その人専用URL」（?user=&exp=&k=）なら、パスワードなしでその1人だけ開ける
+  var qs = new URLSearchParams(location.search);
+  var link = qs.get('k') ? { user: qs.get('user'), exp: qs.get('exp'), k: qs.get('k') } : null;
+
+  var TYPES = [['jiyu','自由型'],['kodawari','こだわり型'],['kyokan','共感型'],['mokuhyo','目標型']];
+  var TENDENCIES = ['先回り','管理しすぎ','口出し','比較','結果へのこだわり'];
+  var ACTION_PRESETS = [
+    ['始める時間を、子どもに決めてもらう','宿題やったの？','今日は何時から始める？'],
+    ['答えより先に「どこまでわかった？」と聞く','ここはこうやるんでしょ','どこまでわかった？'],
+    ['明日の準備は「準備表」に任せる','忘れ物ない？','準備表、どこまでチェックできた？'],
+    ['最初の1問だけ一緒にやって、離れる','早く一人でやりなさい','最初の1問だけ一緒にやろうか'],
+    ['終わりを見える形にする','いつまでやってるの','今日はここまでで完了にしよう'],
+    ['結果より、取り組んだことを言葉にする','なんでこの点数なの','ここ、自分で考えて解いたんだね'],
+    ['比べずに、その子の昨日と比べる','お兄ちゃんはできたのに','昨日より早く始められたね'],
+    ['言いたくなったら、10秒待つ','（すぐに注意する）','（10秒待って、本人が動くのを見る）'],
+  ];
+  function chips(name, items) {
+    var box = document.querySelector('.chips[data-name="' + name + '"]');
+    box.innerHTML = items.map(function (it) { var v = Array.isArray(it) ? it[0] : it, l = Array.isArray(it) ? it[1] : it; return '<button type="button" data-v="' + v + '">' + l + '</button>'; }).join('');
+    box.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; setChip(name, b.getAttribute('data-v')); });
+  }
+  function setChip(name, v) {
+    form.elements[name].value = v || '';
+    document.querySelectorAll('.chips[data-name="' + name + '"] button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+  }
+  chips('type', TYPES); chips('tendency', TENDENCIES);
+
+  var aHtml = '';
+  for (var i = 0; i < 3; i++) {
+    aHtml += '<div class="group"><b>' + (i + 1) + '</b>' +
+      '<div class="pick">文例：<select data-preset="' + i + '"><option value="">選ぶ</option>' +
+      ACTION_PRESETS.map(function (p, j) { return '<option value="' + j + '">' + p[0] + '</option>'; }).join('') + '</select></div>' +
+      '<label>関わり方</label><input type="text" name="actions.' + i + '.title">' +
+      '<div class="row"><div><label>✕ 今の声かけ</label><input type="text" name="actions.' + i + '.ng"></div><div><label>◯ 変えた声かけ</label><input type="text" name="actions.' + i + '.ok"></div></div></div>';
+  }
+  $('actions').innerHTML = aHtml;
+  document.querySelectorAll('[data-preset]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+      var p = ACTION_PRESETS[sel.value]; if (!p) return; var i = sel.getAttribute('data-preset');
+      form.elements['actions.' + i + '.title'].value = p[0]; form.elements['actions.' + i + '.ng'].value = p[1]; form.elements['actions.' + i + '.ok'].value = p[2];
+      sel.value = '';
+    });
+  });
+
+  function api(path, opt) {
+    opt = opt || {};
+    var auth = link ? { 'x-report-user': link.user, 'x-report-exp': link.exp, 'x-report-key': link.k } : { authorization: 'Bearer ' + token };
+    opt.headers = Object.assign(auth, opt.headers || {});
+    return fetch(path, opt).then(function (r) {
+      if (r.status === 401) { if (!link) { try { localStorage.removeItem(KEY); } catch (e) {} } throw new Error(link ? 'このURLは期限切れか、正しくありません。管理画面からログインしてください' : 'パスワードが違います'); }
+      return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('エラー ' + r.status)); return j; });
+    });
+  }
+
+  function setVal(name, v) { var el = form.elements[name]; if (el) el.value = v == null ? '' : v; }
+  function fill(d) {
+    d = d || {};
+    ['interview_at', 'family_name', 'date', 'child_name', 'grade_label', 'worry', 'strength', 'view', 'message', 'check_count'].forEach(function (k) { setVal(k, d[k]); });
+    setChip('type', d.type); setChip('tendency', d.tendency);
+    $('countAuto').textContent = d.check_count === '' || d.check_count == null ? '-' : d.check_count;
+    for (var i = 0; i < 3; i++) { var a = (d.actions || [])[i] || {}; ['title', 'ng', 'ok'].forEach(function (k) { setVal('actions.' + i + '.' + k, a[k]); }); }
+  }
+  function collect() {
+    var v = function (n) { return (form.elements[n].value || '').trim(); };
+    var d = { interview_at: v('interview_at'), family_name: v('family_name'), date: v('date'), child_name: v('child_name'), grade_label: v('grade_label'), worry: v('worry'),
+      type: v('type'), strength: v('strength'), tendency: v('tendency'), check_count: v('check_count'), view: v('view'), actions: [], message: v('message') };
+    for (var i = 0; i < 3; i++) d.actions.push({ title: v('actions.' + i + '.title'), ng: v('actions.' + i + '.ng'), ok: v('actions.' + i + '.ok') });
+    return d;
+  }
+  function msg(t, ok) { $('msg').textContent = t; $('msg').className = 'msg ' + (ok ? 'ok' : 'ng'); }
+
+  function loadUsers() {
+    return api(API + '?action=candidates').then(function (j) {
+      var sel = $('user');
+      sel.innerHTML = '<option value="">選んでください</option>' + j.users.map(function (u) {
+        var tag = u.diagnosis_applied_at ? '【申込済】' : '';
+        var rep = u.report_status === 'draft' ? '（下書きあり）' : u.report_status === 'sent' ? '（送付済）' : '';
+        var info = [u.stage_label, u.parenting_check_count != null ? 'チェック' + u.parenting_check_count + '個' : ''].filter(Boolean).join('・');
+        return '<option value="' + u.id + '">' + tag + (u.display_name || '（名前なし）').replace(/</g, '&lt;') + '　' + info + rep + '</option>';
+      }).join('');
+    });
+  }
+
+  function setSent(sent) { $('sendBtn').disabled = sent || !state.reportId; $('saveBtn').disabled = sent; $('sendBtn').textContent = sent ? '送付済み' : 'LINEで送る'; }
+  $('user').addEventListener('change', function () { loadUser(this.value); });
+  function loadUser(id) {
+    state = { user: id || null, reportId: null, previewUrl: null, sent: false };
+    $('previewBtn').disabled = true; setSent(false); msg('', true);
+    if (!id) return;
+    api(API + '?action=prefill&user=' + encodeURIComponent(id)).then(function (j) {
+      var today = new Date(); var date = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
+      var base = j.report ? j.report.data : {};
+      if (!j.report) fill({ family_name: j.auto.family_name, grade_label: j.auto.grade_label, child_name: j.auto.child_name, worry: j.auto.worry, date: date, check_count: j.auto.check_count });
+      else { var auto = { family_name: j.auto.family_name, grade_label: j.auto.grade_label, child_name: j.auto.child_name, worry: j.auto.worry, date: date, check_count: j.auto.check_count };
+        Object.keys(auto).forEach(function (k) { if (base[k] === undefined || base[k] === '') base[k] = auto[k]; });
+        fill(base); state.reportId = j.report.status === 'draft' ? j.report.id : null; state.previewUrl = j.report.preview_url; $('previewBtn').disabled = false; }
+      $('worryAuto').textContent = j.auto.worry ? '事前アンケートから自動' : '';
+      var s = j.survey || {}; var keys = Object.keys(s);
+      $('surveyBox').classList.toggle('hidden', !keys.length);
+      $('survey').textContent = keys.map(function (k) { return k + '：' + s[k]; }).join('\n');
+      $('who').textContent = (j.auto.family_name || '') + ' さん' + (j.report ? '　No.' + j.report.report_no : '');
+      state.sent = Boolean(j.report && j.report.status === 'sent'); setSent(state.sent);
+      if (state.sent) msg('このレポートは送付済みです', true);
+    }).catch(function (e) { msg(e.message, false); });
+  }
+
+  $('saveBtn').addEventListener('click', function () {
+    if (!state.user) { msg('面談した方を選んでください', false); return; }
+    this.disabled = true;
+    api(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: state.user, report_id: state.reportId, data: collect() }) })
+      .then(function (j) { state.reportId = j.id; state.previewUrl = j.preview_url; $('previewBtn').disabled = false; setSent(false); $('who').textContent = form.elements.family_name.value + ' さん　No.' + j.report_no; msg('保存しました', true); })
+      .catch(function (e) { msg(e.message, false); })
+      .then(function () { $('saveBtn').disabled = false; });
+  });
+  $('sendBtn').addEventListener('click', function () {
+    if (!state.reportId) return;
+    var name = form.elements.family_name.value || 'この方';
+    if (!confirm(name + 'さんのLINEにレポートを送ります。\n送ったあとは直せません。よろしいですか？\n（直前の入力は先に「下書き保存」してください）')) return;
+    this.disabled = true;
+    api(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'send', user: state.user, report_id: state.reportId }) })
+      .then(function () { state.sent = true; setSent(true); msg('送りました', true); })
+      .catch(function (e) {
+        var m = { incomplete: 'お悩み・タイプ・3つの関わり方を入れて保存してから送ってください', already_sent: 'すでに送付済みです', blocked: 'この方はブロック中のため送れません', skipped_not_test_user: '確認用の環境では、テスト用アカウントにしか送れません', skipped_disabled: '送信が止められている設定です' }[e.message];
+        msg(m || ('送れませんでした（' + e.message + '）'), false); setSent(false);
+      });
+  });
+  $('previewBtn').addEventListener('click', function () { if (state.previewUrl) window.open(state.previewUrl, '_blank', 'noopener'); });
+
+  function start() {
+    loadUsers().then(function () {
+      $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('bar').classList.remove('hidden');
+    }).catch(function (e) { $('loginMsg').textContent = e.message; $('loginMsg').className = 'msg ng'; });
+  }
+  $('loginBtn').addEventListener('click', function () {
+    token = $('token').value.trim(); try { localStorage.setItem(KEY, JSON.stringify({ token: token, until: Date.now() + 30 * 86400000 })); } catch (e) {}
+    start();
+  });
+  if (link) {
+    $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('bar').classList.remove('hidden');
+    $('user').closest('.card').querySelector('h2').textContent = '面談した方';
+    $('user').innerHTML = '<option value="' + link.user + '">（この方専用のURLで開いています）</option>';
+    $('user').disabled = true;
+    loadUser(link.user);
+  } else if (token) start();
+})();
+</script>
+</body>
+</html>

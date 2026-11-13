@@ -11,13 +11,14 @@ export const OTHER = 'U' + '1'.repeat(32);
 
 export function baseEnv(overrides = {}) {
   for (const k of Object.keys(process.env)) {
-    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_|WEBINAR_)/.test(k)) delete process.env[k];
+    if (/^(LINE_|DATABASE_URL|CRON_SECRET|ADMIN_API_TOKEN|PARENT_DIAGNOSIS_URL|PUBLIC_BASE_URL|VERCEL_|WEBINAR_|NEW_FLOW_FROM)/.test(k)) delete process.env[k];
   }
   Object.assign(process.env, {
     LINE_CHANNEL_SECRET: SECRET,
     LINE_CHANNEL_ACCESS_TOKEN: 'dummy-token',
     LINE_SEND_ENABLED: 'false',
     LINE_SEND_MODE: 'disabled',
+    NEW_FLOW_FROM: 'off', // 既存のテストは今までの導線で確かめる（新しい導線は newflow.test.js）
 
     ADMIN_API_TOKEN: ADMIN_TOKEN,
     PUBLIC_BASE_URL: 'https://example.test',
@@ -28,7 +29,7 @@ export function baseEnv(overrides = {}) {
 
 export async function freshDb() {
   const db = new PGlite();
-  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql', '006_webinar_registrations.sql', '007_notify_targets.sql']) {
+  for (const f of ['001_parent_line.sql', '002_parent_line_test_users.sql', '003_manual_followup.sql', '004_growth_oriented_survey.sql', '005_parenting_checklist.sql', '006_webinar_registrations.sql', '007_notify_targets.sql', '008_diagnosis_reports.sql']) {
     await db.exec(await readFile(new URL(`../db/migrations/${f}`, import.meta.url), 'utf8'));
   }
   setDb(db);

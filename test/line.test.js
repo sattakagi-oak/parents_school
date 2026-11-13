@@ -198,16 +198,21 @@ test('個数: 保存・pending・お礼→プレゼント動画→個別診断�
   for (const ng of ['個別分析', 'お悩み相談', OWNER]) assert.ok(!all.includes(ng), `含まない: ${ng}`);
 });
 
-test('個数の選び直し: 最新値で上書き、カードは再送せず「更新しました」のみ。対応状況は変えない', async () => {
+test('2回目の回答（きょうだいの分）: 自動返信なし。1回目の学年・個数は残し、記録だけする。対応状況は変えない', async () => {
   testMode();
   await fullFlow(OWNER, 'elementary_upper', 3);
   const before = await user(db, OWNER);
   await setManualFollowup(before.id, 'completed');
+  await send(stage(OWNER, 'junior_high_plus'));
+  assert.equal(lastMessages()[0].type, 'image', '別の学年のシートは届く');
+  const n = calls.sends().length;
   await send(count(OWNER, 8));
-  assert.match(lastMessages()[0].text, /チェック数を更新しました/);
-  assert.equal(lastMessages().length, 1);
+  assert.equal(calls.sends().length, n, '自動では何も返さない');
   const after = await user(db, OWNER);
-  assert.equal(after.parenting_check_count, 8);
+  assert.equal(after.parenting_check_count, 3, '1回目の個数を残す');
+  assert.equal(after.education_stage, 'elementary_upper', '1回目の学年を残す');
+  const { rows } = await db.query(`select detail from parent_line_events where line_user_id = $1 and event_type = 'check_count_again'`, [OWNER]);
+  assert.deepEqual(rows.map((r) => r.detail), [{ count: 8, stage: 'junior_high_plus' }]);
   assert.equal(after.parenting_check_answered_at.getTime(), before.parenting_check_answered_at.getTime());
   assert.equal(after.manual_followup_status, 'completed');
   assert.equal((await logs(db, OWNER)).length, 1);
@@ -511,6 +516,7 @@ test('個別診断カード: ボタンの下に「お支払い完了後に申し
   const footer = lastMessages()[1].contents.footer.contents;
   assert.equal(footer[0].action.label, '個別診断を申し込む');
   assert.equal(footer[1].text, 'お支払いが完了したら、このLINEで「申し込みました」とお送りください😊');
+  assert.equal(footer[2].text, '確認後、候補日程を送らせていただきます。');
 });
 
 test('「申し込みました」報告: 申込済みとして記録し、自動返信はしない（表記ゆれも可）', async () => {
@@ -556,13 +562,13 @@ test('チェック数のメッセージ: ボタンの「【チェック数】n�
   await send(postback(OWNER, 'action=stage&value=elementary_lower'));
   await send(say(OWNER, '【チェック数】7個'));
   assert.equal((await user(db, OWNER)).parenting_check_count, 7);
-  assert.ok(lastReply().length >= 2, 'お礼＋個別分析カード');
+  assert.ok(lastReply().length >= 2, 'お礼＋動画');
 
   await send(say(OWNER, '８個でした'));
-  assert.equal((await user(db, OWNER)).parenting_check_count, 8);
-
   await send(postback(OWNER, 'action=check_count&value=5'));
-  assert.equal((await user(db, OWNER)).parenting_check_count, 5, '旧ボタン（postback）も引き続き使える');
+  assert.equal((await user(db, OWNER)).parenting_check_count, 7, '2回目以降は上書きしない');
+  const { rows } = await db.query(`select detail->>'count' as c from parent_line_events where line_user_id = $1 and event_type = 'check_count_again' order by id`, [OWNER]);
+  assert.deepEqual(rows.map((r) => r.c), ['8', '5'], '手入力「８個でした」も旧ボタン（postback）も2回目の回答として記録');
 });
 
 test('相手が押すボタンはすべて message アクション（postback を使わない＝必ずチャットにルームができる）', async () => {
@@ -610,7 +616,7 @@ test('数字だけの入力: シート受取済み・未回答なら個数とし
   await send(text(OWNER, '3'));
   assert.equal((await user(db, OWNER)).parenting_check_count, 5, '回答済みの人の「3」は気になる番号などの返事かもしれない');
   await send(text(OWNER, '3個'));
-  assert.equal((await user(db, OWNER)).parenting_check_count, 3, '「3個」なら選び直し');
-  await send(text(OWNER, '11'));
-  assert.equal((await user(db, OWNER)).parenting_check_count, 3, '上限を超える数は無視');
+  assert.equal((await user(db, OWNER)).parenting_check_count, 5, '「3個」は2回目の回答として記録だけ（上書きしない）');
+  const { rows } = await db.query(`select count(*)::int as n from parent_line_events where line_user_id = $1 and event_type = 'check_count_again'`, [OWNER]);
+  assert.equal(rows[0].n, 1);
 });

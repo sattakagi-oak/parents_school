@@ -5,19 +5,20 @@
 //   旧入力「①/②/1/2」（シート未取得の人のみ）→ シートだけ保存 → 同じくシート画像＋案内＋0〜10個ボタン
 //   個数タップ（postback action=check_count）→ 個数・回答日時・pending を保存
 //       初回: お礼＋プレゼント動画＋個別診断の案内（旧入力の人には任意で年代ボタンも）
-//       選び直し: 「更新しました」のみ
+//       2回目以降（きょうだいの分・数え直し）: 自動では返信せず、1回目の回答は残したまま美穂先生に通知
 //   以降の自動送信なし（美穂先生が手動コメント）
 //
 // DB保存は postback data（正規化された値）を正とし、displayText は表示用のみでパースしない。
 
 import {
-  STAGES, CHECK_COUNT_MAX, CHECK_UPDATED, STAGE_SUPPLEMENT_THANKS,
+  STAGES, CHECK_COUNT_MAX, STAGE_SUPPLEMENT_THANKS,
   stageByValue, stageLabel, greetingMessages, sheetMessages, checkCompleteMessages, stageMessage,
 } from './messages.js';
 import { notifyAdmins } from './notify.js';
 import { getUser, setStageAndSheet, setStageOnly, setLegacySheet, setCheckCount, recordEvent } from './users.js';
 import { replyOnce, replyUntracked } from './delivery.js';
-import { diagnosisUrl, publicBaseUrl } from './config.js';
+import { getDb } from './db.js';
+import { diagnosisUrl, publicBaseUrl, isNewFlowUser } from './config.js';
 
 export const COMPLETION_CAMPAIGN = 'check:complete';
 
@@ -55,8 +56,10 @@ export async function handleStage(lineUserId, replyToken, value, { supplement = 
     return 'stage_supplement';
   }
 
-  await setStageAndSheet(lineUserId, stage.value, stage.sheet);
-  await recordEvent(lineUserId, 'sheet_sent', { stage: stage.value, sheet: stage.sheet, source: 'stage_button' });
+  // 回答済みの人の選び直し（きょうだいの分など）は、1回目の回答を残すため保存せず、シートだけ送る
+  const answered = (await getUser(lineUserId))?.parenting_check_answered_at;
+  if (!answered) await setStageAndSheet(lineUserId, stage.value, stage.sheet);
+  await recordEvent(lineUserId, 'sheet_sent', { stage: stage.value, sheet: stage.sheet, source: 'stage_button', ...(answered ? { after_answer: true } : {}) });
   await replySheet(lineUserId, replyToken, stage.sheet);
   return `sheet:${stage.sheet}`;
 }
@@ -75,6 +78,9 @@ export async function handleCheckCount(lineUserId, replyToken, value) {
   if (!/^\d{1,2}$/.test(value || '') || Number(value) > CHECK_COUNT_MAX) return 'invalid_count';
   const count = Number(value);
 
+  const before = await getUser(lineUserId);
+  if (before?.parenting_check_answered_at) return handleCountAgain(before, count);
+
   const user = await setCheckCount(lineUserId, count);
   if (!user) {
     // シート未取得（古いボタン等）→ 年代ボタンから
@@ -86,16 +92,31 @@ export async function handleCheckCount(lineUserId, replyToken, value) {
   const offerConsult = Boolean(ctaUrlFor(user));
   const status = await replyOnce(
     lineUserId, replyToken,
-    checkCompleteMessages({ offerConsult, askStage: !user.education_stage, baseUrl: publicBaseUrl() }),
+    checkCompleteMessages({ offerConsult, askStage: !user.education_stage, baseUrl: publicBaseUrl(), showSample: isNewFlowUser(user) }),
     COMPLETION_CAMPAIGN);
-  if (status === 'already_sent') {
-    await replyUntracked(lineUserId, replyToken, [{ type: 'text', text: CHECK_UPDATED }], 'check:updated');
-    return 'count_updated';
-  }
   if (offerConsult && status === 'sent') await recordEvent(lineUserId, 'consult_offer');
   const stage = user.education_stage ? stageLabel(user.education_stage) : '年代未回答';
   await notifyAdmins(lineUserId, 'check_count', `チェック数を回答しました：${count}個（${stage}）`);
   return `completed:${status}`;
+}
+
+/**
+ * 回答済みの人がもう一度個数を送ったとき。1回目の回答（個数・学年）は上書きせず、自動の返信もしない。
+ * 今回の学年は、回答後に選び直した学年（なければ1回目と同じ）として美穂先生に通知する。
+ */
+async function handleCountAgain(user, count) {
+  const { rows } = await getDb().query(
+    `select detail->>'stage' as stage from parent_line_events
+      where line_user_id = $1 and event_type = 'sheet_sent' and created_at > $2
+      order by created_at desc limit 1`,
+    [user.line_user_id, user.parenting_check_answered_at],
+  );
+  const stageNow = rows[0]?.stage || user.education_stage;
+  await recordEvent(user.line_user_id, 'check_count_again', { count, stage: stageNow });
+  const label = (s) => (s ? stageLabel(s) : '学年未回答');
+  await notifyAdmins(user.line_user_id, 'check_count_again',
+    `2回目の回答がありました：${label(stageNow)} ${count}個（前回：${label(user.education_stage)} ${user.parenting_check_count}個）\nきょうだいの分かもしれません。自動では返信していません。`);
+  return 'count_again';
 }
 
 export { STAGES };

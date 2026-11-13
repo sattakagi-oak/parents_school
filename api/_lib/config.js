@@ -106,3 +106,24 @@ export function zoomConfig() {
 export function secretEnv(name) {
   return env(name);
 }
+
+/** 新しい導線を本番で始めた日時（環境変数 NEW_FLOW_FROM があればそちらを優先） */
+const NEW_FLOW_STARTED_AT = '2026-11-13T15:05:00+09:00';
+
+/**
+ * 新しい導線（見本画像・新しい個別診断カード）を始めた日時。
+ * これ以降に初めてチェック数を送った人だけが対象。それより前に回答済みの人は今までどおり。
+ * テストでは NEW_FLOW_FROM で上書きする（'off' で無効）。
+ */
+export function newFlowFrom() {
+  const v = process.env.NEW_FLOW_FROM !== undefined ? env('NEW_FLOW_FROM') : NEW_FLOW_STARTED_AT;
+  const t = Date.parse(v);
+  return Number.isFinite(t) ? new Date(t) : null;
+}
+
+/** その人が新しい導線の対象か（チェック数の初回回答が NEW_FLOW_FROM 以降） */
+export function isNewFlowUser(user) {
+  const from = newFlowFrom();
+  const at = user?.parenting_check_answered_at ? new Date(user.parenting_check_answered_at) : null;
+  return Boolean(from && at && at >= from);
+}
