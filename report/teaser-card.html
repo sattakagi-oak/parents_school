@@ -1,9 +1,9 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex">
-<!-- LINEのトーク画面でそのまま読める、個別診断レポートの見本（1040×1300） -->
+<!-- LINEのトーク画面でそのまま読める、個別診断レポートの見本（1040×1560） -->
 <style>
 :root{--navy:#0b254a;--navy2:#153b6f;--gold:#b48a25;--gold2:#dfbd67;--ink:#17243a;--sub:#56657a;--line:#e3e8ef;--ivory:#faf8f3}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:1040px;height:1300px;overflow:hidden}
+html,body{width:1040px;height:1560px;overflow:hidden}
 body{font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;color:var(--ink);background:#fff;position:relative}
 .mincho{font-family:"Hiragino Mincho ProN",serif;font-weight:700}
 .head{background:linear-gradient(160deg,var(--navy),var(--navy2));color:#fff;padding:34px 50px 30px;position:relative}
@@ -24,11 +24,22 @@ body{font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;color:va
 .lock .h{font-size:34px;font-weight:900;color:var(--navy)}
 .lock .h::before{content:"🔒 "}
 .lock .blur{margin-top:8px;font-size:30px;line-height:1.6;color:#6b7686;filter:blur(7px);user-select:none}
-.cta{position:absolute;left:0;right:0;bottom:0;height:270px;background:linear-gradient(160deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding-top:30px}
+.cta{position:absolute;left:0;right:0;bottom:0;height:262px;background:linear-gradient(160deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding-top:26px}
 .cta .s{font-size:30px;color:var(--gold2);font-weight:900}
 .cta .m{font-size:44px;margin-top:6px}
 .cta .send{display:inline-block;margin-top:16px;background:#06c755;font-size:38px;font-weight:900;padding:12px 34px;border-radius:999px}
 .cta .send b{background:#fff;color:#06c755;padding:0 10px;border-radius:8px;margin:0 4px}
+.acts{margin-top:22px}
+.a{display:flex;gap:16px;margin-top:12px;border:3px solid var(--navy);border-radius:18px;padding:14px 20px}
+.a>span{flex:none;width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;font-size:26px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.a b{font-size:32px;color:var(--navy);line-height:1.4}
+.say{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:8px}
+.say i{font-style:normal;font-size:27px;border-radius:10px;padding:4px 12px}
+.say .ng{background:#f2f4f7;color:#7b8494}
+.say .ok{background:#e6f5ef;color:#135f4c;font-weight:800}
+.why{font-size:25px;color:var(--sub);margin-top:6px}
+.more{margin-top:12px;font-size:26px;color:#7b8494;font-weight:700;text-align:center}
+.res{margin-top:16px}
 </style></head><body>
 <div class="head"><div class="k">個別診断レポート（見本）</div><h1 class="mincho">わが子の強み・伸ばし方</h1>
 <div class="meta">お子さん <b>ゆうくん（小3）</b>　担当 <b>みほ先生</b></div></div>
@@ -41,10 +52,14 @@ body{font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif;color:va
   <div><div class="t">お子さんのタイプ<b>自由型</b></div>
    <div class="str"><em>強み</em> 好きなことへの集中力<br><em>強み</em> 納得したらやり抜く力</div></div>
  </div>
- <div class="lock"><div class="h">今日からできる3つのこと</div>
-  <div class="blur">1. 始める時間をゆうくんに決めてもらう<br>2. 答えより先に「どこまでわかった？」<br>3. 明日の準備は「準備表」に任せる</div></div>
+ <div class="acts"><span class="lbl">今日からできる3つのこと</span>
+  <div class="a"><span>1</span><div><b>始める時間を、ゆうくんに決めてもらう</b><div class="say"><i class="ng">✕ 宿題やったの？</i><i class="ok">◯ 今日は何時から始める？</i></div><div class="why">自由型の子は、自分で決めたことは守ろうとします</div></div></div>
+  <div class="a"><span>2</span><div><b>答えより先に「どこまでわかった？」</b><div class="say"><i class="ng">✕ ここはこうやるんでしょ</i><i class="ok">◯ どこまでわかった？</i></div></div></div>
+  <div class="a"><span>3</span><div><b>明日の準備は「準備表」に任せる</b></div></div>
+ </div>
+ <div class="more">ほかに「原因の見立て」「6〜12か月の見通し」なども</div>
 </div>
-<div class="cta"><div class="s">この続きは、個別診断を受けた方だけに</div>
-<div class="m mincho">わが子専用の「3つのこと」が届きます</div>
+<div class="cta"><div class="s">個別診断を受けると、こんなレポートが届きます</div>
+<div class="m mincho">あなたのお子さん専用の「3つのこと」を</div>
 <div class="send">このLINEに<b>個別診断</b>と送るだけ</div></div>
 </body></html>
