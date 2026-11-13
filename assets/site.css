@@ -158,3 +158,12 @@ h3 { font-size: 20px; }
 @media (min-width: 861px) { body { padding-bottom: 0; } }
 .nw { display: inline-block; }
 @media (max-width: 480px) { .btn-line { font-size: 15px; padding: 14px 18px; } .btn-line::before { font-size: 10px; } }
+
+/* 著書・メディア・Instagram */
+.book img { width: min(100%, 300px); margin: 0 auto; border-radius: 8px; box-shadow: 0 18px 40px rgba(11,37,74,.2); }
+.media-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+.media-list li { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.media-list b { color: var(--navy); margin-right: 10px; }
+.media-list span { font-size: 13px; color: var(--sub); }
+.btn-ig { color: #fff; background: linear-gradient(90deg, #f58529 0%, #dd2a7b 55%, #8134af 100%); box-shadow: 0 8px 20px rgba(221,42,123,.25); }
+.ig-shot img { border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(11,37,74,.1); background: #fff; }

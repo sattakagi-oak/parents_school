@@ -90,7 +90,7 @@ ${html.trim()}
 <footer class="site-footer"><div class="wrap">
 <div class="cols">
 <div><b style="color:#fff">親の学習塾</b><br>スクールオーク ｜ 金沢市片町 ｜ 塾長 高木美保</div>
-<nav>${nav}<a href="${root}line/">LINE登録</a></nav>
+<nav>${nav}<a href="${root}line/">LINE登録</a><a href="https://www.instagram.com/kanazawa_juku/?openExternalBrowser=1" target="_blank" rel="noopener">Instagram</a></nav>
 </div>
 <small>© School Oak. All rights reserved.</small>
 </div></footer>
