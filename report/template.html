@@ -1,232 +1,45 @@
-<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<title>わが子の強み・伸ばし方 個別診断レポート｜親の学習塾</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>個別診断レポート｜親の学習塾</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap" rel="stylesheet">
-<!--
-  個別診断レポートのテンプレート（見本）。{{ }} の部分を、みほ先生の入力から差し込む。
-  この見本の中身は架空の例。
--->
-<style>
-  :root {
-    --navy: #0b254a; --navy2: #153b6f; --gold: #b48a25; --gold2: #dfbd67; --ink: #17243a; --sub: #56657a;
-    --line: #e3e8ef; --ivory: #faf8f3; --sky: #eef5fb; --coral: #d9543a; --green: #0e8b70;
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: #e9edf2; color: var(--ink); line-height: 1.8; font-size: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif; }
-  .mincho { font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif; font-weight: 700; }
-  .sheet { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; }
-  .sample { background: #fff4d6; color: #7a5a00; text-align: center; font-size: 12px; font-weight: 800; padding: 6px; letter-spacing: .06em; }
-
-  /* ヘッダー */
-  .head { background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%); color: #fff; padding: 26px 22px 22px; position: relative; overflow: hidden; }
-  .head::after { content: ""; position: absolute; right: -60px; top: -60px; width: 180px; height: 180px; border-radius: 50%; border: 1px solid rgba(223,189,103,.35); }
-  .head .kicker { font-size: 11px; letter-spacing: .2em; color: var(--gold2); font-weight: 800; }
-  .head h1 { font-size: 23px; line-height: 1.45; margin: 6px 0 14px; }
-  .meta { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; color: #d6e1ef; }
-  .meta b { color: #fff; font-weight: 700; }
-  .no { position: absolute; right: 18px; bottom: 16px; font-size: 11px; color: var(--gold2); letter-spacing: .1em; }
-
-  section { padding: 24px 20px; border-bottom: 8px solid #f3f5f8; }
-  .sec-title { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 17px; }
-  .sec-title .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 14px; font-weight: 900;
-    display: flex; align-items: center; justify-content: center; }
-  .label { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--gold); border: 1px solid var(--gold2); border-radius: 999px; padding: 1px 10px; margin-bottom: 8px; }
-
-  /* お悩み */
-  .worry { background: var(--ivory); border-left: 4px solid var(--gold2); border-radius: 8px; padding: 14px 16px; font-size: 16px; font-weight: 700; }
-  .worry small { display: block; font-size: 12px; color: var(--sub); font-weight: 500; margin-top: 6px; }
-
-  /* タイプ */
-  .type-wrap { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; }
-  .type-main { font-size: 13px; color: var(--sub); }
-  .type-main b { display: block; font-size: 22px; color: var(--navy); }
-  .type-main .subtype { margin-top: 6px; font-size: 13px; }
-  .type-desc { margin-top: 12px; font-size: 14px; background: var(--sky); border-radius: 10px; padding: 12px 14px; }
-
-  .block { margin-top: 20px; }
-  .strengths { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .strengths li { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
-  .strengths b { display: block; color: var(--navy); }
-  .strengths span { font-size: 13px; color: var(--sub); }
-
-  .check { display: flex; gap: 14px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
-  .check .score { flex: none; text-align: center; width: 84px; }
-  .check .score b { font-size: 32px; color: var(--navy); line-height: 1; }
-  .check .score b small { font-size: 15px; color: var(--sub); }
-  .check .score span { display: block; font-size: 11px; color: var(--sub); margin-top: 4px; }
-  .bar { height: 8px; background: #edf1f6; border-radius: 4px; margin-top: 8px; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold2), var(--coral)); }
-  .check .tend b { color: var(--coral); }
-  .check .tend ul { margin: 6px 0 0; padding-left: 1.1em; font-size: 13px; color: var(--sub); line-height: 1.6; }
-
-  .cause { background: #fff8f1; border: 1px solid #f6d9c8; border-radius: 12px; padding: 14px 16px; font-size: 14px; }
-
-  /* 3つのこと */
-  .act { border: 2px solid var(--navy); border-radius: 16px; padding: 16px; margin-top: 14px; position: relative; }
-  .act .num { position: absolute; top: -14px; left: 14px; background: var(--navy); color: #fff; font-size: 12px; font-weight: 900; border-radius: 999px; padding: 3px 12px; letter-spacing: .06em; }
-  .act h3 { margin: 4px 0 10px; font-size: 16px; color: var(--navy); line-height: 1.5; }
-  .say { display: grid; gap: 6px; font-size: 14px; }
-  .say div { border-radius: 10px; padding: 8px 12px; }
-  .say .ng { background: #f5f6f8; color: #7b8494; }
-  .say .ng::before { content: "✕ "; color: #b0b6c0; font-weight: 900; }
-  .say .ok { background: #eaf6f1; color: #135f4c; font-weight: 700; }
-  .say .ok::before { content: "◯ "; color: var(--green); font-weight: 900; }
-  .why { margin-top: 10px; font-size: 13px; color: var(--sub); }
-  .why b { color: var(--gold); }
-
-  .notyet { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-  .notyet li { background: var(--ivory); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
-  .notyet li::before { content: "ー "; color: var(--gold); font-weight: 900; }
-
-  .road { position: relative; padding-left: 22px; }
-  .road::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--gold2), var(--navy)); }
-  .road .st { position: relative; margin-bottom: 14px; }
-  .road .st::before { content: ""; position: absolute; left: -21px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid var(--gold); }
-  .road .st:last-child::before { border-color: var(--navy); }
-  .road .st b { display: block; font-size: 12px; color: var(--gold); letter-spacing: .06em; }
-  .road .st span { font-size: 14px; }
-
-  .letter { background: var(--ivory); border-radius: 16px; padding: 18px; display: flex; gap: 14px; }
-  .letter img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex: none; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,.08); }
-  .letter p { margin: 0; font-family: "Klee One", "Hiragino Maru Gothic ProN", serif; font-size: 16px; line-height: 1.9; }
-  .letter .sign { display: block; text-align: right; font-size: 14px; color: var(--sub); margin-top: 6px; }
-
-  .foot { background: var(--navy); color: #d6e1ef; padding: 22px 20px 30px; font-size: 13px; text-align: center; }
-  .foot b { color: #fff; }
-  .foot .brand { margin-top: 14px; font-size: 11px; color: #8fa6c2; }
-</style>
-</head>
-<body>
-<div class="sheet">
-  <div class="sample">サンプル（架空の例です）</div>
-
-  <header class="head">
-    <div class="kicker">PERSONAL DIAGNOSIS REPORT</div>
-    <h1 class="mincho">わが子の強み・伸ばし方<br>個別診断レポート</h1>
-    <div class="meta">
-      <span>お名前</span><b>サンプル 花子 さま</b>
-      <span>お子さん</span><b>ゆうくん（小学3年生）</b>
-      <span>診断日</span><b>2026年11月20日</b>
-      <span>担当</span><b>高木 美保（みほ先生）</b>
-    </div>
-    <div class="no">No. 0012</div>
-  </header>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">1</span>今回のお悩み</h2>
-    <div class="worry">「宿題を始めるまでに1時間かかります。声をかけると怒って、余計に始めなくなります。」
-      <small>（事前アンケートと面談でお聞きした内容より）</small></div>
-  </section>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">2</span>診断結果</h2>
-
-    <span class="label">お子さんのタイプ</span>
-    <div class="type-wrap">
-      <svg viewBox="0 0 150 150" width="150" height="150" aria-label="4つのタイプのバランス">
-        <g fill="none" stroke="#e3e8ef">
-          <polygon points="75,15 135,75 75,135 15,75"/>
-          <polygon points="75,39 111,75 75,111 39,75"/>
-          <line x1="75" y1="15" x2="75" y2="135"/><line x1="15" y1="75" x2="135" y2="75"/>
-        </g>
-        <!-- 自由5（上）こだわり3（右）共感2（下）目標2（左）。中心75、1点=12 -->
-        <polygon points="75,15 111,75 75,99 51,75" fill="rgba(223,189,103,.35)" stroke="#b48a25" stroke-width="2"/>
-        <g font-size="11" font-weight="700" fill="#56657a" text-anchor="middle">
-          <text x="75" y="10">自由</text><text x="143" y="79" text-anchor="end">こだわり</text>
-          <text x="75" y="148">共感</text><text x="7" y="79" text-anchor="start">目標</text>
-        </g>
-      </svg>
-      <div class="type-main">いちばん強いタイプ<b class="mincho">自由型</b>
-        <div class="subtype">次に強いのは <b style="display:inline;font-size:14px;color:var(--navy)">こだわり型</b></div></div>
-    </div>
-    <div class="type-desc">自分で決める余地があると、ぐんと動きやすくなるタイプです。「なぜやるのか」に納得できると、粘り強く取り組めます。</div>
-
-    <div class="block">
-      <span class="label">今伸びている力・強み</span>
-      <ul class="strengths">
-        <li><b>好きなことへの集中力</b><span>レゴの作品づくりに、2時間黙々と取り組める</span></li>
-        <li><b>納得したら最後までやり抜く力</b><span>理由がわかった漢字の書き取りは、自分から続けている</span></li>
-        <li><b>自分の考えを言葉にする力</b><span>「なんでそうなるの？」と、筋道を立てて聞いてくる</span></li>
-      </ul>
-    </div>
-
-    <div class="block">
-      <span class="label">親の関わりの傾向（チェックリストより）</span>
-      <div class="check">
-        <div class="score"><b>7<small>/10</small></b><span>当てはまった数</span>
-          <div class="bar"><i style="width:70%"></i></div></div>
-        <div class="tend">多かったのは <b>「先回り」</b>
-          <ul><li>No.1 宿題の時間・順番を親が決める</li><li>No.3 明日の準備を親が毎回チェック</li><li>No.7 わからない問題の答えをすぐ教える</li></ul></div>
-      </div>
-    </div>
-
-    <div class="block">
-      <span class="label">お悩みの原因の見立て</span>
-      <div class="cause">自由型のゆうくんにとって、「始める時間」を親に決められることが、やる気を下げる一番の原因になっています。声をかけるほど「やらされている」と感じ、始める前から気持ちが離れてしまう状態です。</div>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">3</span>今日からできる3つのこと</h2>
-
-    <div class="act"><span class="num">1</span>
-      <h3>始める時間を、ゆうくんに決めてもらう</h3>
-      <div class="say"><div class="ng">宿題やったの？</div><div class="ok">今日は何時から始める？</div></div>
-      <p class="why"><b>なぜ：</b>自由型の子は、自分で決めたことは守ろうとします。決めた時間までは、声をかけずに待ちましょう。</p>
-    </div>
-
-    <div class="act"><span class="num">2</span>
-      <h3>わからない問題は、答えより先に「どこまでわかった？」</h3>
-      <div class="say"><div class="ng">ここはこうやるんでしょ</div><div class="ok">どこまでわかった？</div></div>
-      <p class="why"><b>なぜ：</b>こだわり型の傾向があるので、自分で納得できると次の問題も自分で進めます。</p>
-    </div>
-
-    <div class="act"><span class="num">3</span>
-      <h3>明日の準備は「準備表」に任せる</h3>
-      <div class="say"><div class="ng">忘れ物ない？</div><div class="ok">準備表、どこまでチェックできた？</div></div>
-      <p class="why"><b>なぜ：</b>親がチェックする役を、ゆうくんと一緒に作った表に渡します。声かけが減り、自分で確認する習慣がつきます。</p>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">4</span>まだ急がなくていいこと</h2>
-    <ul class="notyet">
-      <li>毎日の勉強時間を増やすこと</li>
-      <li>苦手な計算を、今すぐ克服させること</li>
-    </ul>
-    <p class="why" style="margin-top:12px">まずは「自分で始める」経験を積むことが先です。量や苦手克服は、そのあとで十分間に合います。</p>
-  </section>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">5</span>これからの6〜12か月</h2>
-    <div class="road">
-      <div class="st"><b>今〜3か月</b><span>始める時間を自分で決める習慣をつける</span></div>
-      <div class="st"><b>3〜6か月</b><span>週に1回、自分で計画を立てて振り返る</span></div>
-      <div class="st"><b>6〜12か月</b><span>わからないことを、自分で調べて解決する力を伸ばす</span></div>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="sec-title mincho"><span class="n">6</span>みほ先生から</h2>
-    <div class="letter">
-      <img src="../images/representative.jpg" alt="みほ先生">
-      <p>ゆうくんは、自分で決めたことには本当に粘り強い子です。まずは「待つ」ことから。うまくいかない日があっても大丈夫ですよ。<span class="sign">高木 美保</span></p>
-    </div>
-  </section>
-
-  <footer class="foot">
-    <b>2週間後に「試してみてどうでしたか？」とLINEでお聞きします。</b><br>
-    困ったときは、いつでもこのLINEにどうぞ。
-    <div class="brand">親の学習塾｜スクールオーク</div>
-  </footer>
+<link rel="stylesheet" href="../report/report.css"></head>
+<body><div class="sheet"><div class="sample">サンプル（架空の例です）</div>
+<header class="head">
+  <div class="kicker">PERSONAL DIAGNOSIS REPORT</div>
+  <h1 class="mincho">わが子の強み・伸ばし方<br>個別診断レポート</h1>
+  <div class="meta">
+    <span>お名前</span><b>サンプル 花子 さま</b>
+    <span>お子さん</span><b>ゆうくん（小学3年生）</b>
+    <span>診断日</span><b>2026年11月20日</b>
+    <span>担当</span><b>高木 美保（みほ先生）</b>
+  </div>
+  <div class="no">No. 0012</div>
+</header><section><h2 class="sec-title mincho"><span class="n">1</span>今回のお悩み</h2>
+<div class="worry">「宿題を始めるまでに1時間かかります。声をかけると怒って、余計に始めなくなります。」<small>（事前アンケートと面談でお聞きした内容より）</small></div></section><section><h2 class="sec-title mincho"><span class="n">2</span>診断結果</h2><span class="label">お子さんのタイプ</span>
+<div class="type-wrap"><svg viewBox="0 0 150 150" width="150" height="150" aria-label="4つのタイプのバランス">
+<g fill="none" stroke="#e3e8ef"><polygon points="75,15 135,75 75,135 15,75"/><polygon points="75,39 111,75 75,111 39,75"/><line x1="75" y1="15" x2="75" y2="135"/><line x1="15" y1="75" x2="135" y2="75"/></g>
+<polygon points="75,15 111,75 75,99 51,75" fill="rgba(223,189,103,.35)" stroke="#b48a25" stroke-width="2"/>
+<g font-size="11" font-weight="700" fill="#56657a" text-anchor="middle"><text x="75" y="10">自由</text><text x="143" y="79" text-anchor="end">こだわり</text><text x="75" y="148">共感</text><text x="7" y="79" text-anchor="start">目標</text></g></svg>
+  <div class="type-main">いちばん強いタイプ<b class="mincho">自由型</b>
+  <div class="subtype">次に強いのは <b style="display:inline;font-size:14px;color:var(--navy)">こだわり型</b></div></div>
 </div>
-</body>
-</html>
+<div class="type-desc">自分で決める余地があると、ぐんと動きやすくなるタイプです。「なぜやるのか」に納得できると、粘り強く取り組めます。</div><div class="block"><span class="label">今伸びている力・強み</span><ul class="strengths">
+<li><b>好きなことへの集中力</b><span>レゴの作品づくりに、2時間黙々と取り組める</span></li><li><b>納得したら最後までやり抜く力</b><span>理由がわかった漢字の書き取りは、自分から続けている</span></li><li><b>自分の考えを言葉にする力</b><span>「なんでそうなるの？」と、筋道を立てて聞いてくる</span></li></ul></div><div class="block"><span class="label">親の関わりの傾向（チェックリストより）</span>
+<div class="check"><div class="score"><b>7<small>/10</small></b><span>当てはまった数</span><div class="bar"><i style="width:70%"></i></div></div>
+<div class="tend">多かったのは <b>「先回り」</b><ul><li>No.1 宿題の時間・順番を親が決める</li><li>No.3 明日の準備を親が毎回チェック</li><li>No.7 わからない問題の答えをすぐ教える</li></ul></div></div></div><div class="block"><span class="label">お悩みの原因の見立て</span><div class="cause">自由型のゆうくんにとって、「始める時間」を親に決められることが、やる気を下げる一番の原因になっています。声をかけるほど「やらされている」と感じ、始める前から気持ちが離れてしまう状態です。</div></div></section>
+<section><h2 class="sec-title mincho"><span class="n">3</span>今日からできる3つのこと</h2><div class="act"><span class="num">1</span><h3>始める時間を、ゆうくんに決めてもらう</h3>
+<div class="say"><div class="ng">宿題やったの？</div><div class="ok">今日は何時から始める？</div></div>
+<p class="why"><b>なぜ：</b>自由型の子は、自分で決めたことは守ろうとします。決めた時間までは、声をかけずに待ちましょう。</p></div><div class="act"><span class="num">2</span><h3>わからない問題は、答えより先に「どこまでわかった？」</h3>
+<div class="say"><div class="ng">ここはこうやるんでしょ</div><div class="ok">どこまでわかった？</div></div>
+<p class="why"><b>なぜ：</b>こだわり型の傾向があるので、自分で納得できると次の問題も自分で進めます。</p></div><div class="act"><span class="num">3</span><h3>明日の準備は「準備表」に任せる</h3>
+<div class="say"><div class="ng">忘れ物ない？</div><div class="ok">準備表、どこまでチェックできた？</div></div>
+<p class="why"><b>なぜ：</b>親がチェックする役を、ゆうくんと一緒に作った表に渡します。声かけが減り、自分で確認する習慣がつきます。</p></div></section>
+<section><h2 class="sec-title mincho"><span class="n">4</span>まだ急がなくていいこと</h2>
+<ul class="notyet"><li>毎日の勉強時間を増やすこと</li><li>苦手な計算を、今すぐ克服させること</li></ul>
+<p class="why" style="margin-top:12px">まずは「自分で始める」経験を積むことが先です。量や苦手克服は、そのあとで十分間に合います。</p></section>
+<section><h2 class="sec-title mincho"><span class="n">5</span>これからの6〜12か月</h2><div class="road">
+<div class="st"><b>今〜3か月</b><span>始める時間を自分で決める習慣をつける</span></div><div class="st"><b>3〜6か月</b><span>週に1回、自分で計画を立てて振り返る</span></div><div class="st"><b>6〜12か月</b><span>わからないことを、自分で調べて解決する力を伸ばす</span></div></div></section>
+<section><h2 class="sec-title mincho"><span class="n">6</span>みほ先生から</h2>
+<div class="letter"><img src="../images/representative.jpg" alt="みほ先生"><p>ゆうくんは、自分で決めたことには本当に粘り強い子です。まずは「待つ」ことから。うまくいかない日があっても大丈夫ですよ。<span class="sign">高木 美保</span></p></div></section>
+<footer class="foot"><b>2週間後に「試してみてどうでしたか？」とLINEでお聞きします。</b><br>困ったときは、いつでもこのLINEにどうぞ。<div class="brand">親の学習塾｜スクールオーク</div></footer></div></body></html>

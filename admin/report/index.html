@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>個別診断レポート 入力｜親の学習塾</title>
+<style>
+  :root { --navy:#0b254a; --gold:#b48a25; --gold2:#dfbd67; --ink:#17243a; --sub:#56657a; --line:#d9e2ec; --bg:#f3f5f8; --ok:#0e8b70; --ng:#a84646; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.7 -apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans",sans-serif; }
+  header { background:var(--navy); color:#fff; padding:14px 18px; position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:12px; }
+  header h1 { font-size:16px; margin:0; }
+  header .st { margin-left:auto; font-size:12px; color:#c4d4e8; }
+  main { max-width:760px; margin:0 auto; padding:16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; }
+  .card h2 { font-size:15px; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .card h2 .n { width:24px; height:24px; border-radius:50%; background:var(--navy); color:#fff; font-size:12px; display:inline-flex; align-items:center; justify-content:center; }
+  label { display:block; font-size:12px; font-weight:700; color:var(--sub); margin:10px 0 4px; }
+  .auto { font-size:11px; color:var(--ok); font-weight:700; margin-left:6px; }
+  input[type=text], input[type=password], input[type=number], textarea, select { width:100%; font:inherit; border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:#fff; }
+  textarea { min-height:70px; resize:vertical; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .row4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .sub { font-size:12px; color:var(--sub); }
+  .group { border:1px dashed var(--line); border-radius:12px; padding:10px 12px; margin-top:10px; }
+  .group b { font-size:13px; }
+  .btn { font:inherit; font-weight:800; border:0; border-radius:999px; padding:11px 20px; cursor:pointer; }
+  .btn.primary { background:var(--navy); color:#fff; }
+  .btn.ghost { background:#fff; color:var(--navy); border:2px solid var(--navy); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .bar { position:sticky; bottom:0; background:rgba(243,245,248,.96); border-top:1px solid var(--line); padding:12px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  .msg { font-size:13px; }
+  .msg.ok { color:var(--ok); } .msg.ng { color:var(--ng); }
+  .pick { font-size:12px; margin-top:6px; }
+  .pick select { width:auto; font-size:12px; padding:4px 8px; }
+  .survey { background:#fffaf0; border:1px solid #f1e2bd; border-radius:10px; padding:10px 12px; font-size:13px; white-space:pre-wrap; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<header><h1>個別診断レポート 入力</h1><span class="st" id="who"></span></header>
+<main>
+
+  <div class="card" id="login">
+    <h2>ログイン</h2>
+    <label for="token">管理パスワード</label>
+    <input type="password" id="token" autocomplete="current-password">
+    <p class="sub">この端末のこのタブを閉じるまで覚えます。</p>
+    <button class="btn primary" id="loginBtn">ログイン</button> <span class="msg" id="loginMsg"></span>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="card">
+      <h2>面談した方を選ぶ</h2>
+      <select id="user"></select>
+      <p class="sub">個別診断に「申し込みました」と報告した方が上に出ます。名前・学年・チェック数・事前アンケートは自動で入ります（あとから直せます）。</p>
+      <div id="surveyBox" class="hidden"><label>事前アンケートの回答</label><div class="survey" id="survey"></div></div>
+    </div>
+
+    <form id="form">
+      <div class="card"><h2>基本情報</h2>
+        <div class="row">
+          <div><label>お名前（LINE表示名）<span class="auto">自動</span></label><input type="text" name="family_name"></div>
+          <div><label>診断日</label><input type="text" name="date" placeholder="2026年11月20日"></div>
+          <div><label>お子さんの呼び名 <span class="auto" id="childAuto"></span></label><input type="text" name="child_name" placeholder="ゆうくん"></div>
+          <div><label>学年<span class="auto">自動</span></label><input type="text" name="grade_label" placeholder="小学3年生"></div>
+        </div>
+      </div>
+
+      <div class="card"><h2><span class="n">1</span>今回のお悩み（相手の言葉で）<span class="auto" id="worryAuto"></span></h2>
+        <textarea name="worry" placeholder="宿題を始めるまでに1時間かかります…"></textarea>
+      </div>
+
+      <div class="card"><h2><span class="n">2</span>診断結果</h2>
+        <label>4つのタイプ（1〜5）</label>
+        <div class="row4">
+          <div><span class="sub">自由</span><select name="types.jiyu"></select></div>
+          <div><span class="sub">こだわり</span><select name="types.kodawari"></select></div>
+          <div><span class="sub">共感</span><select name="types.kyokan"></select></div>
+          <div><span class="sub">目標</span><select name="types.mokuhyo"></select></div>
+        </div>
+        <label>タイプの説明（空欄なら、いちばん強いタイプの定型文）</label>
+        <textarea name="type_desc"></textarea>
+
+        <label>今伸びている力・強み（3つ）</label>
+        <div id="strengths"></div>
+
+        <label>チェックリスト</label>
+        <div class="row">
+          <div><span class="sub">当てはまった数<span class="auto">自動</span></span><input type="number" min="0" max="10" name="check.count"></div>
+          <div><span class="sub">多かった傾向</span><select name="check.tendency">
+            <option value="">選ぶ</option><option>先回り</option><option>管理しすぎ</option><option>口出し</option><option>比較</option><option>結果へのこだわり</option></select></div>
+        </div>
+        <span class="sub">当てはまった項目（1行に1つ。例：No.1 宿題の時間を親が決める）</span>
+        <textarea name="check.items"></textarea>
+
+        <label>お悩みの原因の見立て</label>
+        <textarea name="cause"></textarea>
+      </div>
+
+      <div class="card"><h2><span class="n">3</span>今日からできる3つのこと</h2>
+        <div id="actions"></div>
+      </div>
+
+      <div class="card"><h2><span class="n">4</span>まだ急がなくていいこと</h2>
+        <span class="sub">1行に1つ</span><textarea name="notyet"></textarea>
+        <label>ひとこと補足</label><textarea name="notyet_note"></textarea>
+      </div>
+
+      <div class="card"><h2><span class="n">5</span>これからの6〜12か月</h2>
+        <label>今〜3か月</label><input type="text" name="road.0">
+        <label>3〜6か月</label><input type="text" name="road.1">
+        <label>6〜12か月</label><input type="text" name="road.2">
+      </div>
+
+      <div class="card"><h2><span class="n">6</span>みほ先生から（2〜3行）</h2>
+        <textarea name="message"></textarea>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div class="bar hidden" id="bar">
+  <button class="btn ghost" id="saveBtn">下書き保存</button>
+  <button class="btn ghost" id="previewBtn" disabled>プレビューを開く</button>
+  <button class="btn primary" disabled title="本番公開の許可後に使えるようになります">LINEで送る（準備中）</button>
+  <span class="msg" id="msg"></span>
+</div>
+
+<script>
+(function () {
+  var API = '/api/admin/report';
+  var KEY = 'oya_admin_token';
+  var token = '';
+  try { token = sessionStorage.getItem(KEY) || ''; } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('form');
+  var state = { user: null, reportId: null, previewUrl: null };
+
+  // 文例（選ぶと入る。そのあと相手に合わせて直す）
+  var ACTION_PRESETS = [
+    { t: '始める時間を、本人に決めてもらう', ng: '宿題やったの？', ok: '今日は何時から始める？', why: '自分で決めたことは守ろうとします。決めた時間までは、声をかけずに待ちましょう。' },
+    { t: 'わからない問題は、答えより先に「どこまでわかった？」', ng: 'ここはこうやるんでしょ', ok: 'どこまでわかった？', why: '自分で納得できると、次の問題も自分で進めます。' },
+    { t: '明日の準備は「準備表」に任せる', ng: '忘れ物ない？', ok: '準備表、どこまでチェックできた？', why: '親がチェックする役を表に渡すと、自分で確認する習慣がつきます。' },
+    { t: '「一緒に」から始めて、少しずつ離れる', ng: '早く一人でやりなさい', ok: '最初の1問だけ一緒にやろうか', why: '安心できると動き出せます。慣れたら隣にいる時間を少しずつ短くします。' },
+    { t: 'ゴールを見える形にする', ng: 'いつまでやってるの', ok: '今日はここまで終わったら完了にしよう', why: '終わりが見えると集中しやすくなります。' },
+    { t: '結果より、取り組んだことを言葉にする', ng: 'なんでこの点数なの', ok: 'ここ、自分で考えて解いたんだね', why: '過程を認められると、次も自分から取り組もうとします。' },
+  ];
+
+  function opts(sel) { for (var i = 1; i <= 5; i++) { var o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); } sel.value = 3; }
+  ['jiyu', 'kodawari', 'kyokan', 'mokuhyo'].forEach(function (k) { opts(form.elements['types.' + k]); });
+
+  var sHtml = '';
+  for (var i = 0; i < 3; i++) sHtml += '<div class="group"><b>強み ' + (i + 1) + '</b><input type="text" name="strengths.' + i + '.title" placeholder="好きなことへの集中力"><input type="text" style="margin-top:6px" name="strengths.' + i + '.detail" placeholder="具体的な場面：レゴに2時間取り組める"></div>';
+  $('strengths').innerHTML = sHtml;
+
+  var aHtml = '';
+  for (i = 0; i < 3; i++) {
+    aHtml += '<div class="group"><b>' + (i + 1) + '</b>' +
+      '<div class="pick">文例から入れる：<select data-preset="' + i + '"><option value="">選ぶ</option>' +
+      ACTION_PRESETS.map(function (p, j) { return '<option value="' + j + '">' + p.t + '</option>'; }).join('') + '</select></div>' +
+      '<label>やること</label><input type="text" name="actions.' + i + '.title">' +
+      '<div class="row"><div><label>✕ 今の声かけ</label><input type="text" name="actions.' + i + '.ng"></div><div><label>◯ 変えた声かけ</label><input type="text" name="actions.' + i + '.ok"></div></div>' +
+      '<label>なぜ（この子のタイプに合わせて）</label><textarea name="actions.' + i + '.why"></textarea></div>';
+  }
+  $('actions').innerHTML = aHtml;
+  document.querySelectorAll('[data-preset]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+      var p = ACTION_PRESETS[sel.value]; if (!p) return; var i = sel.getAttribute('data-preset');
+      form.elements['actions.' + i + '.title'].value = p.t; form.elements['actions.' + i + '.ng'].value = p.ng;
+      form.elements['actions.' + i + '.ok'].value = p.ok; form.elements['actions.' + i + '.why'].value = p.why;
+      sel.value = '';
+    });
+  });
+
+  function api(path, opt) {
+    opt = opt || {};
+    opt.headers = Object.assign({ authorization: 'Bearer ' + token }, opt.headers || {});
+    return fetch(path, opt).then(function (r) {
+      if (r.status === 401) { throw new Error('パスワードが違います'); }
+      return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('エラー ' + r.status)); return j; });
+    });
+  }
+
+  function setVal(name, v) { var el = form.elements[name]; if (el) el.value = v == null ? '' : v; }
+  function fill(d) {
+    d = d || {};
+    ['family_name', 'date', 'child_name', 'grade_label', 'worry', 'type_desc', 'cause', 'notyet_note', 'message'].forEach(function (k) { setVal(k, d[k]); });
+    var t = d.types || {}; ['jiyu', 'kodawari', 'kyokan', 'mokuhyo'].forEach(function (k) { setVal('types.' + k, t[k] || 3); });
+    var c = d.check || {}; setVal('check.count', c.count); setVal('check.tendency', c.tendency); setVal('check.items', (c.items || []).join('\n'));
+    for (var i = 0; i < 3; i++) {
+      var s = (d.strengths || [])[i] || {}; setVal('strengths.' + i + '.title', s.title); setVal('strengths.' + i + '.detail', s.detail);
+      var a = (d.actions || [])[i] || {}; ['title', 'ng', 'ok', 'why'].forEach(function (k) { setVal('actions.' + i + '.' + k, a[k]); });
+      setVal('road.' + i, (d.road || [])[i]);
+    }
+    setVal('notyet', (d.notyet || []).join('\n'));
+  }
+  function collect() {
+    var v = function (n) { return (form.elements[n].value || '').trim(); };
+    var lines = function (n) { return v(n).split('\n').map(function (x) { return x.trim(); }).filter(Boolean); };
+    var d = { family_name: v('family_name'), date: v('date'), child_name: v('child_name'), grade_label: v('grade_label'), worry: v('worry'),
+      types: {}, type_desc: v('type_desc'), strengths: [], check: { count: v('check.count'), tendency: v('check.tendency'), items: lines('check.items') },
+      cause: v('cause'), actions: [], notyet: lines('notyet'), notyet_note: v('notyet_note'), road: [], message: v('message') };
+    ['jiyu', 'kodawari', 'kyokan', 'mokuhyo'].forEach(function (k) { d.types[k] = Number(v('types.' + k)); });
+    for (var i = 0; i < 3; i++) {
+      d.strengths.push({ title: v('strengths.' + i + '.title'), detail: v('strengths.' + i + '.detail') });
+      d.actions.push({ title: v('actions.' + i + '.title'), ng: v('actions.' + i + '.ng'), ok: v('actions.' + i + '.ok'), why: v('actions.' + i + '.why') });
+      d.road.push(v('road.' + i));
+    }
+    return d;
+  }
+  function msg(t, ok) { $('msg').textContent = t; $('msg').className = 'msg ' + (ok ? 'ok' : 'ng'); }
+
+  function loadUsers() {
+    return api(API + '?action=candidates').then(function (j) {
+      var sel = $('user');
+      sel.innerHTML = '<option value="">選んでください</option>' + j.users.map(function (u) {
+        var tag = u.diagnosis_applied_at ? '【申込済】' : '';
+        var rep = u.report_status === 'draft' ? '（下書きあり）' : u.report_status === 'sent' ? '（送付済）' : '';
+        var info = [u.stage_label, u.parenting_check_count != null ? 'チェック' + u.parenting_check_count + '個' : ''].filter(Boolean).join('・');
+        return '<option value="' + u.id + '">' + tag + (u.display_name || '（名前なし）').replace(/</g, '&lt;') + '　' + info + rep + '</option>';
+      }).join('');
+    });
+  }
+
+  $('user').addEventListener('change', function () {
+    var id = this.value; state = { user: id || null, reportId: null, previewUrl: null };
+    $('previewBtn').disabled = true; msg('', true);
+    if (!id) return;
+    api(API + '?action=prefill&user=' + encodeURIComponent(id)).then(function (j) {
+      var today = new Date(); var date = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
+      var base = j.report ? j.report.data : {};
+      if (!j.report) fill({ family_name: j.auto.family_name, grade_label: j.auto.grade_label, child_name: j.auto.child_name, worry: j.auto.worry, date: date, check: j.auto.check });
+      else { fill(base); state.reportId = j.report.status === 'draft' ? j.report.id : null; state.previewUrl = j.report.preview_url; $('previewBtn').disabled = false; }
+      $('worryAuto').textContent = j.auto.worry ? '事前アンケートから自動' : '';
+      $('childAuto').textContent = j.auto.child_name ? '自動' : '';
+      var s = j.survey || {}; var keys = Object.keys(s);
+      $('surveyBox').classList.toggle('hidden', !keys.length);
+      $('survey').textContent = keys.map(function (k) { return k + '：' + s[k]; }).join('\n');
+      $('who').textContent = (j.auto.family_name || '') + ' さん' + (j.report ? '　No.' + j.report.report_no : '');
+      if (j.report && j.report.status === 'sent') msg('このレポートは送付済みです（編集すると新しい下書きになります）', true);
+    }).catch(function (e) { msg(e.message, false); });
+  });
+
+  $('saveBtn').addEventListener('click', function () {
+    if (!state.user) { msg('面談した方を選んでください', false); return; }
+    this.disabled = true;
+    api(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: state.user, report_id: state.reportId, data: collect() }) })
+      .then(function (j) { state.reportId = j.id; state.previewUrl = j.preview_url; $('previewBtn').disabled = false; $('who').textContent = form.elements.family_name.value + ' さん　No.' + j.report_no; msg('保存しました', true); })
+      .catch(function (e) { msg(e.message, false); })
+      .then(function () { $('saveBtn').disabled = false; });
+  });
+  $('previewBtn').addEventListener('click', function () { if (state.previewUrl) window.open(state.previewUrl, '_blank', 'noopener'); });
+
+  function start() {
+    loadUsers().then(function () {
+      $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('bar').classList.remove('hidden');
+    }).catch(function (e) { $('loginMsg').textContent = e.message; $('loginMsg').className = 'msg ng'; });
+  }
+  $('loginBtn').addEventListener('click', function () {
+    token = $('token').value.trim(); try { sessionStorage.setItem(KEY, token); } catch (e) {}
+    start();
+  });
+  if (token) start();
+})();
+</script>
+</body>
+</html>
