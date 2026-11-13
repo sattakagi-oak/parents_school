@@ -20,3 +20,27 @@
     links[i].rel = 'noopener';
   }
 })();
+
+// GA4 に送る行動（本番ドメインでだけ gtag がある）
+//   oya_line_click      LINEボタン（cta_id: どのページのどのボタンか）
+//   oya_instagram_click Instagram へのリンク
+//   oya_analysis_click  個別診断ページへのリンク／直接お支払い
+//   oya_analysis_view   個別診断ページを見た
+(function () {
+  function send(name, params) {
+    if (typeof window.gtag !== 'function') return;
+    params.page_path = location.pathname; params.transport_type = 'beacon';
+    window.gtag('event', name, params);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    if (a.hasAttribute('data-line')) send('oya_line_click', { cta_id: a.getAttribute('data-cta') || a.getAttribute('data-line') });
+    else if (/instagram\.com/.test(a.href)) send('oya_instagram_click', {});
+    else if (/\/analysis\/|api\/analysis\/apply/.test(a.getAttribute('href') || '')) send('oya_analysis_click', { to: /apply/.test(a.href) ? 'direct_pay' : 'page' });
+  });
+  if (/\/analysis\/$/.test(location.pathname)) {
+    var tries = 0;
+    (function wait() { if (typeof window.gtag === 'function') send('oya_analysis_view', {}); else if (tries++ < 20) setTimeout(wait, 250); })();
+  }
+})();

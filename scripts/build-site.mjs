@@ -42,11 +42,25 @@ function readPage(file) {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const rootOf = (path) => (path ? '../'.repeat(path.split('/').filter(Boolean).length) : './');
 
+// GA4（スクールオークのサイトと同じ計測ID）。本番ドメイン（www.school-oak-m.jp/oya/）でだけ計測する
+const GA_ID = 'G-S76J77XKV6';
+const GA_SNIPPET = `<script>
+if (/(^|\\.)school-oak-m\\.jp$/.test(location.hostname)) {
+  var ga = document.createElement('script'); ga.async = true; ga.src = 'https://www.googletagmanager.com/gtag/js?id=${GA_ID}';
+  document.head.appendChild(ga);
+  window.dataLayer = window.dataLayer || []; window.gtag = function(){dataLayer.push(arguments);};
+  gtag('js', new Date()); gtag('config', '${GA_ID}');
+}
+</script>`;
+
+let ctaSeq = 0; // ページ内のLINEボタンの通し番号（どのボタンが押されたかを計測するため）
 function lineButton(root, src, label = '「親の習慣」チェックリストを受け取る', cls = '') {
-  return `<a class="btn btn-line ${cls}" data-line="${src}" href="${LINE_URL}">${label}</a>`;
+  ctaSeq += 1;
+  return `<a class="btn btn-line ${cls}" data-line="${src}" data-cta="${src}-body${ctaSeq}" href="${LINE_URL}">${label}</a>`;
 }
 
 function layout({ meta, body }, extra = {}) {
+  ctaSeq = 0;
   const root = rootOf(meta.path);
   const url = SITE_URL + meta.path;
   const title = meta.path ? `${meta.title}｜${SITE_NAME}` : meta.title;
@@ -75,6 +89,7 @@ ${robots}<link rel="canonical" href="${url}">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${root}images/PS_logo.png">
+${GA_SNIPPET}
 <link rel="stylesheet" href="${root}assets/site.css?v=${CSS_V}">
 ${jsonld}
 </head>
@@ -82,7 +97,7 @@ ${jsonld}
 ${meta.draft ? '<div class="draft-banner">下書き（検索には出ません）</div>\n' : ''}<header class="site-header"><div class="wrap">
 <a class="brand" href="${root}"><img src="${root}images/logo.png" alt="スクールオーク" width="118" height="26"><span>親の学習塾</span></a>
 <nav class="gnav">${nav}</nav>
-<a class="btn btn-line btn-sm header-cta" data-line="${meta.src}" href="${LINE_URL}">LINEで受け取る</a>
+<a class="btn btn-line btn-sm header-cta" data-line="${meta.src}" data-cta="${meta.src}-header" href="${LINE_URL}">LINEで受け取る</a>
 </div></header>
 <main>
 ${html.trim()}
@@ -94,7 +109,7 @@ ${html.trim()}
 </div>
 <small>© School Oak. All rights reserved.</small>
 </div></footer>
-<div class="sticky-cta"><a class="btn btn-line" data-line="${meta.src}" href="${LINE_URL}">チェックリストを無料で受け取る</a></div>
+<div class="sticky-cta"><a class="btn btn-line" data-line="${meta.src}" data-cta="${meta.src}-sticky" href="${LINE_URL}">チェックリストを無料で受け取る</a></div>
 <script src="${root}assets/site.js?v=${JS_V}"></script>
 </body>
 </html>
