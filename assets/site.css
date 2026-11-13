@@ -157,3 +157,4 @@ h3 { font-size: 20px; }
 @media (max-width: 860px) { .sticky-cta { display: block; } }
 @media (min-width: 861px) { body { padding-bottom: 0; } }
 .nw { display: inline-block; }
+@media (max-width: 480px) { .btn-line { font-size: 15px; padding: 14px 18px; } .btn-line::before { font-size: 10px; } }
