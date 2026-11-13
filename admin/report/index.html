@@ -204,7 +204,9 @@
       var today = new Date(); var date = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
       var base = j.report ? j.report.data : {};
       if (!j.report) fill({ family_name: j.auto.family_name, grade_label: j.auto.grade_label, child_name: j.auto.child_name, worry: j.auto.worry, date: date, check_count: j.auto.check_count });
-      else { fill(base); state.reportId = j.report.status === 'draft' ? j.report.id : null; state.previewUrl = j.report.preview_url; $('previewBtn').disabled = false; }
+      else { var auto = { family_name: j.auto.family_name, grade_label: j.auto.grade_label, child_name: j.auto.child_name, worry: j.auto.worry, date: date, check_count: j.auto.check_count };
+        Object.keys(auto).forEach(function (k) { if (base[k] === undefined || base[k] === '') base[k] = auto[k]; });
+        fill(base); state.reportId = j.report.status === 'draft' ? j.report.id : null; state.previewUrl = j.report.preview_url; $('previewBtn').disabled = false; }
       $('worryAuto').textContent = j.auto.worry ? '事前アンケートから自動' : '';
       var s = j.survey || {}; var keys = Object.keys(s);
       $('surveyBox').classList.toggle('hidden', !keys.length);
