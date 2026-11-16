@@ -186,7 +186,7 @@ test('個数: 保存・pending・お礼→プレゼント動画→個別診断�
   const [, card] = lastMessages();
   assert.equal(card.type, 'flex');
   const cardText = JSON.stringify(card.contents);
-  for (const s of ['わが子の強み・伸ばし方 個別診断', '30分 1,000円（延長あり）', '今のお子さんについてお話を伺いながら、',
+  for (const s of ['わが子の強み・伸ばし方 個別診断', '30分 1,000円', '今のお子さんについてお話を伺いながら、',
     '今どんな力が伸びているか', 'お子さんの強み・得意', '次に何を伸ばすとよいか', '今やること／まだ急がなくていいこと',
     'お子さんに合った親の関わり方', '今後6〜12か月の方向性', 'を一緒に整理します。']) {
     assert.ok(cardText.includes(s), s);

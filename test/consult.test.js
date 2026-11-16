@@ -44,7 +44,7 @@ test('「個別診断」: 案内の前でも、何度でもカードを返す。
   await send(text(OWNER, '個別診断'));
   assert.equal(cardCount(), 2);
   const [reply, card] = replies().at(-1).body.messages;
-  assert.match(reply.text, /個別診断のご案内です/);
+  assert.match(reply.text, /以下のリンクから2日以内に決済してください/);
   assert.equal(card.type, 'flex');
 });
 

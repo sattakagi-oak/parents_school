@@ -122,8 +122,8 @@ export const CONSULT_OFFER = `動画を見て「一度みほ先生と直接話�
 ご希望の方は、このLINEに「個別診断」と送ってください😊`;
 
 /** 「個別診断」などの返信に、カードの前に添える */
-export const CONSULT_REPLY = `ご連絡ありがとうございます😊
-個別診断のご案内です👇`;
+export const CONSULT_REPLY = `ご連絡ありがとうございます。
+以下のリンクから2日以内に決済してください。`;
 
 /**
  * 個数を送ってくれた人へのプレゼント動画（静的ファイル）。LINE の上限は動画200MB・プレビュー画像1MB。
@@ -146,7 +146,7 @@ export const STAGE_SUPPLEMENT_THANKS = 'ありがとうございます😊 学�
  */
 export const ANALYSIS = {
   name: 'わが子の強み・伸ばし方 個別診断',
-  priceLabel: '30分 1,000円（延長あり）',
+  priceLabel: '30分 1,000円',
   lead: '今のお子さんについてお話を伺いながら、',
   points: [
     '今どんな力が伸びているか',
