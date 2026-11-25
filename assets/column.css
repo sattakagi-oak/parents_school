@@ -168,10 +168,6 @@
 .c-voice-tag { position: absolute; top: -13px; left: 18px; background: var(--c-sun); color: #fff; font-family: var(--c-round); font-weight: 900; font-size: 13px; border-radius: 999px; padding: 2px 14px; }
 .c-voice p:last-child { margin-bottom: 0; }
 
-/* 写真 */
-.c-photo { margin: 28px auto; max-width: 340px; text-align: center; }
-.c-photo img { width: 100%; border-radius: 22px; box-shadow: 0 10px 26px rgba(120, 80, 40, .15); }
-.c-photo figcaption { font-size: 13px; color: var(--c-sub); margin-top: 8px; }
 
 /* チェックリスト（読者がやってみる） */
 .c-check { background: var(--c-paper); border-radius: 22px; padding: 20px; margin: 28px 0; border: 2px solid var(--c-leaf); }
@@ -198,3 +194,35 @@
 .c-cta { background: linear-gradient(160deg, #fff6e9, #fde9e3); border-radius: 28px; padding: 26px 20px; text-align: center; }
 .c-cta-title { font-family: var(--c-round); font-weight: 900; font-size: 20px; margin: 0 0 6px !important; line-height: 1.5; }
 .c-cta p { font-size: 15px; color: var(--c-sub); }
+
+/* みほ先生のひと言（切り抜き写真＋回答の言葉） */
+.c-miho { position: relative; display: grid; grid-template-columns: 40% 1fr; align-items: end; background: linear-gradient(150deg, #fff3dc, #fde9e3); border-radius: 26px; margin: 30px 0; overflow: hidden; min-height: 220px; }
+.c-miho.is-flip { grid-template-columns: 1fr 40%; }
+.c-miho.is-flip .c-miho-img { order: 2; }
+.c-miho-img { position: relative; align-self: stretch; display: flex; align-items: flex-end; justify-content: center; }
+.c-miho-img::before { content: ""; position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%); width: 120%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.75); }
+.c-miho-img img { position: relative; width: 100%; max-height: 300px; object-fit: contain; object-position: bottom; }
+.c-miho-say { padding: 22px 18px 22px 6px; }
+.c-miho.is-flip .c-miho-say { padding: 22px 6px 22px 18px; }
+.c-miho-label { display: inline-block; font-family: var(--c-round); font-weight: 900; font-size: 12px; color: #fff; background: var(--c-coral); border-radius: 999px; padding: 2px 12px; margin-bottom: 8px; }
+.c-miho-say blockquote { margin: 0; font-family: var(--c-round); font-weight: 700; font-size: 17px; line-height: 1.75; color: var(--c-ink); }
+.c-miho-say blockquote::before { content: "“"; display: block; font-size: 40px; line-height: .6; color: var(--c-coral); margin-bottom: 4px; }
+.c-miho-say cite { display: block; font-style: normal; font-size: 12px; color: var(--c-sub); margin-top: 8px; }
+
+/* 脳と心のしくみ（脳科学・発達心理学） */
+.c-brain { background: #f1edf8; border-radius: 22px; padding: 18px 20px; margin: 26px 0; line-height: 1.85; }
+.c-brain .c-box-title::before { content: "🧠"; background: #fff; }
+.c-brain p:last-child { margin-bottom: 0; }
+.c-brain .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 6px; line-height: 1.6; }
+.c-brainfig { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 14px; }
+.c-brainfig > div { background: #fff; border-radius: 16px; padding: 12px; text-align: center; line-height: 1.55; }
+.c-brainfig b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 16px; }
+.c-brainfig .gas b { color: #c45f4c; }
+.c-brainfig .brake b { color: #5a6fb0; }
+.c-brainfig small { display: block; font-size: 12px; color: var(--c-sub); }
+.c-brainfig .grow { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; }
+.c-brainfig .gas .grow { background: var(--c-coral-l); color: #c45f4c; }
+.c-brainfig .brake .grow { background: #e3e8f6; color: #5a6fb0; }
+.c-brainflow { display: grid; gap: 0; text-align: center; font-size: 15px; }
+.c-brainflow .n { background: #fff; border-radius: 14px; padding: 8px 10px; font-weight: 700; }
+.c-brainflow .ar { color: #8a7bb8; line-height: 1.6; }
