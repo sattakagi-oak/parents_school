@@ -1,0 +1,172 @@
+<!--{"path":"column/format-sample/","title":"【フォーマット見本】親の学習塾コラムの部品一覧","description":"親の学習塾コラムで使う部品の見本ページ（公開しない）。","nav":"column","src":"column","date":"2026-11-26","category":"見本","layout":"column","draft":true}-->
+<article class="c-page">
+  <div class="c-article">
+    <p class="c-crumb"><a href="{{root}}">トップ</a> ＞ <a href="{{root}}column/">コラム</a></p>
+
+    <!-- ① 冒頭：イラスト＋カテゴリ＋タイトル＋日付・読了時間＋書いた人 -->
+    <header class="c-hero">
+      <div class="c-hero-illust"><img src="{{root}}images/column/hero-family.svg" alt="" width="400" height="240"></div>
+      <span class="c-chip">声かけ</span>
+      <h1>【見本】ここに記事のタイトルが入ります｜前半に検索されることばを入れる</h1>
+      <div class="c-meta"><span class="c-date">2026年11月26日</span><span class="c-time">読了 {{read_time}}</span></div>
+      <div class="c-byline"><img src="{{root}}images/column/miho-face.jpg" alt="" width="44" height="44"><div><b>みほ先生（高木美保）</b><small>スクールオーク塾長／3人の子どもが全員東大へ</small></div></div>
+    </header>
+
+    <!-- ② 導入：悩みの場面から入る。1段落は2〜3行まで -->
+    <div class="c-lead">
+      <p>夕方、つい強い言い方をしてしまって、寝顔を見ながら落ち込む——。そんな夜はありませんか。</p>
+      <p>この見本ページでは、コラムで使う<span class="c-mark">部品の見え方</span>を確認できます。黄色いマーカーは、いちばん伝えたい一文に1記事2〜3か所だけ使います。</p>
+    </div>
+
+    <!-- ③ この記事でわかること -->
+    <div class="c-learn">
+      <p class="c-learn-title">この記事でわかること</p>
+      <ul>
+        <li>部品1：冒頭のイラストとタイトル</li>
+        <li>部品2：みほ先生と保護者の会話</li>
+        <li>部品3：表・グラフ・図</li>
+      </ul>
+    </div>
+
+    <!-- ④ もくじ（h2 から自動で作られる） -->
+    {{toc}}
+
+    <h2>吹き出しで、悩みと答えを会話にする</h2>
+    <div class="c-talk">
+      <div class="c-talk-who"><img src="{{root}}images/column/parent.svg" alt="" width="60" height="60">保護者</div>
+      <div class="c-talk-body"><p>また怒鳴ってしまいました…。毎回あとで落ち込むんです。</p></div>
+    </div>
+    <div class="c-talk is-right is-miho">
+      <div class="c-talk-who"><img src="{{root}}images/column/miho-face.jpg" alt="" width="60" height="60">みほ先生</div>
+      <div class="c-talk-body"><p>大丈夫ですよ。気づいたときに「言いすぎた、ごめんね」と伝えれば、そこからやり直せます。</p></div>
+    </div>
+    <div class="c-talk">
+      <div class="c-talk-who"><img src="{{root}}images/column/child.svg" alt="" width="60" height="60">子ども</div>
+      <div class="c-talk-body"><p>……べつに。</p></div>
+    </div>
+
+    <h2>声かけは「NG → OK」で見せる</h2>
+    <div class="c-ngok">
+      <div class="ng">「宿題やったの？」<small>やっていない前提に聞こえる</small></div>
+      <div class="arrow">▼</div>
+      <div class="ok">「今日は何時から始める？」<small>始める時間を子どもが決められる</small></div>
+    </div>
+    <div class="c-point">
+      <p class="c-box-title">みほ先生のポイント</p>
+      <p>一度に全部変えなくて大丈夫。いちばんよく言ってしまう一言を、ひとつだけ置きかえてみましょう。</p>
+    </div>
+
+    <h2>表・グラフ・図で、ひと目でわかるようにする</h2>
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図1</span>くらべる図（2列）</p>
+      <div class="c-vs">
+        <div class="a"><b>怒る</b><dl><dt>先にあるもの</dt><dd>もう我慢できない、という自分の気持ち</dd></dl></div>
+        <div class="b"><b>叱る</b><dl><dt>先にあるもの</dt><dd>この子に何を伝えたいか</dd></dl></div>
+      </div>
+    </div>
+
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図2</span>横棒グラフ（数字は出典つきのものだけ）</p>
+      <div class="c-bars">
+        <div><div class="c-bar-label">項目A<b>72%</b></div><div class="c-bar-track"><div class="c-bar-fill is-coral" style="--v:72%"></div></div></div>
+        <div><div class="c-bar-label">項目B<b>48%</b></div><div class="c-bar-track"><div class="c-bar-fill" style="--v:48%"></div></div></div>
+        <div><div class="c-bar-label">項目C<b>25%</b></div><div class="c-bar-track"><div class="c-bar-fill is-leaf" style="--v:25%"></div></div></div>
+      </div>
+      <p class="c-fig-src">※見本のための仮の数字です。実際の記事では、調査名・発表した機関・年を必ず書きます。</p>
+    </div>
+
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図3</span>表（スマホでは縦に並ぶ）</p>
+      <table class="c-table">
+        <thead><tr><th>場面</th><th>つい言う一言</th><th>かわりの一言</th></tr></thead>
+        <tbody>
+          <tr><th>朝</th><td data-label="つい言う一言">早くしなさい！</td><td data-label="かわりの一言">あと何分で出られそう？</td></tr>
+          <tr><th>夕方</th><td data-label="つい言う一言">宿題やったの？</td><td data-label="かわりの一言">今日は何時から始める？</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図4</span>ぐるぐる（悪循環）とその止め方</p>
+      <div class="c-cycle">
+        <div class="n">親が強い言葉で叱る<small>怒鳴る・きつい言い方</small></div><div class="ar">▼</div>
+        <div class="n">子どもが反発する・落ち込む<small>話さなくなる</small></div><div class="ar">▼</div>
+        <div class="n">親がもっとイライラする<small>さらに強い言葉に</small></div>
+        <div class="back">↺ 最初にもどって、くり返す</div>
+        <div class="stop">ここで止める：「ごめんね」＋本当に伝えたかったこと</div>
+      </div>
+    </div>
+
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図5</span>ステップ（やることの順番）</p>
+      <ol class="c-steps">
+        <li><b>「言いすぎた」と気づく</b><small>寝る前でも、次の日でもOK</small></li>
+        <li><b>「さっきは強い言い方をしてごめんね」</b><small>あやまるのは「言い方」</small></li>
+        <li><b>伝えたかったことを、短く伝え直す</b><small>落ち着いた声で</small></li>
+      </ol>
+    </div>
+
+    <div class="c-fig">
+      <p class="c-fig-title"><span>図6</span>4つの個性タイプ</p>
+      <div class="c-types">
+        <div class="t-kodawari"><b>こだわり型</b><p><small>気になるところ</small>どうしてダメだったのか</p></div>
+        <div class="t-kyokan"><b>共感型</b><p><small>気になるところ</small>声の強さや表情</p></div>
+        <div class="t-mokuhyo"><b>目標型</b><p><small>気になるところ</small>次はどうすればいいか</p></div>
+        <div class="t-jiyu"><b>自由型</b><p><small>気になるところ</small>自分で決められる余地があるか</p></div>
+      </div>
+    </div>
+
+    <h2>研究・実例・写真で「なるほど」を足す</h2>
+    <div class="c-research">
+      <p class="c-box-title">研究でわかっていること</p>
+      <p>研究の中身を、むずかしい言葉を使わずに2〜3文で書きます。「〜という結果が出ています」「〜と考えられています」のように、言いすぎない書き方にします。</p>
+      <span class="c-src">出典：著者名（発表年）論文名・雑誌名。本文の最後に一覧も載せる</span>
+    </div>
+    <div class="c-voice">
+      <span class="c-voice-tag">こんな親子がいました</span>
+      <p>実例は、名前・学年など個人がわかることを書かずに紹介します。保護者の方の言葉は、そのまま載せず言いかえます。</p>
+    </div>
+    <figure class="c-photo">
+      <img src="{{root}}images/site/miho-smile.jpg" alt="笑顔で話す高木美保（みほ先生）" width="750" height="1000" loading="lazy">
+      <figcaption>みほ先生（高木美保）</figcaption>
+    </figure>
+    <div class="c-note">
+      <p class="c-box-title">ちょっとひと息</p>
+      <p>うまくいかない日があっても大丈夫、という安心のひと言や、補足を入れる箱です。</p>
+    </div>
+
+    <h2>最後は「やってみる」と「まとめ」</h2>
+    <div class="c-check">
+      <p class="c-box-title" style="font-family:var(--c-round);font-weight:900">わが家でチェックしてみよう</p>
+      <ul>
+        <li>今週、いちばん多く言った一言は？</li>
+        <li>そのとき、本当は何を伝えたかった？</li>
+        <li>子どもは、どこに引っかかっていそう？</li>
+      </ul>
+    </div>
+    <div class="c-summary">
+      <p class="c-summary-title">まとめ</p>
+      <ol>
+        <li>気づいたときに「ごめんね」と伝える</li>
+        <li>「何を伝えたかったか」を考える</li>
+        <li>子どもが何に引っかかったかを聞く</li>
+      </ol>
+    </div>
+
+    <p class="c-refs-title">参考にした研究</p>
+    <ol class="c-refs">
+      <li>著者名（年）. 論文名. 雑誌名, 巻(号), ページ.</li>
+    </ol>
+
+    <div class="c-author">
+      <img src="{{root}}images/site/miho.jpg" alt="高木美保" width="80" height="80">
+      <div><b>この記事を書いた人：高木 美保（みほ先生）</b><p>スクールオーク塾長。シングルで3人の子どもを育て、全員が東大へ。塾長として30年、1,000組以上の親子に寄り添ってきました。国立大学で発達認知学・言語発達学・大脳生理学を専攻。</p></div>
+    </div>
+
+    <div class="c-cta">
+      <p class="c-cta-title">わが家の声かけ、<br>どこから見直す？</p>
+      <p>無料の「親の習慣」チェックリストで、つい言ってしまう一言に気づけます。</p>
+      {{line_button}}
+    </div>
+  </div>
+</article>

@@ -8,6 +8,8 @@
 //   path: 公開パス（トップは ""）／ nav: ヘッダーで現在地にする項目／ src: LINEボタンの入口名（site.js の LINE_URLS）
 //   コラムは追加で "date":"2026-11-01","category":"…"。"draft":true なら noindex・一覧/サイトマップに出さない
 // 本文中の {{root}} はサイトの起点への相対パス（/oya/ 配下でも動くよう、リンクはすべて相対にする）。
+// コラム（"layout":"column"）は assets/column.css を読み込む。本文の {{toc}} は h2 から目次を、
+// {{read_time}} は読了時間（1分＝500字）を作る。書き方は docs/column-format.md。
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -23,6 +25,7 @@ const SITE_NAME = '親の学習塾｜スクールオーク';
 const ver = (f) => createHash('sha1').update(readFileSync(join(ROOT, f))).digest('hex').slice(0, 8);
 const CSS_V = ver('assets/site.css');
 const JS_V = ver('assets/site.js');
+const COL_V = ver('assets/column.css');
 
 const NAV = [
   ['', 'top', 'トップ'],
@@ -59,6 +62,21 @@ function lineButton(root, src, label = '「親の習慣」チェックリスト�
   return `<a class="btn btn-line ${cls}" data-line="${src}" data-cta="${src}-body${ctaSeq}" href="${LINE_URL}">${label}</a>`;
 }
 
+// コラム本文：h2 に番号と id を付け、{{toc}}（目次）と {{read_time}}（読了時間）を差し込む
+function columnize(body) {
+  const heads = [];
+  body = body.replace(/<h2>([\s\S]*?)<\/h2>/g, (_, inner) => {
+    heads.push(inner.replace(/<[^>]+>/g, ''));
+    const n = String(heads.length).padStart(2, '0');
+    return `<h2 id="s${heads.length}"><span class="c-h2-num">${n}</span><span class="c-h2-text">${inner}</span></h2>`;
+  });
+  const toc = `<nav class="c-toc" aria-label="目次"><p class="c-toc-title">もくじ</p><ol>${heads.map((h, i) =>
+    `<li><a href="#s${i + 1}">${h}</a></li>`).join('')}</ol></nav>`;
+  const chars = body.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<svg[\s\S]*?<\/svg>/g, '')
+    .replace(/<[^>]+>/g, '').replace(/\s+/g, '').length;
+  return body.replace('{{toc}}', toc).replace('{{read_time}}', `約${Math.max(1, Math.round(chars / 500))}分`);
+}
+
 function layout({ meta, body }, extra = {}) {
   ctaSeq = 0;
   const root = rootOf(meta.path);
@@ -68,6 +86,8 @@ function layout({ meta, body }, extra = {}) {
   const nav = NAV.map(([p, key, label]) =>
     `<a href="${root}${p}"${meta.nav === key ? ' aria-current="page"' : ''}>${label}</a>`).join('');
   const jsonld = extra.jsonld ? `<script type="application/ld+json">${JSON.stringify(extra.jsonld)}</script>` : '';
+  const isCol = meta.layout === 'column';
+  if (isCol) body = columnize(body);
   const html = body.replaceAll('{{root}}', root).replaceAll('{{line_url}}', LINE_URL)
     .replace(/\{\{line_button(?::([^}|]*))?(?:\|([^}]*))?\}\}/g, (_, src, label) => lineButton(root, src || meta.src, label || undefined))
     .replace('{{column_list}}', extra.columnList || '')
@@ -91,6 +111,9 @@ ${robots}<link rel="canonical" href="${url}">
 <link rel="icon" href="${root}images/PS_logo.png">
 ${GA_SNIPPET}
 <link rel="stylesheet" href="${root}assets/site.css?v=${CSS_V}">
+${isCol ? `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="${root}assets/column.css?v=${COL_V}">` : ''}
 ${jsonld}
 </head>
 <body>

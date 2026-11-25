@@ -180,12 +180,12 @@ h3 { font-size: 20px; }
 .cmp dl { margin: 0; font-size: 14px; line-height: 1.7; }
 .cmp dt { color: var(--sub); font-size: 12px; margin-top: 8px; }
 .cmp dd { margin: 0; font-weight: 700; }
-.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
-.steps li { counter-increment: s; position: relative; padding: 10px 12px 10px 52px; background: var(--sky); border-radius: 12px; margin: 0 0 22px; font-size: 15px; }
-.steps li:last-child { margin-bottom: 0; }
-.steps li::before { content: counter(s); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 900; text-align: center; line-height: 28px; font-size: 14px; }
-.steps li:not(:last-child)::after { content: "▼"; position: absolute; left: 50%; bottom: -20px; transform: translateX(-50%); color: var(--gold2); font-size: 12px; }
-.steps small { display: block; color: var(--sub); font-size: 13px; }
+.fig .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+.fig .steps li { counter-increment: s; position: relative; padding: 10px 12px 10px 52px; background: var(--sky); border-radius: 12px; margin: 0 0 22px; font-size: 15px; }
+.fig .steps li:last-child { margin-bottom: 0; }
+.fig .steps li::before { content: counter(s); position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 900; text-align: center; line-height: 28px; font-size: 14px; }
+.fig .steps li:not(:last-child)::after { content: "▼"; position: absolute; left: 50%; bottom: -20px; transform: translateX(-50%); color: var(--gold2); font-size: 12px; }
+.fig .steps small { display: block; color: var(--sub); font-size: 13px; }
 .ftable { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
 .ftable th, .ftable td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
 .ftable thead th { background: var(--navy); color: #fff; font-size: 13px; }

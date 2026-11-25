@@ -1,0 +1,196 @@
+/* 親の学習塾 コラム用フォーマット（"layout":"column" のページだけ読み込む）
+   使い方・部品の一覧は docs/column-format.md。部品はすべて .c- で始まり、.c-page の中だけで効く。 */
+.c-page {
+  --c-bg: #fdf8f1; --c-paper: #fff; --c-ink: #3d3530; --c-sub: #7a6d63; --c-line: #efe3d3;
+  --c-coral: #e9806e; --c-coral-l: #fde9e3; --c-sun: #f4b860; --c-sun-l: #fff3dc;
+  --c-leaf: #6fae7e; --c-leaf-l: #e6f3e8; --c-sky: #6c9ccf; --c-sky-l: #e8f1fa; --c-navy: #0b254a;
+  --c-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+  background: var(--c-bg); color: var(--c-ink); padding: 28px 0 64px;
+}
+.c-page .c-article { max-width: 720px; margin: 0 auto; padding: 0 18px; font-size: 17px; line-height: 2; letter-spacing: .02em; }
+.c-page p { margin: 0 0 1.4em; }
+.c-page a { color: #c45f4c; }
+.c-page a.btn { color: #fff; }
+.c-page b, .c-page strong { font-weight: 700; }
+.c-page .c-mark { background: linear-gradient(transparent 60%, #ffe08a 60%); font-weight: 700; }
+.c-page img { max-width: 100%; height: auto; display: block; }
+
+/* パンくず・冒頭 */
+.c-crumb { font-size: 13px; color: var(--c-sub); margin-bottom: 14px; }
+.c-crumb a { color: var(--c-sub); }
+.c-hero { background: var(--c-paper); border-radius: 28px; padding: 22px 22px 26px; box-shadow: 0 6px 24px rgba(120, 80, 40, .08); }
+.c-hero-illust { border-radius: 20px; overflow: hidden; margin: 0 0 18px; }
+.c-chip { display: inline-block; font-family: var(--c-round); font-weight: 700; font-size: 13px; color: #fff; background: var(--c-coral); border-radius: 999px; padding: 3px 14px; }
+.c-hero h1 { font-family: var(--c-round); font-weight: 900; font-size: clamp(23px, 5.6vw, 32px); line-height: 1.5; margin: 12px 0 10px; color: var(--c-ink); }
+.c-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--c-sub); }
+.c-meta span::before { margin-right: 4px; }
+.c-meta .c-date::before { content: "📅"; }
+.c-meta .c-time::before { content: "⏱"; }
+.c-byline { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--c-line); font-size: 14px; }
+.c-byline img { width: 44px; height: 44px; border-radius: 50%; }
+.c-byline small { display: block; color: var(--c-sub); font-size: 12px; line-height: 1.5; }
+.c-lead { margin-top: 26px; }
+
+/* この記事でわかること */
+.c-learn { background: var(--c-sun-l); border-radius: 22px; padding: 20px 22px; margin: 26px 0; }
+.c-learn-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; margin: 0 0 8px !important; }
+.c-learn ul { list-style: none; padding: 0; margin: 0; }
+.c-learn li { position: relative; padding-left: 30px; margin: 6px 0; line-height: 1.7; font-weight: 700; }
+.c-learn li::before { content: ""; position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--c-sun) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3L15 7' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+
+/* 目次 */
+.c-toc { background: var(--c-paper); border: 2px solid var(--c-line); border-radius: 22px; padding: 18px 22px; margin: 26px 0 8px; }
+.c-toc-title { font-family: var(--c-round); font-weight: 900; margin: 0 0 6px !important; }
+.c-toc ol { list-style: none; counter-reset: t; padding: 0; margin: 0; }
+.c-toc li { counter-increment: t; position: relative; padding: 6px 0 6px 34px; border-bottom: 1px dashed var(--c-line); line-height: 1.6; font-size: 15px; }
+.c-toc li:last-child { border-bottom: 0; }
+.c-toc li::before { content: counter(t, decimal-leading-zero); position: absolute; left: 0; top: 7px; font-family: var(--c-round); font-weight: 900; color: var(--c-coral); }
+.c-toc a { color: var(--c-ink); text-decoration: none; }
+
+/* 見出し */
+.c-page h2 { display: flex; align-items: flex-start; gap: 12px; font-family: var(--c-round); font-weight: 900; font-size: clamp(20px, 5vw, 25px); line-height: 1.5; margin: 56px 0 20px; padding: 16px 18px; background: var(--c-paper); border-radius: 18px; box-shadow: inset 6px 0 0 var(--c-coral); scroll-margin-top: 80px; }
+.c-h2-num { flex: none; font-size: 14px; color: #fff; background: var(--c-coral); border-radius: 10px; padding: 3px 8px; margin-top: 4px; line-height: 1.4; }
+.c-page h3 { font-family: var(--c-round); font-weight: 700; font-size: 19px; margin: 34px 0 12px; padding-bottom: 6px; border-bottom: 3px dotted var(--c-sun); }
+
+/* 吹き出し（会話） */
+.c-talk { display: flex; gap: 12px; align-items: flex-start; margin: 22px 0; }
+.c-talk.is-right { flex-direction: row-reverse; }
+.c-talk-who { flex: none; width: 60px; text-align: center; font-size: 11px; color: var(--c-sub); line-height: 1.4; }
+.c-talk-who img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); margin-bottom: 4px; }
+.c-talk-body { position: relative; background: var(--c-paper); border: 2px solid var(--c-line); border-radius: 18px; padding: 12px 16px; line-height: 1.8; font-size: 16px; }
+.c-talk-body::before { content: ""; position: absolute; top: 20px; left: -9px; width: 14px; height: 14px; background: inherit; border: inherit; border-width: 0 0 2px 2px; transform: rotate(45deg); }
+.c-talk.is-right .c-talk-body::before { left: auto; right: -9px; border-width: 2px 2px 0 0; }
+.c-talk.is-miho .c-talk-body { background: var(--c-coral-l); border-color: #f6c9bd; }
+.c-talk p { margin: 0 !important; }
+
+/* ポイント・注意・研究 */
+.c-box, .c-point, .c-research, .c-note { border-radius: 20px; padding: 18px 20px 18px 20px; margin: 24px 0; line-height: 1.85; }
+.c-point p:last-child, .c-research p:last-child, .c-note p:last-child { margin-bottom: 0; }
+.c-box-title { display: flex; align-items: center; gap: 8px; font-family: var(--c-round); font-weight: 900; font-size: 16px; margin: 0 0 8px !important; }
+.c-box-title::before { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
+.c-point { background: var(--c-sun-l); }
+.c-point .c-box-title::before { content: "💡"; background: #fff; }
+.c-research { background: var(--c-sky-l); }
+.c-research .c-box-title::before { content: "📖"; background: #fff; }
+.c-research .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 6px; line-height: 1.6; }
+.c-note { background: var(--c-leaf-l); }
+.c-note .c-box-title::before { content: "🌱"; background: #fff; }
+
+/* NG→OK の声かけ */
+.c-ngok { display: grid; gap: 10px; margin: 24px 0; }
+.c-ngok > div { position: relative; border-radius: 18px; padding: 14px 16px 14px 58px; font-weight: 700; line-height: 1.7; }
+.c-ngok > div::before { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; color: #fff; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+.c-ngok .ng { background: #f5efe9; color: var(--c-sub); }
+.c-ngok .ng::before { content: "×"; background: #b9aca1; }
+.c-ngok .ok { background: var(--c-leaf-l); border: 2px solid var(--c-leaf); }
+.c-ngok .ok::before { content: "◯"; background: var(--c-leaf); font-size: 15px; }
+.c-ngok small { display: block; font-weight: 400; font-size: 13px; color: var(--c-sub); }
+.c-ngok .arrow { padding: 0; text-align: center; color: var(--c-coral); font-size: 20px; line-height: 1; }
+.c-ngok .arrow::before { display: none; }
+
+/* 図のわく */
+.c-fig { background: var(--c-paper); border-radius: 22px; padding: 20px 18px; margin: 28px 0; box-shadow: 0 4px 18px rgba(120, 80, 40, .07); }
+.c-fig-title { font-family: var(--c-round); font-weight: 900; font-size: 16px; margin: 0 0 14px !important; display: flex; gap: 8px; align-items: baseline; }
+.c-fig-title span { flex: none; font-size: 12px; color: #fff; background: var(--c-sun); border-radius: 8px; padding: 1px 8px; }
+.c-fig-src { font-size: 12px; color: var(--c-sub); margin: 12px 0 0 !important; line-height: 1.6; }
+
+/* 比べる（2列。スマホでも横並び） */
+.c-vs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.c-vs > div { border-radius: 16px; padding: 14px 12px; text-align: center; }
+.c-vs .a { background: var(--c-coral-l); }
+.c-vs .b { background: var(--c-leaf-l); }
+.c-vs b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 20px; margin-bottom: 4px; }
+.c-vs .a b { color: #c45f4c; }
+.c-vs .b b { color: #3f8a52; }
+.c-vs dl { margin: 0; font-size: 14px; line-height: 1.6; }
+.c-vs dt { font-size: 11px; color: var(--c-sub); margin-top: 10px; }
+.c-vs dd { margin: 2px 0 0; font-weight: 700; }
+
+/* 表（スマホでは縦に並ぶ） */
+.c-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; line-height: 1.6; border-radius: 16px; overflow: hidden; border: 2px solid var(--c-line); }
+.c-table th, .c-table td { padding: 12px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--c-line); }
+.c-table thead th { background: var(--c-sun-l); font-family: var(--c-round); font-weight: 900; font-size: 14px; }
+.c-table tbody th { font-family: var(--c-round); white-space: nowrap; }
+.c-table tr:last-child > * { border-bottom: 0; }
+@media (max-width: 560px) {
+  .c-table thead { display: none; }
+  .c-table, .c-table tbody, .c-table tr, .c-table th, .c-table td { display: block; width: 100%; }
+  .c-table tr { border-bottom: 2px solid var(--c-line); }
+  .c-table tr:last-child { border-bottom: 0; }
+  .c-table tbody th { background: var(--c-sun-l); border-bottom: 0; padding: 10px 14px; }
+  .c-table td { border-bottom: 0; padding: 4px 14px 10px; }
+  .c-table td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; color: var(--c-sub); }
+}
+
+/* 横棒グラフ */
+.c-bars { display: grid; gap: 14px; }
+.c-bar-label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; margin-bottom: 4px; line-height: 1.5; }
+.c-bar-label b { font-family: var(--c-round); font-size: 16px; color: var(--c-ink); }
+.c-bar-track { height: 18px; background: #f3ebe1; border-radius: 999px; overflow: hidden; }
+.c-bar-fill { height: 100%; width: var(--v); border-radius: 999px; background: var(--c-sun); }
+.c-bar-fill.is-coral { background: var(--c-coral); }
+.c-bar-fill.is-leaf { background: var(--c-leaf); }
+.c-bar-fill.is-sky { background: var(--c-sky); }
+
+/* ステップ（縦の流れ） */
+.c-steps { list-style: none; counter-reset: st; padding: 0; margin: 0; }
+.c-steps li { counter-increment: st; position: relative; padding: 0 0 22px 56px; line-height: 1.7; }
+.c-steps li::before { content: counter(st); position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--c-coral); color: #fff; font-family: var(--c-round); font-weight: 900; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.c-steps li:not(:last-child)::after { content: ""; position: absolute; left: 19px; top: 44px; bottom: 4px; width: 2px; background: repeating-linear-gradient(var(--c-coral) 0 4px, transparent 4px 8px); }
+.c-steps li:last-child { padding-bottom: 0; }
+.c-steps b { display: block; font-size: 16px; padding-top: 6px; }
+.c-steps small { display: block; font-size: 14px; color: var(--c-sub); }
+
+/* ぐるぐる（悪循環・よい循環） */
+.c-cycle { display: grid; gap: 0; text-align: center; }
+.c-cycle .n { background: var(--c-coral-l); border-radius: 16px; padding: 10px 12px; font-weight: 700; line-height: 1.6; }
+.c-cycle .n small { display: block; font-weight: 400; font-size: 13px; color: var(--c-sub); }
+.c-cycle .ar { color: var(--c-coral); font-size: 18px; line-height: 1.8; }
+.c-cycle .back { color: #c45f4c; font-family: var(--c-round); font-weight: 700; font-size: 14px; margin: 6px 0 12px; }
+.c-cycle .stop { background: var(--c-leaf); color: #fff; border-radius: 16px; padding: 12px; font-family: var(--c-round); font-weight: 900; line-height: 1.6; }
+
+/* 4つの個性タイプ */
+.c-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.c-types > div { border-radius: 18px; padding: 14px 12px; background: var(--c-paper); border: 2px solid var(--t, var(--c-line)); }
+.c-types .t-kodawari { --t: #6c9ccf; } .c-types .t-kyokan { --t: #e9806e; } .c-types .t-mokuhyo { --t: #f4b860; } .c-types .t-jiyu { --t: #6fae7e; }
+.c-types b { display: inline-block; font-family: var(--c-round); font-weight: 900; color: #fff; background: var(--t); border-radius: 999px; padding: 1px 12px; font-size: 15px; margin-bottom: 8px; }
+.c-types p { font-size: 14px; line-height: 1.7; margin: 0 0 6px !important; }
+.c-types p:last-child { margin: 0 !important; }
+.c-types small { display: block; font-size: 11px; color: var(--c-sub); }
+@media (max-width: 340px) { .c-types { grid-template-columns: 1fr; } }
+
+/* 実例・保護者の声 */
+.c-voice { position: relative; background: var(--c-paper); border-radius: 22px; padding: 22px 20px 18px; margin: 28px 0; border: 2px dashed #f2c7a6; }
+.c-voice-tag { position: absolute; top: -13px; left: 18px; background: var(--c-sun); color: #fff; font-family: var(--c-round); font-weight: 900; font-size: 13px; border-radius: 999px; padding: 2px 14px; }
+.c-voice p:last-child { margin-bottom: 0; }
+
+/* 写真 */
+.c-photo { margin: 28px auto; max-width: 340px; text-align: center; }
+.c-photo img { width: 100%; border-radius: 22px; box-shadow: 0 10px 26px rgba(120, 80, 40, .15); }
+.c-photo figcaption { font-size: 13px; color: var(--c-sub); margin-top: 8px; }
+
+/* チェックリスト（読者がやってみる） */
+.c-check { background: var(--c-paper); border-radius: 22px; padding: 20px; margin: 28px 0; border: 2px solid var(--c-leaf); }
+.c-check ul { list-style: none; padding: 0; margin: 0; }
+.c-check li { position: relative; padding: 8px 0 8px 34px; border-bottom: 1px dashed var(--c-line); line-height: 1.7; }
+.c-check li:last-child { border-bottom: 0; }
+.c-check li::before { content: ""; position: absolute; left: 2px; top: 12px; width: 20px; height: 20px; border: 2px solid var(--c-leaf); border-radius: 6px; background: #fff; }
+
+/* まとめ */
+.c-summary { background: var(--c-paper); border-radius: 26px; padding: 22px 20px; margin: 30px 0; box-shadow: 0 6px 24px rgba(120, 80, 40, .1); border-top: 8px solid var(--c-coral); }
+.c-summary-title { font-family: var(--c-round); font-weight: 900; font-size: 18px; margin: 0 0 10px !important; }
+.c-summary ol { margin: 0; padding-left: 0; list-style: none; counter-reset: sm; }
+.c-summary li { counter-increment: sm; position: relative; padding: 8px 0 8px 40px; font-weight: 700; line-height: 1.7; }
+.c-summary li::before { content: counter(sm); position: absolute; left: 0; top: 8px; width: 28px; height: 28px; border-radius: 50%; background: var(--c-sun); color: #fff; font-family: var(--c-round); font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+
+/* 参考文献・著者・LINE */
+.c-refs { font-size: 13px; color: var(--c-sub); line-height: 1.7; padding-left: 20px; }
+.c-refs li { margin: 6px 0; }
+.c-refs-title { font-family: var(--c-round); font-weight: 700; font-size: 15px; margin: 36px 0 6px !important; }
+.c-author { display: flex; gap: 16px; align-items: flex-start; background: var(--c-paper); border-radius: 24px; padding: 20px; margin: 36px 0 24px; }
+.c-author img { flex: none; width: 80px; height: 80px; border-radius: 50%; }
+.c-author b { font-family: var(--c-round); font-size: 16px; }
+.c-author p { margin: 4px 0 0 !important; font-size: 14px; line-height: 1.8; color: var(--c-sub); }
+.c-cta { background: linear-gradient(160deg, #fff6e9, #fde9e3); border-radius: 28px; padding: 26px 20px; text-align: center; }
+.c-cta-title { font-family: var(--c-round); font-weight: 900; font-size: 20px; margin: 0 0 6px !important; line-height: 1.5; }
+.c-cta p { font-size: 15px; color: var(--c-sub); }
