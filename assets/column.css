@@ -233,3 +233,7 @@
 .c-ig-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; margin: 0 0 4px !important; }
 .c-ig p { font-size: 14px; line-height: 1.7; color: var(--c-sub); margin: 0 0 12px; }
 .c-ig .btn { padding: 10px 20px; font-size: 15px; }
+.c-ig .c-ig-count { font-size: 13px; color: var(--c-sub); margin: 0 0 8px; }
+.c-ig .c-ig-count b { font-family: var(--c-round); font-weight: 900; font-size: 18px; color: #dd2a7b; }
+.c-check .c-check-after { font-size: 14px; color: var(--c-sub); margin: 10px 0 0 !important; }
+.c-ig-title small { display: block; font-family: inherit; font-weight: 400; font-size: 12px; color: var(--c-sub); }
