@@ -62,6 +62,13 @@ function lineButton(root, src, label = '「親の習慣」チェックリスト�
   return `<a class="btn btn-line ${cls}" data-line="${src}" data-cta="${src}-body${ctaSeq}" href="${LINE_URL}">${label}</a>`;
 }
 
+const IG_URL = 'https://www.instagram.com/kanazawa_juku/?openExternalBrowser=1';
+const IG_BLOCK = `<div class="c-ig">
+      <img src="{{root}}images/column/miho-face.jpg" alt="" width="64" height="64">
+      <div><p class="c-ig-title">みほ先生のInstagram</p><p>子育てのヒントや、毎週日曜夜のインスタライブのお知らせを発信しています。</p>
+      <a class="btn btn-ig" href="${IG_URL}" target="_blank" rel="noopener">Instagramを見る</a></div>
+    </div>`;
+
 // コラム本文：h2 に番号と id を付け、{{toc}}（目次）と {{read_time}}（読了時間）を差し込む
 function columnize(body) {
   const heads = [];
@@ -74,7 +81,10 @@ function columnize(body) {
     `<li><a href="#s${i + 1}">${h}</a></li>`).join('')}</ol></nav>`;
   const chars = body.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<svg[\s\S]*?<\/svg>/g, '')
     .replace(/<[^>]+>/g, '').replace(/\s+/g, '').length;
-  return body.replace('{{toc}}', toc).replace('{{read_time}}', `約${Math.max(1, Math.round(chars / 500))}分`);
+  // Instagram への案内は毎回のせる（本文に {{instagram}} が無ければ、記事の最後に自動で足す）
+  if (!body.includes('{{instagram}}')) body = body.replace(/<\/div>\s*<\/article>\s*$/, '{{instagram}}\n  </div>\n</article>\n');
+  return body.replace('{{toc}}', toc).replace('{{instagram}}', IG_BLOCK)
+    .replace('{{read_time}}', `約${Math.max(1, Math.round(chars / 500))}分`);
 }
 
 function layout({ meta, body }, extra = {}) {

@@ -22,7 +22,7 @@
 | 6 | わが家でチェック `.c-check` | 読者が今日やってみることを3つ |
 | 7 | まとめ `.c-summary` | 3つ |
 | 8 | 参考にした研究 `.c-refs` | 研究を書いたときだけ |
-| 9 | 書いた人 `.c-author` → LINE `.c-cta` | 毎回同じ |
+| 9 | 書いた人 `.c-author` → LINE `.c-cta`（`{{line_button}}`）→ Instagram `.c-ig` | 毎回同じ。**LINE と Instagram のリンクは毎回のせる**（2026-11-26 ユーザー）。Instagram の案内はビルドで記事の最後に自動で入る（置き場所を変えたいときは本文に `{{instagram}}`） |
 
 ## 3. 部品の一覧
 

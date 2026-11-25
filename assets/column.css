@@ -226,3 +226,10 @@
 .c-brainflow { display: grid; gap: 0; text-align: center; font-size: 15px; }
 .c-brainflow .n { background: #fff; border-radius: 14px; padding: 8px 10px; font-weight: 700; }
 .c-brainflow .ar { color: #8a7bb8; line-height: 1.6; }
+
+/* Instagram への案内（毎回、記事の最後に自動でのる） */
+.c-ig { display: flex; gap: 14px; align-items: flex-start; background: var(--c-paper); border-radius: 24px; padding: 20px; margin: 20px 0 0; border: 2px solid #f6d3e2; }
+.c-ig img { flex: none; width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 3px #dd2a7b; }
+.c-ig-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; margin: 0 0 4px !important; }
+.c-ig p { font-size: 14px; line-height: 1.7; color: var(--c-sub); margin: 0 0 12px; }
+.c-ig .btn { padding: 10px 20px; font-size: 15px; }
