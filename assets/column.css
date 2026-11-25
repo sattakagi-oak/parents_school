@@ -282,3 +282,5 @@
 .c-order .item:last-child .bar { border-left-color: var(--c-coral); }
 .c-order .bar small { display: block; font-weight: 400; font-size: 12px; color: var(--c-sub); }
 
+.c-refs-wrap { margin-top: 40px; padding-top: 8px; border-top: 1px dashed var(--c-line); }
+.c-refs-wrap .c-refs-title { margin-top: 16px !important; }

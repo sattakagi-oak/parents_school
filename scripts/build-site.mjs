@@ -85,6 +85,9 @@ function columnize(body) {
     .replace(/<[^>]+>/g, '').replace(/\s+/g, '').length;
   // Instagram への案内は毎回のせる（本文に {{instagram}} が無ければ、記事の最後に自動で足す）
   if (!body.includes('{{instagram}}')) body = body.replace(/<\/div>\s*<\/article>\s*$/, '{{instagram}}\n  </div>\n</article>\n');
+  // 「参考にした研究・本」は、本文のどこに書いても記事のいちばん最後（Instagram の案内の後）に移す
+  const refs = body.match(/\s*<p class="c-refs-title">[\s\S]*?<\/ol>/);
+  if (refs) body = body.replace(refs[0], '').replace(/<\/div>\s*<\/article>\s*$/, `\n    <div class="c-refs-wrap">${refs[0]}\n    </div>\n  </div>\n</article>\n`);
   return body.replace('{{toc}}', toc).replace('{{instagram}}', IG_BLOCK)
     .replace('{{read_time}}', `約${Math.max(1, Math.round(chars / 500))}分`);
 }

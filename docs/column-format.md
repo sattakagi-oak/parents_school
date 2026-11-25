@@ -23,8 +23,8 @@
 | 5 | 目次 `{{toc}}` | 見出しは4〜6個 |
 | 6 | 本文（h2 ごと） | **h2 ごとに、図表か吹き出しを最低1つ入れる**（文字だけの h2 を作らない） |
 | 7 | まとめ `.c-summary` | 3つ |
-| 8 | 参考にした研究 `.c-refs` | 研究を書いたときだけ |
-| 9 | 書いた人 `.c-author` → LINE `.c-cta`（`{{line_button}}`）→ Instagram `.c-ig` | 毎回同じ。**LINE と Instagram のリンクは毎回のせる**（2026-11-26 ユーザー）。Instagram の案内（フォロワー数つき。数は scripts/build-site.mjs の IG_FOLLOWERS）はビルドで記事の最後に自動で入る（置き場所を変えたいときは本文に `{{instagram}}`） |
+| 8 | 書いた人 `.c-author` → LINE `.c-cta`（`{{line_button}}`）→ Instagram `.c-ig` | 毎回同じ。**LINE と Instagram のリンクは毎回のせる**（2026-11-26 ユーザー）。Instagram の案内（フォロワー数つき。数は scripts/build-site.mjs の IG_FOLLOWERS）はビルドで記事の最後に自動で入る（置き場所を変えたいときは本文に `{{instagram}}`） |
+| 9 | 参考にした研究・本 `.c-refs` | 研究を書いたときだけ。**記事のいちばん最後**（LINE・Instagram の後）。本文のどこに書いても、ビルドで最後に移る |
 
 ## 3. 部品の一覧
 
