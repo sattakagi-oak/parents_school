@@ -237,3 +237,44 @@
 .c-ig .c-ig-count b { font-family: var(--c-round); font-weight: 900; font-size: 18px; color: #dd2a7b; }
 .c-check .c-check-after { font-size: 14px; color: var(--c-sub); margin: 10px 0 0 !important; }
 .c-ig-title small { display: block; font-family: inherit; font-weight: 400; font-size: 12px; color: var(--c-sub); }
+
+/* 研究カード（数字＋図で見せる） */
+.c-study { background: var(--c-sky-l); border-radius: 22px; padding: 18px 16px; margin: 26px 0; }
+.c-study.is-brain { background: #f1edf8; }
+.c-study-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--c-round); font-weight: 900; font-size: 13px; color: #fff; background: var(--c-sky); border-radius: 999px; padding: 2px 12px; margin: 0 0 8px !important; }
+.c-study.is-brain .c-study-tag { background: #8a7bb8; }
+.c-study-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; line-height: 1.5; margin: 0 0 12px !important; }
+.c-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 12px; }
+.c-stats > div { background: #fff; border-radius: 14px; padding: 10px 6px; text-align: center; line-height: 1.3; }
+.c-stats b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 22px; color: #3f6fa8; }
+.c-study.is-brain .c-stats b { color: #6a5aa6; }
+.c-stats small { font-size: 11px; color: var(--c-sub); }
+.c-study > p { font-size: 15px; line-height: 1.85; margin: 12px 0 0 !important; }
+.c-study .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 8px; line-height: 1.6; }
+
+/* 矢印の図（原因 → 結果） */
+.c-arrows { display: grid; gap: 8px; }
+.c-arrows .row { display: grid; grid-template-columns: 1fr 26px 1fr; align-items: center; gap: 4px; }
+.c-arrows .box { background: #fff; border-radius: 12px; padding: 8px 10px; font-size: 13px; font-weight: 700; line-height: 1.5; text-align: center; }
+.c-arrows .box small { display: block; font-weight: 400; font-size: 11px; color: var(--c-sub); }
+.c-arrows .box.is-bad { background: var(--c-coral-l); }
+.c-arrows .box.is-good { background: var(--c-leaf-l); }
+.c-arrows .to { text-align: center; color: var(--c-sky); font-weight: 900; font-size: 18px; }
+.c-arrows .row-label { font-size: 12px; font-weight: 700; color: var(--c-sub); margin: 4px 0 -2px; }
+
+/* 枝分かれの図（ひとつの関わり方 → いくつかの結果） */
+.c-branch { display: grid; gap: 6px; text-align: center; }
+.c-branch .root { background: var(--c-sky); color: #fff; font-family: var(--c-round); font-weight: 900; border-radius: 14px; padding: 10px; line-height: 1.5; }
+.c-branch .down { color: var(--c-sky); font-weight: 900; line-height: 1; }
+.c-branch .leaves { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.c-branch .leaves div { background: #fff; border-radius: 12px; padding: 8px 4px; font-size: 13px; font-weight: 700; line-height: 1.5; }
+.c-branch .leaves small { display: block; font-weight: 400; font-size: 11px; color: var(--c-sub); }
+
+/* 育つ順番（脳の発達など） */
+.c-order { display: grid; gap: 6px; }
+.c-order .item { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
+.c-order .when { font-family: var(--c-round); font-weight: 900; font-size: 13px; color: #6a5aa6; text-align: right; line-height: 1.3; }
+.c-order .bar { background: #fff; border-radius: 12px; padding: 8px 12px; font-size: 14px; font-weight: 700; line-height: 1.5; border-left: 6px solid #c9bfe6; }
+.c-order .item:last-child .bar { border-left-color: #6a5aa6; }
+.c-order .bar small { display: block; font-weight: 400; font-size: 12px; color: var(--c-sub); }
+
