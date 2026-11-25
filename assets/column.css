@@ -2,8 +2,12 @@
    使い方・部品の一覧は docs/column-format.md。部品はすべて .c- で始まり、.c-page の中だけで効く。 */
 .c-page {
   --c-bg: #fdf8f1; --c-paper: #fff; --c-ink: #3d3530; --c-sub: #7a6d63; --c-line: #efe3d3;
-  --c-coral: #e9806e; --c-coral-l: #fde9e3; --c-sun: #f4b860; --c-sun-l: #fff3dc;
-  --c-leaf: #6fae7e; --c-leaf-l: #e6f3e8; --c-sky: #6c9ccf; --c-sky-l: #e8f1fa; --c-navy: #0b254a;
+  /* 色は「アクセント1色（コーラル）＋ベージュ＋白」だけに絞る（2026-11-26 ユーザー：色を使いすぎ） */
+  --c-coral: #e07a62; --c-coral-l: #fcece6; --c-coral-d: #c45f4c;
+  --c-beige: #f3ece3; --c-gray: #a89c91;
+  --c-sun: var(--c-coral); --c-sun-l: var(--c-beige);
+  --c-leaf: var(--c-coral); --c-leaf-l: var(--c-coral-l);
+  --c-sky: var(--c-coral); --c-sky-l: var(--c-beige); --c-navy: #0b254a;
   --c-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
   background: var(--c-bg); color: var(--c-ink); padding: 28px 0 64px;
 }
@@ -12,7 +16,7 @@
 .c-page a { color: #c45f4c; }
 .c-page a.btn { color: #fff; }
 .c-page b, .c-page strong { font-weight: 700; }
-.c-page .c-mark { background: linear-gradient(transparent 60%, #ffe08a 60%); font-weight: 700; }
+.c-page .c-mark { background: linear-gradient(transparent 62%, #f9d5c8 62%); font-weight: 700; }
 .c-page img { max-width: 100%; height: auto; display: block; }
 
 /* パンくず・冒頭 */
@@ -33,7 +37,7 @@
 .c-lead { margin-top: 26px; }
 
 /* この記事でわかること */
-.c-learn { background: var(--c-sun-l); border-radius: 22px; padding: 20px 22px; margin: 26px 0; }
+.c-learn { background: var(--c-paper); border-radius: 22px; padding: 20px 22px; margin: 26px 0; }
 .c-learn-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; margin: 0 0 8px !important; }
 .c-learn ul { list-style: none; padding: 0; margin: 0; }
 .c-learn li { position: relative; padding-left: 30px; margin: 6px 0; line-height: 1.7; font-weight: 700; }
@@ -59,7 +63,7 @@
 .c-talk-who { flex: none; width: 60px; text-align: center; font-size: 11px; color: var(--c-sub); line-height: 1.4; }
 .c-ava { display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); margin-bottom: 4px; font-family: var(--c-round); font-weight: 900; font-size: 12px; color: #fff; }
 .c-ava.is-parent { background: var(--c-sky); }
-.c-ava.is-child { background: var(--c-leaf); }
+.c-ava.is-child { background: var(--c-gray); }
 .c-talk-who img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); margin-bottom: 4px; }
 .c-talk-body { position: relative; background: var(--c-paper); border: 2px solid var(--c-line); border-radius: 18px; padding: 12px 16px; line-height: 1.8; font-size: 16px; }
 .c-talk-body::before { content: ""; position: absolute; top: 20px; left: -9px; width: 14px; height: 14px; background: inherit; border: inherit; border-width: 0 0 2px 2px; transform: rotate(45deg); }
@@ -72,12 +76,12 @@
 .c-point p:last-child, .c-research p:last-child, .c-note p:last-child { margin-bottom: 0; }
 .c-box-title { display: flex; align-items: center; gap: 8px; font-family: var(--c-round); font-weight: 900; font-size: 16px; margin: 0 0 8px !important; }
 .c-box-title::before { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
-.c-point { background: var(--c-sun-l); }
+.c-point { background: var(--c-paper); box-shadow: inset 5px 0 0 var(--c-coral); }
 .c-point .c-box-title::before { content: "💡"; background: #fff; }
-.c-research { background: var(--c-sky-l); }
+.c-research { background: var(--c-beige); }
 .c-research .c-box-title::before { content: "📖"; background: #fff; }
 .c-research .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 6px; line-height: 1.6; }
-.c-note { background: var(--c-leaf-l); }
+.c-note { background: var(--c-beige); }
 .c-note .c-box-title::before { content: "🌱"; background: #fff; }
 
 /* NG→OK の声かけ */
@@ -85,7 +89,7 @@
 .c-ngok > div { position: relative; border-radius: 18px; padding: 14px 16px 14px 58px; font-weight: 700; line-height: 1.7; }
 .c-ngok > div::before { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; color: #fff; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
 .c-ngok .ng { background: #f5efe9; color: var(--c-sub); }
-.c-ngok .ng::before { content: "×"; background: #b9aca1; }
+.c-ngok .ng::before { content: "×"; background: var(--c-gray); }
 .c-ngok .ok { background: var(--c-leaf-l); border: 2px solid var(--c-leaf); }
 .c-ngok .ok::before { content: "◯"; background: var(--c-leaf); font-size: 15px; }
 .c-ngok small { display: block; font-weight: 400; font-size: 13px; color: var(--c-sub); }
@@ -101,11 +105,11 @@
 /* 比べる（2列。スマホでも横並び） */
 .c-vs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .c-vs > div { border-radius: 16px; padding: 14px 12px; text-align: center; }
-.c-vs .a { background: var(--c-coral-l); }
+.c-vs .a { background: var(--c-beige); }
 .c-vs .b { background: var(--c-leaf-l); }
 .c-vs b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 20px; margin-bottom: 4px; }
-.c-vs .a b { color: #c45f4c; }
-.c-vs .b b { color: #3f8a52; }
+.c-vs .a b { color: #8a7a6e; }
+.c-vs .b b { color: var(--c-coral-d); }
 .c-vs dl { margin: 0; font-size: 14px; line-height: 1.6; }
 .c-vs dt { font-size: 11px; color: var(--c-sub); margin-top: 10px; }
 .c-vs dd { margin: 2px 0 0; font-weight: 700; }
@@ -113,7 +117,7 @@
 /* 表（スマホでは縦に並ぶ） */
 .c-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; line-height: 1.6; border-radius: 16px; overflow: hidden; border: 2px solid var(--c-line); }
 .c-table th, .c-table td { padding: 12px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--c-line); }
-.c-table thead th { background: var(--c-sun-l); font-family: var(--c-round); font-weight: 900; font-size: 14px; }
+.c-table thead th { background: var(--c-beige); font-family: var(--c-round); font-weight: 900; font-size: 14px; }
 .c-table tbody th { font-family: var(--c-round); white-space: nowrap; }
 .c-table tr:last-child > * { border-bottom: 0; }
 @media (max-width: 560px) {
@@ -131,10 +135,10 @@
 .c-bar-label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; margin-bottom: 4px; line-height: 1.5; }
 .c-bar-label b { font-family: var(--c-round); font-size: 16px; color: var(--c-ink); }
 .c-bar-track { height: 18px; background: #f3ebe1; border-radius: 999px; overflow: hidden; }
-.c-bar-fill { height: 100%; width: var(--v); border-radius: 999px; background: var(--c-sun); }
+.c-bar-fill { height: 100%; width: var(--v); border-radius: 999px; background: #e8b4a3; }
 .c-bar-fill.is-coral { background: var(--c-coral); }
-.c-bar-fill.is-leaf { background: var(--c-leaf); }
-.c-bar-fill.is-sky { background: var(--c-sky); }
+.c-bar-fill.is-leaf { background: var(--c-gray); }
+.c-bar-fill.is-sky { background: #d9c8bb; }
 
 /* ステップ（縦の流れ） */
 .c-steps { list-style: none; counter-reset: st; padding: 0; margin: 0; }
@@ -151,12 +155,12 @@
 .c-cycle .n small { display: block; font-weight: 400; font-size: 13px; color: var(--c-sub); }
 .c-cycle .ar { color: var(--c-coral); font-size: 18px; line-height: 1.8; }
 .c-cycle .back { color: #c45f4c; font-family: var(--c-round); font-weight: 700; font-size: 14px; margin: 6px 0 12px; }
-.c-cycle .stop { background: var(--c-leaf); color: #fff; border-radius: 16px; padding: 12px; font-family: var(--c-round); font-weight: 900; line-height: 1.6; }
+.c-cycle .stop { background: var(--c-coral); color: #fff; border-radius: 16px; padding: 12px; font-family: var(--c-round); font-weight: 900; line-height: 1.6; }
 
 /* 4つの個性タイプ */
 .c-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .c-types > div { border-radius: 18px; padding: 14px 12px; background: var(--c-paper); border: 2px solid var(--t, var(--c-line)); }
-.c-types .t-kodawari { --t: #6c9ccf; } .c-types .t-kyokan { --t: #e9806e; } .c-types .t-mokuhyo { --t: #f4b860; } .c-types .t-jiyu { --t: #6fae7e; }
+.c-types > div { --t: var(--c-coral); border-color: var(--c-line); }
 .c-types b { display: inline-block; font-family: var(--c-round); font-weight: 900; color: #fff; background: var(--t); border-radius: 999px; padding: 1px 12px; font-size: 15px; margin-bottom: 8px; }
 .c-types p { font-size: 14px; line-height: 1.7; margin: 0 0 6px !important; }
 .c-types p:last-child { margin: 0 !important; }
@@ -164,13 +168,13 @@
 @media (max-width: 340px) { .c-types { grid-template-columns: 1fr; } }
 
 /* 実例・保護者の声 */
-.c-voice { position: relative; background: var(--c-paper); border-radius: 22px; padding: 22px 20px 18px; margin: 28px 0; border: 2px dashed #f2c7a6; }
+.c-voice { position: relative; background: var(--c-paper); border-radius: 22px; padding: 22px 20px 18px; margin: 28px 0; border: 2px dashed #ecd3c6; }
 .c-voice-tag { position: absolute; top: -13px; left: 18px; background: var(--c-sun); color: #fff; font-family: var(--c-round); font-weight: 900; font-size: 13px; border-radius: 999px; padding: 2px 14px; }
 .c-voice p:last-child { margin-bottom: 0; }
 
 
 /* チェックリスト（読者がやってみる） */
-.c-check { background: var(--c-paper); border-radius: 22px; padding: 20px; margin: 28px 0; border: 2px solid var(--c-leaf); }
+.c-check { background: var(--c-paper); border-radius: 22px; padding: 20px; margin: 28px 0; border: 2px solid var(--c-coral); }
 .c-check ul { list-style: none; padding: 0; margin: 0; }
 .c-check li { position: relative; padding: 8px 0 8px 34px; border-bottom: 1px dashed var(--c-line); line-height: 1.7; }
 .c-check li:last-child { border-bottom: 0; }
@@ -191,12 +195,12 @@
 .c-author img { flex: none; width: 80px; height: 80px; border-radius: 50%; }
 .c-author b { font-family: var(--c-round); font-size: 16px; }
 .c-author p { margin: 4px 0 0 !important; font-size: 14px; line-height: 1.8; color: var(--c-sub); }
-.c-cta { background: linear-gradient(160deg, #fff6e9, #fde9e3); border-radius: 28px; padding: 26px 20px; text-align: center; }
+.c-cta { background: var(--c-beige); border-radius: 28px; padding: 26px 20px; text-align: center; }
 .c-cta-title { font-family: var(--c-round); font-weight: 900; font-size: 20px; margin: 0 0 6px !important; line-height: 1.5; }
 .c-cta p { font-size: 15px; color: var(--c-sub); }
 
 /* みほ先生のひと言（切り抜き写真＋回答の言葉） */
-.c-miho { position: relative; display: grid; grid-template-columns: 40% 1fr; align-items: end; background: linear-gradient(150deg, #fff3dc, #fde9e3); border-radius: 26px; margin: 30px 0; overflow: hidden; min-height: 220px; }
+.c-miho { position: relative; display: grid; grid-template-columns: 40% 1fr; align-items: end; background: var(--c-beige); border-radius: 26px; margin: 30px 0; overflow: hidden; min-height: 220px; }
 .c-miho.is-flip { grid-template-columns: 1fr 40%; }
 .c-miho.is-flip .c-miho-img { order: 2; }
 .c-miho-img { position: relative; align-self: stretch; display: flex; align-items: flex-end; justify-content: center; }
@@ -210,44 +214,44 @@
 .c-miho-say cite { display: block; font-style: normal; font-size: 12px; color: var(--c-sub); margin-top: 8px; }
 
 /* 脳と心のしくみ（脳科学・発達心理学） */
-.c-brain { background: #f1edf8; border-radius: 22px; padding: 18px 20px; margin: 26px 0; line-height: 1.85; }
+.c-brain { background: var(--c-beige); border-radius: 22px; padding: 18px 20px; margin: 26px 0; line-height: 1.85; }
 .c-brain .c-box-title::before { content: "🧠"; background: #fff; }
 .c-brain p:last-child { margin-bottom: 0; }
 .c-brain .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 6px; line-height: 1.6; }
 .c-brainfig { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 14px; }
 .c-brainfig > div { background: #fff; border-radius: 16px; padding: 12px; text-align: center; line-height: 1.55; }
 .c-brainfig b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 16px; }
-.c-brainfig .gas b { color: #c45f4c; }
-.c-brainfig .brake b { color: #5a6fb0; }
+.c-brainfig .gas b { color: var(--c-coral-d); }
+.c-brainfig .brake b { color: #8a7a6e; }
 .c-brainfig small { display: block; font-size: 12px; color: var(--c-sub); }
 .c-brainfig .grow { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; }
-.c-brainfig .gas .grow { background: var(--c-coral-l); color: #c45f4c; }
-.c-brainfig .brake .grow { background: #e3e8f6; color: #5a6fb0; }
+.c-brainfig .gas .grow { background: var(--c-coral-l); color: var(--c-coral-d); }
+.c-brainfig .brake .grow { background: var(--c-beige); color: #8a7a6e; }
 .c-brainflow { display: grid; gap: 0; text-align: center; font-size: 15px; }
 .c-brainflow .n { background: #fff; border-radius: 14px; padding: 8px 10px; font-weight: 700; }
-.c-brainflow .ar { color: #8a7bb8; line-height: 1.6; }
+.c-brainflow .ar { color: var(--c-coral); line-height: 1.6; }
 
 /* Instagram への案内（毎回、記事の最後に自動でのる） */
-.c-ig { display: flex; gap: 14px; align-items: flex-start; background: var(--c-paper); border-radius: 24px; padding: 20px; margin: 20px 0 0; border: 2px solid #f6d3e2; }
-.c-ig img { flex: none; width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 3px #dd2a7b; }
+.c-ig { display: flex; gap: 14px; align-items: flex-start; background: var(--c-paper); border-radius: 24px; padding: 20px; margin: 20px 0 0; border: 2px solid var(--c-line); }
+.c-ig img { flex: none; width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 3px var(--c-coral); }
 .c-ig-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; margin: 0 0 4px !important; }
 .c-ig p { font-size: 14px; line-height: 1.7; color: var(--c-sub); margin: 0 0 12px; }
 .c-ig .btn { padding: 10px 20px; font-size: 15px; }
 .c-ig .c-ig-count { font-size: 13px; color: var(--c-sub); margin: 0 0 8px; }
-.c-ig .c-ig-count b { font-family: var(--c-round); font-weight: 900; font-size: 18px; color: #dd2a7b; }
+.c-ig .c-ig-count b { font-family: var(--c-round); font-weight: 900; font-size: 18px; color: var(--c-coral-d); }
 .c-check .c-check-after { font-size: 14px; color: var(--c-sub); margin: 10px 0 0 !important; }
 .c-ig-title small { display: block; font-family: inherit; font-weight: 400; font-size: 12px; color: var(--c-sub); }
 
 /* 研究カード（数字＋図で見せる） */
 .c-study { background: var(--c-sky-l); border-radius: 22px; padding: 18px 16px; margin: 26px 0; }
-.c-study.is-brain { background: #f1edf8; }
+.c-study.is-brain { background: var(--c-beige); }
 .c-study-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--c-round); font-weight: 900; font-size: 13px; color: #fff; background: var(--c-sky); border-radius: 999px; padding: 2px 12px; margin: 0 0 8px !important; }
-.c-study.is-brain .c-study-tag { background: #8a7bb8; }
+
 .c-study-title { font-family: var(--c-round); font-weight: 900; font-size: 17px; line-height: 1.5; margin: 0 0 12px !important; }
 .c-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 12px; }
 .c-stats > div { background: #fff; border-radius: 14px; padding: 10px 6px; text-align: center; line-height: 1.3; }
-.c-stats b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 22px; color: #3f6fa8; }
-.c-study.is-brain .c-stats b { color: #6a5aa6; }
+.c-stats b { display: block; font-family: var(--c-round); font-weight: 900; font-size: 22px; color: var(--c-coral-d); }
+
 .c-stats small { font-size: 11px; color: var(--c-sub); }
 .c-study > p { font-size: 15px; line-height: 1.85; margin: 12px 0 0 !important; }
 .c-study .c-src { display: block; font-size: 12px; color: var(--c-sub); margin-top: 8px; line-height: 1.6; }
@@ -257,8 +261,8 @@
 .c-arrows .row { display: grid; grid-template-columns: 1fr 26px 1fr; align-items: center; gap: 4px; }
 .c-arrows .box { background: #fff; border-radius: 12px; padding: 8px 10px; font-size: 13px; font-weight: 700; line-height: 1.5; text-align: center; }
 .c-arrows .box small { display: block; font-weight: 400; font-size: 11px; color: var(--c-sub); }
-.c-arrows .box.is-bad { background: var(--c-coral-l); }
-.c-arrows .box.is-good { background: var(--c-leaf-l); }
+.c-arrows .box.is-bad { background: var(--c-beige); }
+.c-arrows .box.is-good { background: var(--c-coral-l); border: 2px solid var(--c-coral); }
 .c-arrows .to { text-align: center; color: var(--c-sky); font-weight: 900; font-size: 18px; }
 .c-arrows .row-label { font-size: 12px; font-weight: 700; color: var(--c-sub); margin: 4px 0 -2px; }
 
@@ -273,8 +277,8 @@
 /* 育つ順番（脳の発達など） */
 .c-order { display: grid; gap: 6px; }
 .c-order .item { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
-.c-order .when { font-family: var(--c-round); font-weight: 900; font-size: 13px; color: #6a5aa6; text-align: right; line-height: 1.3; }
-.c-order .bar { background: #fff; border-radius: 12px; padding: 8px 12px; font-size: 14px; font-weight: 700; line-height: 1.5; border-left: 6px solid #c9bfe6; }
-.c-order .item:last-child .bar { border-left-color: #6a5aa6; }
+.c-order .when { font-family: var(--c-round); font-weight: 900; font-size: 13px; color: var(--c-coral-d); text-align: right; line-height: 1.3; }
+.c-order .bar { background: #fff; border-radius: 12px; padding: 8px 12px; font-size: 14px; font-weight: 700; line-height: 1.5; border-left: 6px solid #ecd3c6; }
+.c-order .item:last-child .bar { border-left-color: var(--c-coral); }
 .c-order .bar small { display: block; font-weight: 400; font-size: 12px; color: var(--c-sub); }
 
