@@ -64,7 +64,7 @@ function lineButton(root, src, label = '「親の習慣」チェックリスト�
 
 const IG_URL = 'https://www.instagram.com/kanazawa_juku/?openExternalBrowser=1';
 // Instagram のフォロワー数（HP の他のページと同じ表記。増えたらここを書きかえる）
-const IG_FOLLOWERS = '1.9万人';
+const IG_FOLLOWERS = '2万人';
 const IG_BLOCK = `<div class="c-ig">
       <img src="{{root}}images/column/miho-face.jpg" alt="" width="64" height="64">
       <div><p class="c-ig-title">みほ先生のInstagram <small>@kanazawa_juku</small></p><p class="c-ig-count">フォロワー <b>${IG_FOLLOWERS}</b></p><p>子育てのヒントや、毎週日曜夜のインスタライブのお知らせを発信しています。</p>
